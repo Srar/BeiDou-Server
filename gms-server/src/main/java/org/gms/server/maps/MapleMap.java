@@ -2805,7 +2805,9 @@ public class MapleMap {
         chrRLock.lock();
         try {
             for (Character c : characters) {
-                if (c != null && c.isAwayFromWorld()) {
+                // Bot 框架：bot 由 BotGeneration 管理生命周期，跳过幽灵判定（其 awayFromWorld
+                // 语义与真实玩家不同，若不跳过会被误杀——双保险，正常路径 setEnteredChannelWorld 已置 false）
+                if (c != null && !BotHelpers.isBotId(c.getId()) && c.isAwayFromWorld()) {
                     ghosts.add(c);
                 }
             }
@@ -3100,6 +3102,12 @@ public class MapleMap {
     }
 
     private void sendObjectPlacement(Client c) {
+        // Bot 框架：无头 botClient 的 player 恒为 null，而各 MapObject.sendSpawnData
+        // 依赖 client.getPlayer()（如 MapItem 的 dropItemFromMapObject）——bot 不需要
+        // 接收地图对象放置包，直接跳过（否则 bot 落到含掉落物的图必 NPE）
+        if (c == null || c.getPlayer() == null) {
+            return;
+        }
         Character chr = c.getPlayer();
         Collection<MapObject> objects;
 

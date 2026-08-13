@@ -31,8 +31,7 @@ public class MakeCharInfo {
     private final Set<Integer> charShoes = new HashSet<>();
     private final Set<Integer> charWeapons = new HashSet<>();
 
-    public MakeCharInfo(Data charInfoData) {
-        for (Data data : charInfoData.getChildren()) {
+    public MakeCharInfo(Data charInfoData) {        for (Data data : charInfoData.getChildren()) {
             switch (data.getName()) {
                 case FACE_ID -> {
                     for (Data faceData : data) {
@@ -112,6 +111,21 @@ public class MakeCharInfo {
 
     public boolean verifyWeaponId(int id) {
         return this.charWeapons.contains(id);
+    }
+
+    /** Bot 框架：合法脸型 id 池（供随机外观选择，避免无效 id 导致客户端崩溃）。 */
+    public Set<Integer> getCharFaces() {
+        return this.charFaces;
+    }
+
+    /** Bot 框架：合法发型 id 池。 */
+    public Set<Integer> getCharHairs() {
+        return this.charHairs;
+    }
+
+    /** Bot 框架：合法肤色 id 池。 */
+    public Set<Integer> getCharSkins() {
+        return this.charSkins;
     }
 
     public boolean verifyCharacter(Character character) {

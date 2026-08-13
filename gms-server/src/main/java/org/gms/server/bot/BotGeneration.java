@@ -2,12 +2,18 @@ package org.gms.server.bot;
 
 import lombok.extern.slf4j.Slf4j;
 import org.gms.client.Character;
+import org.gms.client.SkinColor;
+import org.gms.client.creator.MakeCharInfo;
+import org.gms.client.creator.MakeCharInfoValidator;
 import org.gms.server.maps.MapleMap;
 import org.gms.util.I18nUtil;
 import org.gms.util.PacketCreator;
 import org.gms.util.Randomizer;
 
 import java.awt.Point;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
@@ -56,11 +62,34 @@ public final class BotGeneration {
         baseCharacterSupplier = supplier == null ? BotGeneration::createBaseCharacter : supplier;
     }
 
-    /** 生产实现：内存构造默认角色（level 1 初心者），不复用数据库基底。 */
+    /** 生产实现：内存构造默认角色（level 1 初心者）+ 随机合法外观，不复用数据库基底。 */
     private static Character createBaseCharacter() {
         int world = DefaultBotServerAccess.resolveBotWorld();
         int channel = DefaultBotServerAccess.resolveBotChannel();
-        return Character.getDefault(BotClientHolder.getBotClient(world, channel));
+        Character chr = Character.getDefault(BotClientHolder.getBotClient(world, channel));
+        applyRandomAppearance(chr);
+        return chr;
+    }
+
+    /**
+     * 从 WZ 的 MakeCharInfo 合法池随机取外观。getDefault 的角色 face/hair 为 0，
+     * 该 id 在客户端 WZ 中不存在——spawn 包里的无效外观 id 会直接崩掉 v83 客户端。
+     */
+    private static void applyRandomAppearance(Character chr) {
+        boolean male = Randomizer.nextBoolean();
+        chr.setGender(male ? 0 : 1);
+        MakeCharInfo pool = MakeCharInfoValidator.getAppearancePool(male);
+        chr.setFace(randomPick(pool.getCharFaces(), 20000));
+        chr.setHair(randomPick(pool.getCharHairs(), 30000));
+        chr.setSkinColor(SkinColor.getById(randomPick(pool.getCharSkins(), 0)));
+    }
+
+    private static int randomPick(Set<Integer> pool, int fallback) {
+        if (pool == null || pool.isEmpty()) {
+            return fallback;
+        }
+        List<Integer> list = new ArrayList<>(pool);
+        return list.get(Randomizer.nextInt(list.size()));
     }
 
     /** 本次运行已创建的 bot 总数（诊断/测试用）。 */
@@ -85,11 +114,16 @@ public final class BotGeneration {
         bot.setFame(botId); // 调试标记：fame 值 == botId
         bot.setWorld(world);
         bot.setLevel(Randomizer.rand(10, 40)); // 等级多样性（纯装饰；属性仍是初心者默认值）
+        // 标记已进入频道世界：awayFromWorld 默认 true，不置 false 的话
+        // MapleMap.cleanupGhostPlayers 会把 bot 当「断线未移除的幽灵玩家」误杀
+        bot.setEnteredChannelWorld();
 
         try {
             serverAccess.addBotToServer(bot);      // channel.addPlayer + world 玩家存储
             placeBotOnMap(bot, pos, map);
         } catch (RuntimeException e) {
+            // 先把根因打进日志再回滚重抛——否则线上只会看到回滚警告而无从定位
+            log.error(I18nUtil.getLogMessage("BotGeneration.bot.create.failed", botId), e);
             rollbackRegistration(bot);
             throw e;
         }

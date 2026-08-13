@@ -32,6 +32,14 @@ public class MakeCharInfoValidator {
         };
     }
 
+    /**
+     * Bot 框架：按性别取合法外观池（face/hair/skin 的 WZ 有效 id 集合）。
+     * bot 若用 face=0/hair=0 之类无效 id 生成 spawn 包，客户端会崩溃。
+     */
+    public static MakeCharInfo getAppearancePool(boolean male) {
+        return male ? charMale : charFemale;
+    }
+
     public static boolean isNewCharacterValid(Character character) {
         MakeCharInfo makeCharInfo = getMakeCharInfo(character);
         if (makeCharInfo == null) return false;

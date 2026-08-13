@@ -158,16 +158,30 @@ public final class BotGeneration {
         log.warn(I18nUtil.getLogMessage("BotGeneration.bot.create.rollback", bot.getId()));
     }
 
-    /** 把 bot 放到地图与位置（先摘除旧图登记，无论同图异图，避免重复登记）。 */
+    /**
+     * 把 bot 放到地图与位置（先摘除旧图登记，无论同图异图，避免重复登记）。
+     * <p>
+     * 落地三件套（修复「卡在空中不动」）：
+     * <ol>
+     *   <li>出生坐标修正到脚下地面（portal/传入点可能悬空；下方无 foothold 则保留原坐标）；</li>
+     *   <li>stance 用站立 0（5 是怪物出生姿态，会面向左）；</li>
+     *   <li>落图后补发一次 MOVE_PLAYER 站立包——SPAWN_PLAYER 的进图帧写死
+     *       y-42 + stance=6，客户端只对「有后续移动包」的角色完成落地，
+     *       真实玩家靠客户端自发移动包，bot 没有客户端，必须服务端补发，
+     *       否则先到玩家眼中 bot 永远定格在半空下落帧。</li>
+     * </ol>
+     */
     private static void placeBotOnMap(Character bot, Point pos, MapleMap map) {
         MapleMap current = bot.getMap();
         if (current != null) {
             current.removePlayer(bot);
         }
         bot.setMap(map);
-        bot.setPosition(pos);
-        bot.setStance(5);
+        Point ground = map.getPointBelow(pos);
+        bot.setPosition(ground != null ? ground : pos);
+        bot.setStance(0);
         map.addPlayer(bot);
+        bot.broadcastStance(0);
     }
 
     /**

@@ -168,6 +168,36 @@ class BotGenerationTest {
     }
 
     @Test
+    void createBotGroundsAndStandsBot() {
+        // 回归防线（「卡在空中不动」）：出生坐标必须修正到脚下地面、stance 用站立 0、
+        // 落图后必须补发一次 MOVE_PLAYER 站立包（客户端只对「有后续移动包」的角色
+        // 完成进图落地，bot 无客户端自发移动，不发就永远定格在 y-42 空中帧）
+        Character bot = newBaseCharacter();
+        BotGeneration.setBaseCharacterSupplier(() -> bot);
+        Mockito.when(map.getPointBelow(Mockito.any())).thenReturn(new Point(5, 10));
+
+        BotGeneration.createBot(new Point(3, 7), map);
+
+        Mockito.verify(bot).setPosition(new Point(5, 10));
+        Mockito.verify(bot).setStance(0);
+        Mockito.verify(bot).broadcastStance(0);
+    }
+
+    @Test
+    void createBotKeepsOriginalPositionWhenNoFootholdBelow() {
+        // getPointBelow 在下方无 foothold 时返回 null：保留原坐标，不得回退到 (0,0)
+        Character bot = newBaseCharacter();
+        BotGeneration.setBaseCharacterSupplier(() -> bot);
+        Mockito.when(map.getPointBelow(Mockito.any())).thenReturn(null);
+
+        BotGeneration.createBot(new Point(3, 7), map);
+
+        Mockito.verify(bot).setPosition(new Point(3, 7));
+        Mockito.verify(bot).setStance(0);
+        Mockito.verify(bot).broadcastStance(0);
+    }
+
+    @Test
     void createBotMarksEnteredChannelWorld() {
         // 回归防线：不标记进入频道世界（awayFromWorld 保持 true），
         // MapleMap.cleanupGhostPlayers 会把 bot 当断线幽灵误杀

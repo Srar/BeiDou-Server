@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.gms.client.Character;
 import org.gms.config.GameConfig;
 import org.gms.server.maps.MapleMap;
+import org.gms.server.maps.Portal;
 import org.gms.util.I18nUtil;
 
 import java.awt.Point;
@@ -81,10 +82,13 @@ public final class BotStartupManager {
             log.warn(I18nUtil.getLogMessage("BotStartupManager.map.missing", mapId));
             return;
         }
-        // 用地图随机出生点，避免固定 (0,0) 落在不可行走/悬挂区域
-        Point spawnPoint = map.getRandomSP(0);
-        if (spawnPoint == null) {
-            spawnPoint = new Point(0, 0);
+        // 出生点用玩家出生 portal（getRandomSP 是怪物刷点：无 type="m" 的地图返回 null，
+        // 回退 (0,0) 会把 bot 扔到天空左上角）。portal 坐标可能略高于地面——
+        // BotGeneration.placeBotOnMap 会按 foothold 修正到脚下地面。
+        Point spawnPoint = new Point(0, 0);
+        Portal portal = map.getPortal(0);
+        if (portal != null) {
+            spawnPoint = portal.getPosition();
         }
         int botId = BotGeneration.createBot(spawnPoint, map);
         Character bot = serverAccess.getCharacterById(botId);

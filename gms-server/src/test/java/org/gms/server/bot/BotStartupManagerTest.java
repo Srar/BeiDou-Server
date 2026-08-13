@@ -3,6 +3,7 @@ package org.gms.server.bot;
 import org.gms.client.Character;
 import org.gms.server.bot.event.BotEventBus;
 import org.gms.server.maps.MapleMap;
+import org.gms.server.maps.Portal;
 import org.gms.test.BotTestSupport;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -64,6 +65,7 @@ class BotStartupManagerTest {
 
     private FakeBotServerAccess fakeAccess;
     private MapleMap map;
+    private Character baseCharacter;
 
     @BeforeAll
     static void initSupport() {
@@ -75,7 +77,8 @@ class BotStartupManagerTest {
         fakeAccess = new FakeBotServerAccess();
         BotStartupManager.setServerAccess(fakeAccess);
         BotGeneration.setServerAccess(fakeAccess);
-        BotGeneration.setBaseCharacterSupplier(() -> mock(Character.class));
+        baseCharacter = mock(Character.class);
+        BotGeneration.setBaseCharacterSupplier(() -> baseCharacter);
         map = mock(MapleMap.class);
     }
 
@@ -117,7 +120,6 @@ class BotStartupManagerTest {
 
     @Test
     void spawnOneFullPathRegistersBotAndStarts() {
-        when(map.getRandomSP(0)).thenReturn(new Point(0, 0));
         fakeAccess.map = map;
 
         BotStartupManager.spawnOne(BotTypeManager.BotType.SOCIAL_BOT, 123);
@@ -130,5 +132,30 @@ class BotStartupManagerTest {
         assertEquals(botId, registered.getChr().getId(), "registered bot must carry the created id");
         // manuallyStartBot 首 tick 延迟 2-5s，不会在测试窗口内触发；断言已挂轮盘
         assertTrue(BotTickService.isRegistered(botId), "spawned bot must be registered on the tick wheel");
+    }
+
+    @Test
+    void spawnOneUsesPlayerPortalAsSpawnPoint() {
+        // 回归防线：出生点必须来自玩家出生 portal（getRandomSP 是怪物刷点，无刷点
+        // 地图返回 null 会把 bot 扔到 (0,0) 天空左上角）
+        Portal portal = mock(Portal.class);
+        when(portal.getPosition()).thenReturn(new Point(7, 8));
+        when(map.getPortal(0)).thenReturn(portal);
+        fakeAccess.map = map;
+
+        BotStartupManager.spawnOne(BotTypeManager.BotType.IDLE_BOT, 123);
+
+        // placeBotOnMap 会先按 foothold 修正（getPointBelow 默认 null → 回退 portal 坐标）
+        org.mockito.Mockito.verify(baseCharacter).setPosition(new Point(7, 8));
+    }
+
+    @Test
+    void spawnOneFallsBackToZeroZeroWhenNoPortal() {
+        when(map.getPortal(0)).thenReturn(null);
+        fakeAccess.map = map;
+
+        BotStartupManager.spawnOne(BotTypeManager.BotType.IDLE_BOT, 123);
+
+        org.mockito.Mockito.verify(baseCharacter).setPosition(new Point(0, 0));
     }
 }

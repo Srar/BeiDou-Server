@@ -2641,10 +2641,15 @@ public class MapleMap {
         chr.receivePartyMemberHP();
         // Bot 框架：真实玩家进图时发布 MAP_ENTERED，供同图 bot 拉前下一次 tick（BotMapEntryResponder）。
         // 用区段初筛（isBotId）：bot 自身落图不发布；真实玩家 id 由数据库自增分配，恒在区段之外。
-        if (!BotHelpers.isBotId(chr.getId())) {
+        if (shouldPublishMapEntered(chr)) {
             BotEventBus.getInstance().publish(GameEvent.mapEntered(chr.getWorld(), chr.getClient().getChannel(), mapid, chr.getId()));
         }
         announcePlayerDiseases(chr.getClient());
+    }
+
+    /** Bot 框架：真实玩家进图才发布 MAP_ENTERED（bot 自身落图不发布）。抽出为静态以便单测。 */
+    static boolean shouldPublishMapEntered(Character chr) {
+        return !BotHelpers.isBotId(chr.getId());
     }
 
     private static void announcePlayerDiseases(final Client c) {

@@ -46,9 +46,9 @@ public final class BotGeneration {
     private BotGeneration() {
     }
 
-    /** 测试注入接缝。 */
+    /** 测试注入接缝（传 null 恢复生产默认，与 BotStartupManager.setServerAccess 语义一致）。 */
     static void setServerAccess(BotServerAccess access) {
-        serverAccess = access;
+        serverAccess = access == null ? DefaultBotServerAccess.INSTANCE : access;
     }
 
     /** 测试注入接缝（传 null 恢复生产默认）。 */

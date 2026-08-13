@@ -30,6 +30,13 @@ public final class BotStartupManager {
     private BotStartupManager() {
     }
 
+    private static volatile BotServerAccess serverAccess = DefaultBotServerAccess.INSTANCE;
+
+    /** 测试注入接缝（传 null 恢复生产默认）。 */
+    static void setServerAccess(BotServerAccess access) {
+        serverAccess = access == null ? DefaultBotServerAccess.INSTANCE : access;
+    }
+
     /**
      * 服务器启动完成后调用（挂 ServerManager.run 的 Server.init 之后）。
      * 先注册进图响应订阅者（无论是否开启批量生成），再按配置生成 bot。
@@ -65,10 +72,11 @@ public final class BotStartupManager {
         log.info(I18nUtil.getLogMessage("BotStartupManager.done", count));
     }
 
-    private static void spawnOne(BotTypeManager.BotType type, int mapId) {
+    /** 包私有（测试可直调）：在指定地图生成一个指定类型 bot 并启动。 */
+    static void spawnOne(BotTypeManager.BotType type, int mapId) {
         int world = DefaultBotServerAccess.resolveBotWorld();
         int channel = DefaultBotServerAccess.resolveBotChannel();
-        MapleMap map = DefaultBotServerAccess.INSTANCE.getMap(world, channel, mapId);
+        MapleMap map = serverAccess.getMap(world, channel, mapId);
         if (map == null) {
             log.warn(I18nUtil.getLogMessage("BotStartupManager.map.missing", mapId));
             return;
@@ -79,7 +87,7 @@ public final class BotStartupManager {
             spawnPoint = new Point(0, 0);
         }
         int botId = BotGeneration.createBot(spawnPoint, map);
-        Character bot = DefaultBotServerAccess.INSTANCE.getCharacterById(botId);
+        Character bot = serverAccess.getCharacterById(botId);
         if (bot == null) {
             log.warn(I18nUtil.getLogMessage("BotStartupManager.bot.missing", botId));
             return;

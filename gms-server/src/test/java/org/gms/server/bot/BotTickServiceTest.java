@@ -54,6 +54,7 @@ class BotTickServiceTest {
             sleep(300);
             inTick.decrementAndGet();
         }, 0, 50);
+        BotTickService.setNoThrottle(botId, true); // 免疫 governor 拉伸，防 CI 卡顿静态污染
 
         sleep(1500);
 
@@ -71,6 +72,7 @@ class BotTickServiceTest {
             startTimes.add(System.currentTimeMillis());
             sleep(300);
         }, 0, 300);
+        BotTickService.setNoThrottle(botId, true); // 免疫 governor 拉伸，防 CI 卡顿静态污染
 
         sleep(2500);
         BotTickService.unregister(botId);
@@ -120,6 +122,7 @@ class BotTickServiceTest {
         AtomicInteger second = new AtomicInteger();
 
         BotTickService.register(botId, first::incrementAndGet, 0, 150);
+        BotTickService.setNoThrottle(botId, true); // 免疫 governor 拉伸，防 CI 卡顿静态污染
         sleep(400);
         assertTrue(first.get() >= 1, "original tick never ran");
 
@@ -156,6 +159,7 @@ class BotTickServiceTest {
             attempts.incrementAndGet();
             throw new IllegalStateException("boom");
         }, 0, 100);
+        BotTickService.setNoThrottle(botId, true); // 免疫 governor 拉伸，防 CI 卡顿静态污染
 
         sleep(800);
         assertTrue(attempts.get() >= 3, "tick stopped being dispatched after exceptions, got " + attempts.get());
@@ -177,6 +181,7 @@ class BotTickServiceTest {
                 second.countDown();
             }
         }, 0, 60_000);
+        BotTickService.setNoThrottle(botId, true); // 免疫 governor 拉伸，防 CI 卡顿静态污染
 
         assertTrue(first.await(3, TimeUnit.SECONDS), "first tick never ran");
 
@@ -201,6 +206,7 @@ class BotTickServiceTest {
         int restartId = botId;
 
         BotTickService.register(restartId, ticked::countDown, 0, 100);
+        BotTickService.setNoThrottle(restartId, true); // 免疫 governor 拉伸，防 CI 卡顿静态污染
         assertTrue(ticked.await(3, TimeUnit.SECONDS), "first registration must tick");
 
         // 模拟服务器 in-place 重启：关停复位后，同一 id 可以重新注册并再次 tick
@@ -209,6 +215,7 @@ class BotTickServiceTest {
 
         CountDownLatch second = new CountDownLatch(1);
         BotTickService.register(restartId, second::countDown, 0, 100);
+        BotTickService.setNoThrottle(restartId, true); // shutdown 重建条目：新条目同样免疫拉伸
         assertTrue(second.await(3, TimeUnit.SECONDS), "wheel must work again after shutdown reset");
         BotTickService.unregister(restartId);
     }

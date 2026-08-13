@@ -16,11 +16,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.awt.Point;
+import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.never;
@@ -93,7 +95,10 @@ class SocialBotTest {
         Mockito.when(player.getId()).thenReturn(5); // 真实玩家
         Mockito.when(map.getCharacters()).thenReturn(List.of(player));
 
-        bot.updateState(); // 首次：间隔门控通过（lastAction=0）→ 台词或表情广播一次
+        // 显式注入 nextActionMs=0（到期），消除对字段初值语义的隐式依赖
+        setField(bot, "nextActionMs", 0);
+
+        bot.updateState(); // 到期：观察门槛通过 → 台词或表情广播一次，nextActionMs 掷到未来
         verify(map, times(1)).broadcastMessage(any());
 
         bot.updateState(); // 间隔未到：不再动作
@@ -103,8 +108,9 @@ class SocialBotTest {
     @Test
     void chatEventTriggersReplyOncePerCooldown() {
         // 发布同图真实玩家聊天 → 事件入队 → tick 内应答（冷却窗口内仅一次）。
-        // 注意：地图无真实玩家（getCharacters 为空），主动动作被观察门槛挡住，
-        // 因此这里的 broadcast 全部来自应答——动作间隔门控在本用例中不参与。
+        // 注意：地图无真实玩家（getCharacters 为空），本用例的 broadcast 全部来自应答——
+        // 第一次 updateState 应答后走「本 tick 刚应答过」分支短路（先滚 nextActionMs 再返回，
+        // 未走到观察门槛）；第二次 updateState 冷却内不应答，被动作间隔门控挡住。
         BotEventBus.getInstance().publish(GameEvent.chat(0, 1, MAP_ID, 5, "你好"));
 
         bot.updateState();
@@ -181,5 +187,16 @@ class SocialBotTest {
         bot.stopScheduledTask();
         assertEquals(baseline - 1, BotEventBus.getInstance().subscriberCount(EventType.CHAT),
                 "stopScheduledTask must unsubscribe the bot from the event bus");
+    }
+
+    /** 反射注入时间语义字段（nextActionMs/lastReplyMs）；字段缺失/不可见时 fail 并给出字段名。 */
+    private static void setField(Object target, String name, long value) {
+        try {
+            Field field = target.getClass().getDeclaredField(name);
+            field.setAccessible(true);
+            field.setLong(target, value);
+        } catch (ReflectiveOperationException e) {
+            fail("无法访问时间语义字段 " + name + ": " + e.getMessage());
+        }
     }
 }

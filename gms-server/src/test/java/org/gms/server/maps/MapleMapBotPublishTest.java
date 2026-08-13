@@ -11,7 +11,9 @@ import org.gms.server.bot.event.BotEventBus;
 import org.gms.server.bot.event.EventSubscriber;
 import org.gms.server.bot.event.EventType;
 import org.gms.server.bot.event.GameEvent;
+import org.gms.server.maps.MapObjectType;
 import org.gms.test.BotTestSupport;
+import org.gms.util.PacketCreator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
@@ -161,5 +164,49 @@ class MapleMapBotPublishTest {
         assertEquals(CHANNEL, event.getChannel());
         assertEquals(MAP_ID, event.getMapId());
         assertEquals(42, event.getSourceCharacterId());
+    }
+
+    @Test
+    void ghostCleanupSkipsBots() {
+        // 回归防线：bot 的 awayFromWorld 语义与真实玩家不同，曾被 cleanupGhostPlayers
+        // 当「断线未移除的幽灵玩家」误杀（落图即被移除）。
+        when(chr.getId()).thenReturn(2_000_000_001);
+        when(chr.isAwayFromWorld()).thenReturn(true); // 真实玩家掉线态；bot 不应因此被清
+        map.addPlayer(chr);
+
+        // 真实 Character（getDefault 内存构造，BotTestSupport 已让 GameConfig 可用）：
+        // 第二个玩家进图会对图上 bot 广播 spawn 包，包构造需要完整角色字段，
+        // mock 角色会因 getName()==null 等在 writeString 处 NPE。
+        Character realPlayer = Character.getDefault(botClient);
+        realPlayer.setId(42);
+        realPlayer.setName("RealPlayer42");
+        realPlayer.setMap(map); // 生产路径（登录/换图）在 addPlayer 前由调用方设 map 字段
+
+        // spawn 包构造（addCharEquips）会触达 ItemInformationProvider 单例——其静态初始化
+        // 直连数据库且构造器无法被 Mockito instrument。改为拦截它的上层调用点
+        // PacketCreator.spawnPlayerMapObject（纯静态工具类，无静态初始化依赖）：
+        // 本用例只验证幽灵清理跳过 bot，不关心 spawn 包内容。
+        try (MockedStatic<PacketCreator> pcStatic = Mockito.mockStatic(PacketCreator.class)) {
+            pcStatic.when(() -> PacketCreator.spawnPlayerMapObject(any(), any(), anyBoolean())).thenReturn(null);
+            map.addPlayer(realPlayer); // 触发 cleanupGhostPlayers：bot 必须被跳过
+        }
+
+        assertTrue(map.getCharacters().contains(chr),
+                "bot must survive ghost cleanup even when awayFromWorld is true");
+        assertTrue(map.getCharacters().contains(realPlayer));
+    }
+
+    @Test
+    void sendObjectPlacementSkipsHeadlessClient() {
+        // 回归防线：图上存在掉落物时，sendObjectPlacement 若给无头客户端发送对象放置包，
+        // MapItem.sendSpawnData 内部 client.getPlayer() 为 null 会 NPE 导致 createBot 回滚。
+        MapItem item = Mockito.mock(MapItem.class);
+        when(item.getType()).thenReturn(MapObjectType.ITEM);
+        map.addMapObject(item);
+
+        when(chr.getId()).thenReturn(2_000_000_001);
+        map.addPlayer(chr); // headless botClient：不得触达任何 MapObject.sendSpawnData
+
+        Mockito.verify(item, Mockito.never()).sendSpawnData(any());
     }
 }

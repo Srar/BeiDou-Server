@@ -1,6 +1,7 @@
 package org.gms.server.bot;
 
 import org.gms.client.Character;
+import org.gms.client.SkinColor;
 import org.gms.server.bot.types.IdleBot;
 import org.gms.server.maps.MapleMap;
 import org.gms.test.BotTestSupport;
@@ -8,6 +9,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import java.awt.Point;
@@ -163,6 +165,62 @@ class BotGenerationTest {
 
         assertEquals(1, fakeAccess.addCalls.get());
         assertEquals(1, fakeAccess.removeCalls.get(), "failed registration must be rolled back");
+    }
+
+    @Test
+    void createBotMarksEnteredChannelWorld() {
+        // 回归防线：不标记进入频道世界（awayFromWorld 保持 true），
+        // MapleMap.cleanupGhostPlayers 会把 bot 当断线幽灵误杀
+        Character bot = newBaseCharacter();
+        BotGeneration.setBaseCharacterSupplier(() -> bot);
+
+        BotGeneration.createBot(new Point(0, 0), map);
+
+        Mockito.verify(bot).setEnteredChannelWorld();
+    }
+
+    @Test
+    void applyAppearanceUsesValuesFromPools() {
+        // 回归防线：face/hair=0 是 WZ 中不存在的 id，spawn 包会崩客户端——
+        // 外观必须来自注入的合法池
+        Character bot = newBaseCharacter();
+        Set<Integer> faces = Set.of(20000, 20001, 20002);
+        Set<Integer> hairs = Set.of(30000, 30030);
+        Set<Integer> skins = Set.of(0, 1, 2);
+
+        BotGeneration.applyAppearance(bot, true, faces, hairs, skins);
+
+        Mockito.verify(bot).setGender(0);
+        ArgumentCaptor<Integer> faceCaptor = ArgumentCaptor.forClass(Integer.class);
+        ArgumentCaptor<Integer> hairCaptor = ArgumentCaptor.forClass(Integer.class);
+        ArgumentCaptor<SkinColor> skinCaptor = ArgumentCaptor.forClass(SkinColor.class);
+        Mockito.verify(bot).setFace(faceCaptor.capture());
+        Mockito.verify(bot).setHair(hairCaptor.capture());
+        Mockito.verify(bot).setSkinColor(skinCaptor.capture());
+
+        assertTrue(faces.contains(faceCaptor.getValue()), "face must come from the pool: " + faceCaptor.getValue());
+        assertTrue(hairs.contains(hairCaptor.getValue()), "hair must come from the pool: " + hairCaptor.getValue());
+        assertTrue(skins.contains(skinCaptor.getValue().getId()), "skin must come from the pool");
+    }
+
+    @Test
+    void applyAppearanceFallsBackWhenPoolsEmpty() {
+        Character bot = newBaseCharacter();
+
+        BotGeneration.applyAppearance(bot, false, Set.of(), Set.of(), Set.of());
+
+        Mockito.verify(bot).setGender(1);
+        Mockito.verify(bot).setFace(20000);
+        Mockito.verify(bot).setHair(30000);
+        Mockito.verify(bot).setSkinColor(SkinColor.getById(0));
+    }
+
+    @Test
+    void randomPickFallsBackOnEmptyPool() {
+        assertEquals(20000, BotGeneration.randomPick(Set.of(), 20000));
+        assertEquals(7, BotGeneration.randomPick(null, 7));
+        Set<Integer> pool = Set.of(42);
+        assertEquals(42, BotGeneration.randomPick(pool, 7), "non-empty pool must return its member");
     }
 
     @Test

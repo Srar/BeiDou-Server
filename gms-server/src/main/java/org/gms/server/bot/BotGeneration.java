@@ -77,14 +77,19 @@ public final class BotGeneration {
      */
     private static void applyRandomAppearance(Character chr) {
         boolean male = Randomizer.nextBoolean();
-        chr.setGender(male ? 0 : 1);
         MakeCharInfo pool = MakeCharInfoValidator.getAppearancePool(male);
-        chr.setFace(randomPick(pool.getCharFaces(), 20000));
-        chr.setHair(randomPick(pool.getCharHairs(), 30000));
-        chr.setSkinColor(SkinColor.getById(randomPick(pool.getCharSkins(), 0)));
+        applyAppearance(chr, male, pool.getCharFaces(), pool.getCharHairs(), pool.getCharSkins());
     }
 
-    private static int randomPick(Set<Integer> pool, int fallback) {
+    /** 外观应用（拆出便于单测：注入显式池，测试无需触碰 WZ）。 */
+    static void applyAppearance(Character chr, boolean male, Set<Integer> faces, Set<Integer> hairs, Set<Integer> skins) {
+        chr.setGender(male ? 0 : 1);
+        chr.setFace(randomPick(faces, 20000));
+        chr.setHair(randomPick(hairs, 30000));
+        chr.setSkinColor(SkinColor.getById(randomPick(skins, 0)));
+    }
+
+    static int randomPick(Set<Integer> pool, int fallback) {
         if (pool == null || pool.isEmpty()) {
             return fallback;
         }

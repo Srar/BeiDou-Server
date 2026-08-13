@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.gms.ServerApplication;
 import org.gms.constants.net.ServerConstants;
 import org.gms.net.server.Server;
+import org.gms.server.bot.BotStartupManager;
 import org.gms.util.I18nUtil;
 import org.springdoc.core.properties.SpringDocConfigProperties;
 import org.springdoc.core.properties.SwaggerUiConfigProperties;
@@ -35,6 +36,9 @@ public class ServerManager implements ApplicationContextAware, ApplicationRunner
     @Override
     public void run(ApplicationArguments args) throws Exception {
         Server.getInstance().init();
+
+        // Bot 框架：游戏服就绪后按配置批量生成人工玩家（默认关闭）
+        BotStartupManager.startup();
 
         SpringDocConfigProperties springDocConfigProperties = applicationContext.getBean(SpringDocConfigProperties.class);
         SwaggerUiConfigProperties swaggerUiConfigProperties = applicationContext.getBean(SwaggerUiConfigProperties.class);

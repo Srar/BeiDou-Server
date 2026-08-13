@@ -59,6 +59,7 @@ import org.gms.server.CashShop.CashItemFactory;
 import org.gms.server.SkillbookInformationProvider;
 import org.gms.server.ThreadManager;
 import org.gms.server.TimerManager;
+import org.gms.server.bot.BotTickService;
 import org.gms.server.expeditions.ExpeditionBossLog;
 import org.gms.server.life.PlayerNPC;
 import org.gms.server.quest.Quest;
@@ -1680,6 +1681,9 @@ public class Server {
         ThreadManager.getInstance().stop();
         TimerManager.getInstance().purge();
         TimerManager.getInstance().stop();
+        // Bot 框架：复位中央 tick 轮（TimerManager 已 shutdownNow，旧 driver 被取消；
+        // 不复位 DRIVER_STARTED/ENTRIES 的话，重启后 bot 将注册成功但永不 tick）
+        BotTickService.shutdown();
         loginServer.stop();
         online = false;
         log.info(I18nUtil.getLogMessage("Server.shutdownInternal.info4"));

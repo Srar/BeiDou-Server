@@ -101,6 +101,10 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Predicate;
 
+import org.gms.server.bot.BotHelpers;
+import org.gms.server.bot.event.BotEventBus;
+import org.gms.server.bot.event.GameEvent;
+
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -2635,6 +2639,11 @@ public class MapleMap {
         }
 
         chr.receivePartyMemberHP();
+        // Bot 框架：真实玩家进图时发布 MAP_ENTERED，供同图 bot 拉前下一次 tick（BotMapEntryResponder）。
+        // 用区段初筛（isBotId）：bot 自身落图不发布；真实玩家 id 由数据库自增分配，恒在区段之外。
+        if (!BotHelpers.isBotId(chr.getId())) {
+            BotEventBus.getInstance().publish(GameEvent.mapEntered(chr.getWorld(), chr.getClient().getChannel(), mapid, chr.getId()));
+        }
         announcePlayerDiseases(chr.getClient());
     }
 

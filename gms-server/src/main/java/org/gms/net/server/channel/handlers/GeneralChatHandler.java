@@ -27,6 +27,8 @@ import org.gms.client.autoban.AutobanFactory;
 import org.gms.client.command.CommandsExecutor;
 import org.gms.net.AbstractPacketHandler;
 import org.gms.net.packet.InPacket;
+import org.gms.server.bot.event.BotEventBus;
+import org.gms.server.bot.event.GameEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.gms.server.ChatLogger;
@@ -68,6 +70,13 @@ public final class GeneralChatHandler extends AbstractPacketHandler {
             }
 
             chr.getAutoBanManager().spam(7);
+
+            // Bot 框架：非隐藏玩家的聊天发布 CHAT 事件，供同图 bot 在自身 tick 内应答。
+            // 放在 spam(7) 之后：订阅者异常（理论上总线契约禁止）也不会跳过反刷屏计数。
+            // 隐身 GM 的发言只对 GM 可见，不进 bot 事件流（否则 bot 公开应答会暴露 GM 隐身）。
+            if (!chr.isHidden()) {
+                BotEventBus.getInstance().publish(GameEvent.chat(chr.getWorld(), chr.getClient().getChannel(), chr.getMapId(), chr.getId(), s));
+            }
         }
     }
 }

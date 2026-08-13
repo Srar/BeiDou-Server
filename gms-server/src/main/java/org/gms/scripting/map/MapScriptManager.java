@@ -47,6 +47,11 @@ public class MapScriptManager extends AbstractScriptManager {
     }
 
     public boolean runMapScript(Client c, String mapScriptPath, boolean firstUser) {
+        // Bot 框架：无头 botClient 没有 player（共享 client、player 恒为 null），
+        // 直接跳过地图脚本——否则空图首个 bot 进入必在下方 chr.getMapId() 处 NPE。
+        if (c == null || c.getPlayer() == null) {
+            return false;
+        }
         if (firstUser) {
             Character chr = c.getPlayer();
             int mapid = chr.getMapId();

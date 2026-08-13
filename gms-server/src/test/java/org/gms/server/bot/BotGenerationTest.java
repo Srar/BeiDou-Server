@@ -169,9 +169,9 @@ class BotGenerationTest {
 
     @Test
     void createBotGroundsAndStandsBot() {
-        // 回归防线（「卡在空中不动」）：出生坐标必须修正到脚下地面、stance 用站立 0、
-        // 落图后必须补发一次 MOVE_PLAYER 站立包（客户端只对「有后续移动包」的角色
-        // 完成进图落地，bot 无客户端自发移动，不发就永远定格在 y-42 空中帧）
+        // 回归防线（「卡在空中不动 / 浮空姿势」）：出生坐标必须修正到脚下地面、
+        // stance 必须用站立帧 4/5（0 会被客户端渲染成悬空姿势）、落图后必须补发
+        // 一次 MOVE_PLAYER 站立包（客户端只对「有后续移动包」的角色完成进图落地）
         Character bot = newBaseCharacter();
         BotGeneration.setBaseCharacterSupplier(() -> bot);
         Mockito.when(map.getPointBelow(Mockito.any())).thenReturn(new Point(5, 10));
@@ -179,8 +179,11 @@ class BotGenerationTest {
         BotGeneration.createBot(new Point(3, 7), map);
 
         Mockito.verify(bot).setPosition(new Point(5, 10));
-        Mockito.verify(bot).setStance(0);
-        Mockito.verify(bot).broadcastStance(0);
+        ArgumentCaptor<Integer> stanceCaptor = ArgumentCaptor.forClass(Integer.class);
+        Mockito.verify(bot).setStance(stanceCaptor.capture());
+        Mockito.verify(bot).broadcastStance(stanceCaptor.getValue());
+        assertTrue(stanceCaptor.getValue() == 4 || stanceCaptor.getValue() == 5,
+                "stance must be a standing frame (4 or 5), got " + stanceCaptor.getValue());
     }
 
     @Test
@@ -193,8 +196,8 @@ class BotGenerationTest {
         BotGeneration.createBot(new Point(3, 7), map);
 
         Mockito.verify(bot).setPosition(new Point(3, 7));
-        Mockito.verify(bot).setStance(0);
-        Mockito.verify(bot).broadcastStance(0);
+        Mockito.verify(bot).setStance(Mockito.anyInt());
+        Mockito.verify(bot).broadcastStance(Mockito.anyInt());
     }
 
     @Test

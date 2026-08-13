@@ -5,3 +5,7 @@ logs
 src/main/resources/static
 docker-db-data
 .idea
+
+# 部署文件（本地运行配置与捆绑 JRE，不入库）
+application.yml
+jdk-21.0.11+10-jre/

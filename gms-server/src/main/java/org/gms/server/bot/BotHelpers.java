@@ -1,9 +1,12 @@
 package org.gms.server.bot;
 
 import org.gms.client.Character;
+import org.gms.server.maps.MapleMap;
 import org.gms.util.I18nUtil;
 import org.gms.util.Randomizer;
 
+import java.awt.Point;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -17,6 +20,9 @@ public final class BotHelpers {
      * 保证真实玩家 ID 与 bot ID 空间不发生碰撞（与 SoloMapling 的 20000 约定同构，但拉高区段）。
      */
     public static final int BOT_BASE_ID = 2_000_000_000;
+
+    /** 批量出生点之间的最小水平间距（与 SoloMapling BotSpotPicker.MIN_SPACING 对齐）。 */
+    private static final int MIN_SPACING = 30;
 
     private static final String NAME_POOL_KEY = "bot.name.pool";
 
@@ -66,5 +72,56 @@ public final class BotHelpers {
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
                 .toList();
+    }
+
+    /**
+     * 批量出生点选择（参考 SoloMapling 的 BotSpotPicker.pickGroundSpots 语义，
+     * 无导航图版）：以 anchor（出生 portal）为中心沿 X 均匀分桶，桶内随机抖动，
+     * 每个候选点经 {@link MapleMap#getPointBelow} 修正到脚下地面，并保证点间
+     * 最小水平间距——避免批量生成的 bot 全部挤在同一个 portal 出生点上。
+     * 某桶拿不到合法地面点时回退 anchor 地面点（尽力而为）。
+     */
+    public static List<Point> pickGroundSpots(MapleMap map, Point anchor, int count) {
+        List<Point> out = new ArrayList<>();
+        if (map == null || anchor == null || count <= 0) {
+            return out;
+        }
+        int spread = Math.max(400, count * 50);
+        int lo = anchor.x - spread / 2;
+        int hi = anchor.x + spread / 2;
+        for (int i = 0; i < count; i++) {
+            int bucketLo = lo + (hi - lo) * i / count;
+            int bucketHi = lo + (hi - lo) * (i + 1) / count;
+            out.add(pickInBucket(map, anchor, bucketLo, bucketHi, out));
+        }
+        return out;
+    }
+
+    private static Point pickInBucket(MapleMap map, Point anchor, int bucketLo, int bucketHi, List<Point> taken) {
+        // 桶中心 + 受限抖动：相邻桶中心的距离 ≥ 桶宽，抖动半径收窄后理论上保证 MIN_SPACING
+        int center = (bucketLo + bucketHi) / 2;
+        int radius = Math.max(0, (bucketHi - bucketLo) / 2 - MIN_SPACING / 2);
+        for (int attempt = 0; attempt < 12; attempt++) {
+            int x = center + (radius > 0 ? Randomizer.nextInt(2 * radius + 1) - radius : 0);
+            Point ground = map.getPointBelow(new Point(x, anchor.y));
+            if (ground == null) {
+                continue;
+            }
+            if (overlaps(ground, taken)) {
+                continue;
+            }
+            return ground;
+        }
+        Point fallback = map.getPointBelow(anchor);
+        return fallback != null ? fallback : new Point(anchor);
+    }
+
+    private static boolean overlaps(Point p, List<Point> taken) {
+        for (Point q : taken) {
+            if (Math.abs(p.x - q.x) < MIN_SPACING && Math.abs(p.y - q.y) < MIN_SPACING) {
+                return true;
+            }
+        }
+        return false;
     }
 }

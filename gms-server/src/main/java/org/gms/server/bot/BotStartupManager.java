@@ -9,7 +9,9 @@ import org.gms.util.I18nUtil;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 启动编排（对应 SoloMapling 环境启动的简化版）：按 game_config 配置在服务器
@@ -66,29 +68,39 @@ public final class BotStartupManager {
         BotTypeManager.BotType type = parseType(typeName);
 
         log.info(I18nUtil.getLogMessage("BotStartupManager.spawning", count, maps, typeName));
+        // 每张图预生成分散的出生点（以玩家出生 portal 为锚点沿 X 分桶随机 + 地面修正），
+        // 避免批量 bot 全部挤在同一个 portal 出生点上（参考 SoloMapling BotSpotPicker）
+        Map<Integer, List<Point>> spotsByMap = new HashMap<>();
+        for (int mapId : maps) {
+            MapleMap map = serverAccess.getMap(DefaultBotServerAccess.resolveBotWorld(),
+                    DefaultBotServerAccess.resolveBotChannel(), mapId);
+            if (map == null) {
+                continue;
+            }
+            Point anchor = new Point(0, 0);
+            Portal portal = map.getPortal(0);
+            if (portal != null) {
+                anchor = portal.getPosition();
+            }
+            spotsByMap.put(mapId, BotHelpers.pickGroundSpots(map, anchor, count));
+        }
         for (int i = 0; i < count; i++) {
             int mapId = maps.get(i % maps.size());
-            BotTiming.after((long) i * STAGGER_MS, () -> spawnOne(type, mapId));
+            List<Point> spots = spotsByMap.getOrDefault(mapId, List.of());
+            Point spot = spots.isEmpty() ? new Point(0, 0) : spots.get(Math.min(i / maps.size(), spots.size() - 1));
+            BotTiming.after((long) i * STAGGER_MS, () -> spawnOne(type, mapId, spot));
         }
         log.info(I18nUtil.getLogMessage("BotStartupManager.done", count));
     }
 
-    /** 包私有（测试可直调）：在指定地图生成一个指定类型 bot 并启动。 */
-    static void spawnOne(BotTypeManager.BotType type, int mapId) {
+    /** 包私有（测试可直调）：在指定地图的指定出生点生成一个指定类型 bot 并启动。 */
+    static void spawnOne(BotTypeManager.BotType type, int mapId, Point spawnPoint) {
         int world = DefaultBotServerAccess.resolveBotWorld();
         int channel = DefaultBotServerAccess.resolveBotChannel();
         MapleMap map = serverAccess.getMap(world, channel, mapId);
         if (map == null) {
             log.warn(I18nUtil.getLogMessage("BotStartupManager.map.missing", mapId));
             return;
-        }
-        // 出生点用玩家出生 portal（getRandomSP 是怪物刷点：无 type="m" 的地图返回 null，
-        // 回退 (0,0) 会把 bot 扔到天空左上角）。portal 坐标可能略高于地面——
-        // BotGeneration.placeBotOnMap 会按 foothold 修正到脚下地面。
-        Point spawnPoint = new Point(0, 0);
-        Portal portal = map.getPortal(0);
-        if (portal != null) {
-            spawnPoint = portal.getPosition();
         }
         int botId = BotGeneration.createBot(spawnPoint, map);
         Character bot = serverAccess.getCharacterById(botId);

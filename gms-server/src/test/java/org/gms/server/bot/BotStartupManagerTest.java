@@ -3,7 +3,6 @@ package org.gms.server.bot;
 import org.gms.client.Character;
 import org.gms.server.bot.event.BotEventBus;
 import org.gms.server.maps.MapleMap;
-import org.gms.server.maps.Portal;
 import org.gms.test.BotTestSupport;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -113,7 +112,7 @@ class BotStartupManagerTest {
     void spawnOneSkipsMissingMap() {
         fakeAccess.map = null;
 
-        BotStartupManager.spawnOne(BotTypeManager.BotType.SOCIAL_BOT, 123);
+        BotStartupManager.spawnOne(BotTypeManager.BotType.SOCIAL_BOT, 123, new Point(7, 8));
 
         assertEquals(0, fakeAccess.addCalls.get(), "missing map must abort spawn before registration");
     }
@@ -122,7 +121,7 @@ class BotStartupManagerTest {
     void spawnOneFullPathRegistersBotAndStarts() {
         fakeAccess.map = map;
 
-        BotStartupManager.spawnOne(BotTypeManager.BotType.SOCIAL_BOT, 123);
+        BotStartupManager.spawnOne(BotTypeManager.BotType.SOCIAL_BOT, 123, new Point(7, 8));
 
         assertEquals(1, fakeAccess.addCalls.get(), "spawn must register the bot exactly once");
         int botId = fakeAccess.lastRequestedId.get();
@@ -135,27 +134,13 @@ class BotStartupManagerTest {
     }
 
     @Test
-    void spawnOneUsesPlayerPortalAsSpawnPoint() {
-        // 回归防线：出生点必须来自玩家出生 portal（getRandomSP 是怪物刷点，无刷点
-        // 地图返回 null 会把 bot 扔到 (0,0) 天空左上角）
-        Portal portal = mock(Portal.class);
-        when(portal.getPosition()).thenReturn(new Point(7, 8));
-        when(map.getPortal(0)).thenReturn(portal);
+    void spawnOnePassesGivenSpawnPointThrough() {
+        // 回归防线：出生点由调用方（startupInternal 预生成的分散点位）传入，
+        // spawnOne 必须原样交给 createBot（经 placeBotOnMap 地面修正，getPointBelow 默认 null → 回退原坐标）
         fakeAccess.map = map;
 
-        BotStartupManager.spawnOne(BotTypeManager.BotType.IDLE_BOT, 123);
+        BotStartupManager.spawnOne(BotTypeManager.BotType.IDLE_BOT, 123, new Point(7, 8));
 
-        // placeBotOnMap 会先按 foothold 修正（getPointBelow 默认 null → 回退 portal 坐标）
         org.mockito.Mockito.verify(baseCharacter).setPosition(new Point(7, 8));
-    }
-
-    @Test
-    void spawnOneFallsBackToZeroZeroWhenNoPortal() {
-        when(map.getPortal(0)).thenReturn(null);
-        fakeAccess.map = map;
-
-        BotStartupManager.spawnOne(BotTypeManager.BotType.IDLE_BOT, 123);
-
-        org.mockito.Mockito.verify(baseCharacter).setPosition(new Point(0, 0));
     }
 }

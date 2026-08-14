@@ -2,6 +2,7 @@ package org.gms.server.bot;
 
 import org.gms.client.Character;
 import org.gms.server.bot.types.IdleBot;
+import org.gms.server.maps.MapleMap;
 import org.gms.test.BotTestSupport;
 import org.gms.util.I18nUtil;
 import org.junit.jupiter.api.AfterEach;
@@ -9,10 +10,13 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.awt.Point;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -86,5 +90,49 @@ class BotHelpersTest {
             assertFalse(name.isBlank(), "generated name must not be blank");
             assertTrue(poolNames.contains(name), "generated name not from pool: " + name);
         }
+    }
+
+    @Test
+    void pickGroundSpotsSpreadsBatchAcrossX() {
+        // 回归防线（「批量 bot 都站在一起」）：出生点必须沿 X 分散且保持最小间距，
+        // 每个点经 getPointBelow 修正到地面（mock：地面 Y 恒为 100）
+        MapleMap map = Mockito.mock(MapleMap.class);
+        Mockito.when(map.getPointBelow(Mockito.any())).thenAnswer(inv -> new Point(
+                ((Point) inv.getArgument(0)).x, 100));
+
+        List<Point> spots = BotHelpers.pickGroundSpots(map, new Point(0, 100), 10);
+
+        assertEquals(10, spots.size());
+        for (Point spot : spots) {
+            assertEquals(100, spot.y, "every spot must be grounded via getPointBelow");
+        }
+        for (int i = 0; i < spots.size(); i++) {
+            for (int j = i + 1; j < spots.size(); j++) {
+                assertTrue(Math.abs(spots.get(i).x - spots.get(j).x) >= 20,
+                        "spots must keep horizontal spacing, got " + spots.get(i) + " vs " + spots.get(j));
+            }
+        }
+    }
+
+    @Test
+    void pickGroundSpotsFallsBackToAnchorWhenNoFoothold() {
+        MapleMap map = Mockito.mock(MapleMap.class);
+        Mockito.when(map.getPointBelow(Mockito.any())).thenReturn(null);
+
+        List<Point> spots = BotHelpers.pickGroundSpots(map, new Point(50, 60), 5);
+
+        assertEquals(5, spots.size());
+        for (Point spot : spots) {
+            assertEquals(new Point(50, 60), spot,
+                    "without footholds every spot must fall back to the anchor");
+        }
+    }
+
+    @Test
+    void pickGroundSpotsHandlesDegenerateInputs() {
+        MapleMap map = Mockito.mock(MapleMap.class);
+        assertTrue(BotHelpers.pickGroundSpots(null, new Point(0, 0), 3).isEmpty());
+        assertTrue(BotHelpers.pickGroundSpots(map, null, 3).isEmpty());
+        assertTrue(BotHelpers.pickGroundSpots(map, new Point(0, 0), 0).isEmpty());
     }
 }

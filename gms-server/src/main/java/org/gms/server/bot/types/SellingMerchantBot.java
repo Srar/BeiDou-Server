@@ -144,8 +144,8 @@ public class SellingMerchantBot extends BotSM {
     // band-aid (recorded paths piling bots onto fixed endpoints) is no longer needed here.
     private boolean tryPlatformShuffleWhileAdvertising() {
         // gms 移植：源按平台聚合点换位（PlatformPlacement.botMoveToPlatformAnyUnoccupiedSpotDynamic /
-        // getCurrentPlatform / getMainPlatformIds）。gms 未移植 PlatformPlacement，保留原概率分支，
-        // 落地为 gcmove 随机小幅踱步。TODO(PlatformPlacement)：落地后恢复按平台/主平台聚合点换位。
+        // getCurrentPlatform / getMainPlatformIds）。PlatformPlacement 已移植
+        // （org.gms.server.bot.environment.platform）但换位 API 未接线，本类用 gcmove 踱步等价替代。
         if (rollChanceInverse(10)) {
             nudgeRandomly();
             return true;

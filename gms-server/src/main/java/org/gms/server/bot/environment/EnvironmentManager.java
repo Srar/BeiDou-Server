@@ -19,6 +19,9 @@ import org.gms.server.bot.decorate.BotDecorate;
 import org.gms.server.bot.decorate.BotDecorationQueue;
 import org.gms.server.bot.decorate.BotEquipChecker;
 import org.gms.server.bot.dialogue.ConversationManager;
+import org.gms.server.bot.environment.platform.Platform;
+import org.gms.server.bot.environment.platform.PlatformParser;
+import org.gms.server.bot.environment.platform.PlatformSpawner;
 import org.gms.server.bot.gcmove.GCMovement;
 import org.gms.server.bot.grind.BotSpotPicker;
 import org.gms.server.bot.social.SocialHotPotatoManager;
@@ -27,6 +30,8 @@ import org.gms.server.bot.town.TownPresenceSampler;
 import org.gms.server.bot.types.blackjack.BlackjackDealerBot;
 import org.gms.server.life.LifeFactory;
 import org.gms.server.life.NPC;
+import org.gms.server.maps.Foothold;
+import org.gms.server.maps.FootholdTree;
 import org.gms.server.maps.MapleMap;
 import org.gms.server.maps.Portal;
 import org.gms.util.PacketCreator;
@@ -35,6 +40,8 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -43,12 +50,13 @@ import java.util.stream.Collectors;
 /**
  * 可手动触发的环境生成器（对应 SoloMapling EnvironmentManager 的移植）。
  * <p>
- * 注意：本类<b>不</b>接入 gms 的 {@code ServerManager} 启动链，也不改动
- * {@link org.gms.server.bot.BotStartupManager} 现状——仅由 GM 命令
- * {@code !env loadenv} 与各 {@code !env spawn*} 子命令手动触发。
- * 9 波启动编排逐波对齐源实现；依赖的平台系统（PlatformPlacement / CSV）在 gms
- * 未移植，此处用 {@link BotHelpers#pickGroundSpots} / {@link BotSpotPicker}
- * 等已落地等价物替代，平台级查询类功能以 TODO 保留。
+ * 环境模式由 {@link org.gms.server.bot.BotStartupManager}（spawn_on_startup=true）自动触发，
+ * 也可由 GM 命令 {@code !env loadenv} 与各 {@code !env spawn*} 子命令手动触发
+ * （防重复 guard 见 {@link #ENV_LOADED}）。
+ * 9 波启动编排逐波对齐源实现；平台系统已移植（PlatformPlacement / PlatformParser /
+ * PlatformSpawner / Platform，CSV 位于 jar 内 src/main/resources/movementDataPackets/），
+ * spawn 路径平台优先 + 地面回退；平台级查询（getCurrentPlatform 等）由
+ * {@link org.gms.server.bot.environment.platform.PlatformPlacement} 提供。
  */
 @Slf4j
 public final class EnvironmentManager {
@@ -450,9 +458,55 @@ public final class EnvironmentManager {
         }
     }
 
-    // gms 未移植 FreeMarket 房间人口（ArtificialFreeMarket.populateFreeMarketRegion）。保留调用点以对齐 9 波结构。
+    // FM 房间 mapId 表（源自 SoloMapling FMShopInfoManager 各 region 房间列表；
+    // 坐标表不移植，gms 侧以平台撒点替代；perion/elnath 房间无平台 CSV，自动地面回退）。
+    private static final Map<String, int[]> FM_ROOM_MAP_IDS = Map.of(
+            "henesys", new int[]{910000001, 910000002, 910000003, 910000004, 910000005, 910000006},
+            "ludi", new int[]{910000007, 910000008, 910000009, 910000010, 910000011, 910000012},
+            "perion", new int[]{910000013, 910000014, 910000015, 910000016, 910000017},
+            "elnath", new int[]{910000018, 910000019, 910000020, 910000021, 910000022}
+    );
+
+    // 对应源 ArtificialFreeMarket.populateFreeMarketRegion（并行点燃区域内每个房间的商店生成）。
+    // gms 增强：源有完整商店经济（ArtificialShopGenerator 等未移植），此处只恢复
+    // 「商人在 FM 房间分布」语义——每房间小规模试点商人防拥挤，不做摊位商店经济。
+    // gms 简化：region 内顺序执行（region 级已由 wave task 并行）。
+    // 审计修正（LOW）：region 名做 toLowerCase 容错（源实现同款容错，调用方可能传 "HENESYS"），
+    // region 为 null 先判再查表。
     private static void populateFreeMarketRegion(String region) {
-        debugprint(fmt("populateFreeMarketRegion({}): TODO - FM room population not ported in gms", region));
+        int[] roomMapIds = region == null ? null : FM_ROOM_MAP_IDS.get(region.toLowerCase(Locale.ROOT));
+        if (roomMapIds == null) {
+            // 源对非法 region 抛 IllegalArgumentException；wave 任务跑在异步线程里异常会被吞掉，
+            // gms 改为 warn + return 显式可见。
+            log.warn("populateFreeMarketRegion: unknown region '{}' (expected henesys/ludi/perion/elnath)", region);
+            return;
+        }
+        for (int roomMapId : roomMapIds) {
+            spawnFMRoomBots(roomMapId);
+        }
+    }
+
+    private static void spawnFMRoomBots(int roomMapId) {
+        if (getMapleMapById(roomMapId) == null) {
+            debugprint(fmt("populateFreeMarketRegion: room map {} not found, skipped", roomMapId));
+            return;
+        }
+        // 源每房间约 24-28 摊位（坐标硬编码于 FMShopInfoManager）；gms 未移植商店经济，
+        // 先小规模试点：selling=2 / buying=2 / nx=1 为基数并按核数缩放（2 核下实际更少）。
+        double scale = scaleForCores();
+        int selling = (int) Math.round(2 * scale);
+        int buying = (int) Math.round(2 * scale);
+        int nx = (int) Math.round(1 * scale);
+        if (selling > 0) {
+            setAndStartBots(spawnBotsOnMapOnPlatform(selling, roomMapId, "m1"), BotTypeManager.BotType.SELLING_MERCHANT_BOT);
+        }
+        if (buying > 0) {
+            setAndStartBots(spawnBotsOnMapOnPlatform(buying, roomMapId, "m1"), BotTypeManager.BotType.BUYING_MERCHANT_BOT);
+        }
+        if (nx > 0) {
+            setAndStartBots(spawnBotsOnMapOnPlatform(nx, roomMapId, "m1"), BotTypeManager.BotType.NX_MERCHANT_BOT);
+        }
+        debugprint(fmt("populateFreeMarketRegion: room {} merchants selling={} buying={} nx={}", roomMapId, selling, buying, nx));
     }
 
     public static void spawnCasinoNpcs() {
@@ -848,7 +902,7 @@ public final class EnvironmentManager {
             debugprint("No OPQ lobby map / spawn portal");
             return;
         }
-        // 源实现按平台 CSV 分平台撒点；gms 未移植平台系统，改为整图地面撒点。
+        // TODO: 本方法暂未接平台（保持整图地面撒点现状）。
         List<Point> spots = BotHelpers.pickGroundSpots(map, anchor, totalBots);
         debugprint(fmt("Spawning {} OPQ bots in lobby...", totalBots));
 
@@ -875,7 +929,7 @@ public final class EnvironmentManager {
         }
     }
 
-    // ── 平台系统替代实现（gms 无 PlatformPlacement / CSV） ──────────────────
+    // ── 平台批量 spawn / 创建辅助（平台系统已移植：spawn 路径平台优先 + 地面回退） ──
 
     public static void setAndStartBots(List<Integer> botIds, BotTypeManager.BotType type) {
         for (int botId : botIds) {
@@ -922,12 +976,32 @@ public final class EnvironmentManager {
         map.broadcastMessage(PacketCreator.spawnNPC(npc));
     }
 
-    // 平台批量 spawn：以出生 portal 为锚点，用 BotHelpers.pickGroundSpots 整图撒点。
+    // 平台批量 spawn：平台优先（PlatformParser 解析 CSV + PlatformSpawner 取未占用点，
+    // 坐标经 groundSafePoint 安全校验），平台解析失败/无点时回退整图地面撒点。
     private static List<Integer> spawnBotsOnMapOnPlatform(int numBots, int mapId, String platformId) {
         MapleMap map = getMapleMapById(mapId);
+        if (map == null) {
+            debugprint(fmt("spawnBotsOnMapOnPlatform: no map for {} ({})", mapId, platformId));
+            return List.of();
+        }
+        // 平台优先：解析平台 CSV 并逐个取未占用点 createBot。
+        List<Point> platformSpots = platformSpawnPoints(numBots, mapId, platformId);
+        if (!platformSpots.isEmpty()) {
+            List<Integer> ids = new ArrayList<>();
+            for (Point spot : platformSpots) {
+                Character bot = createBotWithRetry(groundSafePoint(map, spot), mapId, 5);
+                if (bot != null) {
+                    ids.add(bot.getId());
+                }
+            }
+            if (!ids.isEmpty()) {
+                return ids;
+            }
+        }
+        // 回退：平台解析失败/无点时，以出生 portal 为锚点用 BotHelpers.pickGroundSpots 整图撒点。
         Point anchor = spawnPortal(map);
-        if (map == null || anchor == null) {
-            debugprint(fmt("spawnBotsOnMapOnPlatform: no map/portal for {} ({})", mapId, platformId));
+        if (anchor == null) {
+            debugprint(fmt("spawnBotsOnMapOnPlatform: no portal for {} ({})", mapId, platformId));
             return List.of();
         }
         List<Point> spots = BotHelpers.pickGroundSpots(map, anchor, numBots);
@@ -946,6 +1020,21 @@ public final class EnvironmentManager {
         if (map == null) {
             return List.of();
         }
+        // 平台优先：平台未占用点中取半径内候选，逐个 createBot。
+        List<Point> platformSpots = platformSpawnPointsInRadius(numBots, mapId, platformId, center, radius);
+        if (!platformSpots.isEmpty()) {
+            List<Integer> ids = new ArrayList<>();
+            for (Point spot : platformSpots) {
+                Character bot = createBotWithRetry(groundSafePoint(map, spot), mapId, 5);
+                if (bot != null) {
+                    ids.add(bot.getId());
+                }
+            }
+            if (!ids.isEmpty()) {
+                return ids;
+            }
+        }
+        // 回退：现有半径内地面选点逻辑。
         List<Integer> ids = new ArrayList<>();
         for (int i = 0; i < numBots; i++) {
             Point target = pickPointInRadius(map, center, radius);
@@ -955,6 +1044,74 @@ public final class EnvironmentManager {
             }
         }
         return ids;
+    }
+
+    // 平台选点辅助：解析 CSV 平台；平台无效（解析失败/无记录点）时返回空列表。
+    private static List<Point> platformSpawnPoints(int numBots, int mapId, String platformId) {
+        Platform platform = PlatformParser.parsePlatform(mapId, platformId);
+        if (platform == null || platform.getSortedPoints().isEmpty()) {
+            return List.of();
+        }
+        List<Point> occupied = new ArrayList<>();
+        List<Point> spots = new ArrayList<>();
+        for (int i = 0; i < numBots; i++) {
+            Point p = PlatformSpawner.findUnoccupiedPoint(platform, occupied);
+            occupied.add(p);
+            spots.add(p);
+        }
+        return spots;
+    }
+
+    // 平台选点辅助（半径版）：多次尝试取半径内未占用点，凑不满时返回已找到的部分。
+    private static List<Point> platformSpawnPointsInRadius(int numBots, int mapId, String platformId, Point center, int radius) {
+        Platform platform = PlatformParser.parsePlatform(mapId, platformId);
+        if (platform == null || platform.getSortedPoints().isEmpty()) {
+            return List.of();
+        }
+        List<Point> occupied = new ArrayList<>();
+        List<Point> spots = new ArrayList<>();
+        for (int i = 0; i < numBots; i++) {
+            Point candidate = null;
+            for (int attempt = 0; attempt < 100; attempt++) {
+                Point p = PlatformSpawner.findUnoccupiedPoint(platform, occupied);
+                if (Math.abs(p.x - center.x) <= radius && Math.abs(p.y - center.y) <= radius) {
+                    candidate = p;
+                    break;
+                }
+            }
+            if (candidate == null) {
+                break;
+            }
+            occupied.add(candidate);
+            spots.add(candidate);
+        }
+        return spots;
+    }
+
+    // 坐标安全校验（审计修正 P2）：gms wz 数据集与源不同，平台点可能悬空/陷地。
+    // 旧实现「getPointBelow 差>60px 替换」有两处缺陷：固定 60px 无法区分低平台与悬空
+    // （40px 高的低平台点与地面差约 40px，会被地面点替换而丢失低平台语义），
+    // 且 ground==null 时悬空点被直接保留。新实现先查正下方 foothold：平台点贴合
+    // foothold 表面（y 落在其 y1/y2 范围 ±2px 内，低平台自身 foothold 差≈0）则保留
+    // 平台点；否则仅在平台点与地面差 > GROUND_SAFE_DROP_PX 时用地面点替换，其余保留平台点。
+    private static final int GROUND_SAFE_DROP_PX = 20;
+
+    private static Point groundSafePoint(MapleMap map, Point platformPoint) {
+        if (map.getFootholds() != null) {
+            Foothold fh = map.getFootholds().findBelow(new Point(platformPoint.x, platformPoint.y));
+            if (fh != null) {
+                int fhMinY = Math.min(fh.getY1(), fh.getY2());
+                int fhMaxY = Math.max(fh.getY1(), fh.getY2());
+                if (platformPoint.y >= fhMinY - 2 && platformPoint.y <= fhMaxY + 2) {
+                    return platformPoint; // 平台贴合：防止低平台语义丢失
+                }
+            }
+        }
+        Point ground = map.getPointBelow(new Point(platformPoint.x, platformPoint.y));
+        if (ground != null && Math.abs(ground.y - platformPoint.y) > GROUND_SAFE_DROP_PX) {
+            return ground; // 悬空/陷地：地面点替换
+        }
+        return platformPoint;
     }
 
     private static Point pickPointInRadius(MapleMap map, Point center, int radius) {
@@ -1028,23 +1185,45 @@ public final class EnvironmentManager {
         return BotGeneration.createBot(pos, map, baseClass, loLevel, hiLevel);
     }
 
+    // 审计修正（LOW）：botId>0 但 getCharacterById 返回 null 时不再立即重新 createBot
+    // （角色异步可见存在窗口期，重建会泄漏孤儿 bot），改为轮询同一 id（30 次 ×100ms）；
+    // 轮询超时仍不可见才重置 botId，由下一轮 attempt 重新 createBot。
+    private static final int CREATE_BOT_POLL_MAX = 30;
+    private static final long CREATE_BOT_POLL_INTERVAL_MS = 100;
+
     private static Character createBotWithRetry(Point spawn, int mapId, int maxRetries) {
         MapleMap map = getMapleMapById(mapId);
         if (map == null) {
             return null;
         }
+        int botId = 0;
         for (int attempt = 1; attempt <= maxRetries; attempt++) {
             try {
-                int botId = BotGeneration.createBot(spawn, map);
-                Character bot = DefaultBotServerAccess.INSTANCE.getCharacterById(botId);
-                if (bot != null) {
-                    return bot;
+                if (botId <= 0) {
+                    botId = BotGeneration.createBot(spawn, map);
+                }
+                if (botId > 0) {
+                    Character bot = DefaultBotServerAccess.INSTANCE.getCharacterById(botId);
+                    if (bot != null) {
+                        return bot;
+                    }
+                    for (int poll = 1; poll <= CREATE_BOT_POLL_MAX; poll++) {
+                        blockingSleep(CREATE_BOT_POLL_INTERVAL_MS);
+                        bot = DefaultBotServerAccess.INSTANCE.getCharacterById(botId);
+                        if (bot != null) {
+                            return bot;
+                        }
+                    }
+                    debugprint(fmt("createBotWithRetry: botId {} not visible after {} polls, will recreate",
+                            botId, CREATE_BOT_POLL_MAX));
+                    botId = 0;
                 }
                 if (attempt < maxRetries) {
                     blockingSleep(200L * attempt);
                 }
             } catch (Exception e) {
                 debugprint(fmt("createBotWithRetry attempt {}/{} failed at {}: {}", attempt, maxRetries, spawn, e.getMessage()));
+                botId = 0;
                 if (attempt < maxRetries) {
                     blockingSleep(200L * attempt);
                 }

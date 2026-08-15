@@ -152,8 +152,9 @@ public class HenesysBot extends BotSM {
     }
 
     /**
-     * Moves the bot to another platform on the current map (gcmove 图导航随机游走，
-     * 替代 SoloMapling PlatformPlacement 的平台行走).
+     * Moves the bot to another platform on the current map (gcmove 图导航随机游走；
+     * PlatformPlacement 已移植（org.gms.server.bot.environment.platform）但换位 API
+     * 未接线，本类用 gcmove 踱步等价替代).
      */
     private void wanderPlatforms() {
         MapleMap map = getChr().getMap();

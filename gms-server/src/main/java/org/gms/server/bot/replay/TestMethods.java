@@ -2,7 +2,9 @@ package org.gms.server.bot.replay;
 
 import org.gms.client.Character;
 import org.gms.client.Client;
+import org.gms.server.bot.BotGeneration;
 import org.gms.server.bot.BotHelpers;
+import org.gms.server.bot.commands.MapleMessengerCommands;
 import org.gms.server.maps.MapleMap;
 import org.gms.server.maps.Portal;
 
@@ -21,7 +23,8 @@ import static org.gms.server.bot.replay.navigation.PathFinder.coordPathSplitter;
 
 /**
  * SoloMapling {@code ArtificialPlayer.TestMethods} 的逐行移植：GM 移动/录制回放的
- * 组合测试入口。gms 尚无「Console Bot」这一角色，{@link #addMMC} 暂时置空。
+ * 组合测试入口。MMC 主类暂未移植（gms 已有 botlog.txt 文件日志与粉笔黑板两条
+ * 等效调试渠道），{@link #addMMC} 仅恢复「Console 假人加入 messenger」语义。
  */
 public class TestMethods {
 
@@ -124,10 +127,25 @@ public class TestMethods {
      */
 
     /**
-     * gms 尚未落地「Console Bot」这一角色（对应 SoloMapling 的 getConsoleBot()），
-     * 故 addMMC 暂为空操作；后续补齐 Console Bot 时再接通 messenger。
+     * 把懒加载的调试傀儡「Console」拉进调试者 GM 的 messenger（SoloMapling addMMC 移植）。
+     * <p>
+     * MMC 主类（SoloMapling MapleMessengerConsole 及其交互命令）暂未移植：gms 已有
+     * botlog.txt 文件日志与粉笔黑板两条等效调试渠道（见 BotDebugHandler），messenger
+     * 对话式调试无消费者；故本方法仅恢复「Console 假人加入 messenger」语义，
+     * 后续如需 messenger 调试再补主类。
      */
     public static void addMMC(Client c) {
-        // TODO(gms): 落地 Console Bot 后改为 MapleMessengerCommands.addBotToMessenger(c.getPlayer(), consoleBot)。
+        if (c == null || c.getPlayer() == null) {
+            return;
+        }
+        // GM 尚未加入任何 messenger 时无调试通道可用；addBotToMessenger 内部直接
+        // 解引用 mainChar.getMessenger()（getLowestPosition），不判空会 NPE。
+        if (c.getPlayer().getMessenger() == null) {
+            return;
+        }
+        Character consoleBot = BotGeneration.getConsoleBot();
+        if (consoleBot != null) {
+            MapleMessengerCommands.addBotToMessenger(c.getPlayer(), consoleBot);
+        }
     }
 }

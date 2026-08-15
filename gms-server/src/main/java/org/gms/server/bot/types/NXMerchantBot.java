@@ -116,7 +116,8 @@ public class NXMerchantBot extends BotSM {
     // Dynamic movement lands on the exact picked pixel, so the old nudgeAwayFromOverlap
     // band-aid (recorded paths piling bots onto fixed endpoints) is no longer needed here.
     private boolean tryPlatformShuffle() {
-        // gms 移植：等价 PlatformPlacement 换位（见 SellingMerchantBot 同类注释）。
+        // gms 移植：PlatformPlacement 已移植（org.gms.server.bot.environment.platform）
+        // 但换位 API 未接线，本类用 gcmove 踱步等价替代。
         if (rollChanceInverse(15)) {
             nudgeRandomly();
             return true;

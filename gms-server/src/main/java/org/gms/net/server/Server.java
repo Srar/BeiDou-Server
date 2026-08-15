@@ -59,6 +59,7 @@ import org.gms.server.CashShop.CashItemFactory;
 import org.gms.server.SkillbookInformationProvider;
 import org.gms.server.ThreadManager;
 import org.gms.server.TimerManager;
+import org.gms.server.bot.BotGeneration;
 import org.gms.server.bot.BotTickService;
 import org.gms.server.bot.BotTypeManager;
 import org.gms.server.bot.decorate.BotDecorationQueue;
@@ -1693,6 +1694,9 @@ public class Server {
         // 若先停执行器，轮盘/移动 tick 会向已关停的池疯狂派发；若先停 TimerManager 前的
         // bot 调度未走完，残留轮盘条目会在停机后继续空转。单个钩子失败不阻断停机。
         runShutdownHook("BotTypeManager.stopAllBots", BotTypeManager::stopAllBots);
+        // 审计修正：清空 Console 傀儡缓存——停机后旧角色已摘除，缓存滞留会在
+        // in-place 重启后让 getConsoleBot 返回指向已销毁世界的僵尸角色。
+        runShutdownHook("BotGeneration.resetConsoleBot", BotGeneration::resetConsoleBotForShutdown);
         runShutdownHook("Dispatcher.shutdown", () -> Dispatcher.getInstance().shutdown());
         runShutdownHook("BotDecorationQueue.stop", BotDecorationQueue::stop);
         runShutdownHook("GCMovement.shutdown", GCMovement::shutdown);

@@ -141,7 +141,8 @@ public class BuyingMerchantBot extends BotSM {
     }
 
     private boolean tryPlatformShuffleWhileAdvertising() {
-        // gms 移植：等价 PlatformPlacement 换位（见 SellingMerchantBot 同类注释）。
+        // gms 移植：PlatformPlacement 已移植（org.gms.server.bot.environment.platform）
+        // 但换位 API 未接线，本类用 gcmove 踱步等价替代。
         if (rollChanceInverse(10)) {
             nudgeRandomly();
             return true;

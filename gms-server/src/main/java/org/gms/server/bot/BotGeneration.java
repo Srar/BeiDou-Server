@@ -2,12 +2,15 @@ package org.gms.server.bot;
 
 import lombok.extern.slf4j.Slf4j;
 import org.gms.client.Character;
+import org.gms.client.Job;
 import org.gms.client.inventory.InventoryType;
 import org.gms.client.SkinColor;
 import org.gms.client.creator.MakeCharInfo;
 import org.gms.client.creator.MakeCharInfoValidator;
 import org.gms.server.bot.decorate.BotDecorate;
+import org.gms.server.bot.party.BotRecruitManager;
 import org.gms.server.maps.MapleMap;
+import org.gms.server.maps.Portal;
 import org.gms.util.I18nUtil;
 import org.gms.util.PacketCreator;
 import org.gms.util.Randomizer;
@@ -65,6 +68,17 @@ public final class BotGeneration {
     private static final Set<String> ASSIGNED_BOT_NAMES = ConcurrentHashMap.newKeySet();
 
     private static volatile BotServerAccess serverAccess = DefaultBotServerAccess.INSTANCE;
+
+    /** 懒加载的调试傀儡「Console」角色缓存；创建语义见 {@link #getConsoleBot()}。 */
+    private static volatile Character consoleBot;
+
+    /**
+     * Console 傀儡的固定 id：普通 bot 从 BOT_BASE_ID + 100 起按自增计数分配，
+     * 若 Console 落在低区段，生成第 900 个普通 bot 时必然撞车。放高区段
+     * （BOT_BASE_ID + 100_000_000 = 2_100_000_000，仍小于 Integer.MAX_VALUE 无溢出），
+     * 普通 bot 需生成 1 亿个才可能进入该区段，实际不可达。
+     */
+    private static final int CONSOLE_BOT_ID = BotHelpers.BOT_BASE_ID + 100_000_000;
 
     /** 基底角色工厂（测试注入点：替换为 mock 角色，避免触碰 GameConfig/WZ）。 */
     private static Supplier<Character> baseCharacterSupplier = BotGeneration::createBaseCharacter;
@@ -142,6 +156,87 @@ public final class BotGeneration {
     /** 本次运行已创建的 bot 总数（诊断/测试用）。 */
     public static int getBotsCreatedCount() {
         return currentBotCount.get() - 100;
+    }
+
+    /**
+     * 懒加载调试傀儡角色「Console」（SoloMapling BotGeneration.getConsoleBot 移植）：
+     * 首次调用创建 level 69 / job 420 的固定 bot 并缓存，之后每次返回同一实例；
+     * 供 TestMethods.addMMC 把它拉进调试者 GM 的 messenger。
+     * <p>
+     * gms 增强：源实现用字面 id=999——那是 SoloMapling BOT_BASE_ID=20000 玩家空间内的
+     * 固定值；gms 的真实玩家 id 由数据库自增分配（从 1 起），字面 999 会与真人撞车，
+     * 且不在 bot 区段（&gt; {@link BotHelpers#BOT_BASE_ID}）、不被 {@link BotHelpers#isBot(int)}
+     * 识别，故改用区段内固定 id {@link #CONSOLE_BOT_ID}（=2_100_000_000）。
+     * 高区段隔离理由见 {@link #CONSOLE_BOT_ID}：普通 bot id 从 BOT_BASE_ID + 100
+     * 起自增，低区段固定值会被第 900 个普通 bot 撞上，高区段则实际不可达。
+     * <p>
+     * 创建失败（异常）时 log.warn 并返回 null，绝不抛出：addMMC 是 GM 调试命令，
+     * 不应因傀儡创建失败把异常甩回命令分发层。失败不写缓存（保持 null），下次调用自动重试。
+     */
+    public static Character getConsoleBot() {
+        Character cached = consoleBot;
+        if (cached != null) {
+            return cached;
+        }
+        synchronized (BotGeneration.class) {
+            if (consoleBot != null) {
+                return consoleBot;
+            }
+            try {
+                consoleBot = createConsoleBot();
+            } catch (RuntimeException e) {
+                // 字面量日志而非 I18nUtil 键：本移植未随附 i18n 资源，缺键会抛 NoSuchMessageException 掩盖根因。
+                log.warn("Console bot (addMMC 调试傀儡) 创建失败，返回 null", e);
+            }
+            return consoleBot;
+        }
+    }
+
+    /**
+     * 停机复位：清空 Console 傀儡缓存。停机后旧角色对象已从 channel/world 摘除，
+     * 若缓存滞留，in-place 重启（同 JVM）后 getConsoleBot 会返回指向已销毁世界的
+     * 僵尸角色。下次调用时懒加载重建。
+     */
+    public static void resetConsoleBotForShutdown() {
+        consoleBot = null;
+    }
+
+    /**
+     * 仿 {@link #createBot} 骨架构造 Console 傀儡：基底角色 → 固定 id/IGN/Client →
+     * 注册 channel/world → 落图 HENESYS。与 createBot 的差异：id 固定（不走自增计数）、
+     * fame 固定 999（源实现 fame=botId=999，此处保留字面值作调试标记）、名字不参与
+     * ASSIGNED_BOT_NAMES 查重（固定英文名与随机中文池无冲突）。
+     */
+    private static Character createConsoleBot() {
+        Character bot = baseCharacterSupplier.get();
+        int botId = CONSOLE_BOT_ID; // 固定 id：gms 增强（高区段隔离），理由见 getConsoleBot 注释
+        int world = DefaultBotServerAccess.resolveBotWorld();
+        int channel = DefaultBotServerAccess.resolveBotChannel();
+
+        bot.setClient(BotClientHolder.getBotClient(world, channel));
+        bot.setId(botId);
+        bot.setName("Console");
+        bot.setLevel(69);
+        bot.setJob(Job.getById(420));
+        bot.setFame(999); // 调试标记：对齐源的 fame=botId(999)
+        bot.setWorld(world);
+        // 标记已进入频道世界：awayFromWorld 默认 true，不置 false 会被
+        // MapleMap.cleanupGhostPlayers 当「断线幽灵玩家」误杀（同 createBot）。
+        bot.setEnteredChannelWorld();
+
+        serverAccess.addBotToServer(bot); // channel.addPlayer + world 玩家存储
+
+        // 落图尽力而为：失败仅告警，不影响返回角色（Console 只服务于 messenger 调试）。
+        MapleMap henesys = serverAccess.getMap(world, channel, 100000000);
+        if (henesys != null) {
+            try {
+                Portal spawn = henesys.getPortal("sp");
+                placeBotOnMap(bot, spawn != null ? spawn.getPosition() : new Point(0, 0), henesys);
+            } catch (RuntimeException e) {
+                log.warn("Console bot 落图 HENESYS 失败（不影响返回角色）", e);
+            }
+        }
+        return bot;
     }
 
     /** 无 class/等级约束的默认生成：委托 6 参版走完整随机装饰（tier/level/job/body/equip/NX）。 */
@@ -297,6 +392,8 @@ public final class BotGeneration {
             ASSIGNED_BOT_NAMES.remove(botName.toLowerCase(Locale.ROOT));
         }
         log.info(I18nUtil.getLogMessage("BotGeneration.bot.removed", bot.getId()));
+        // 销毁即清理招募残留（ARMED 武装窗口 / PENDING 转换交接），防止泄漏拒掉后续合法邀请。
+        BotRecruitManager.clearHandoffs(bot.getId());
     }
 
     /**

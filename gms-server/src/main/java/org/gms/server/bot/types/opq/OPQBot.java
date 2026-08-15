@@ -944,7 +944,8 @@ public class OPQBot extends BotSM {
     // gcmove 适配辅助
     // =========================================================================
 
-    /** 到随机可走平台的图导航游走（替代 SoloMapling PlatformPlacement）。 */
+    /** 到随机可走平台的图导航游走（PlatformPlacement 已移植（org.gms.server.bot.environment.platform）
+        但换位 API 未接线，本类用 gcmove 踱步等价替代）。 */
     private void wanderToRandomLedge() {
         MapleMap map = getChr().getMap();
         if (map == null) return;

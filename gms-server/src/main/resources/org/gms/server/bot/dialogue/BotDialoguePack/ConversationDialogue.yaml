@@ -286,7 +286,7 @@ conversations:
     lines:
       - {speaker: A, text: "昨天自由市场那瓜你吃了吗"}
       - {speaker: B, text: "没有，咋了"}
-      - {speaker: A, text: "有人用bug复制被抓住，封号了"}
+      - {speaker: A, text: "有人用BUG复制被抓住，封号了"}
       - {speaker: B, text: "哈哈活该，复制党把经济都搞崩了"}
       - {speaker: A, text: "确实"}
 
@@ -570,7 +570,7 @@ conversations:
     participants: 2
     lines:
       - {speaker: A, text: "你键盘按键都怎么设置的？"}
-      - {speaker: B, text: "药水放ASDF，主技能QWE，状态技能1234"}
+      - {speaker: B, text: "药水放中间那排键，主技能放上面那排，状态技能1234"}
       - {speaker: A, text: "有意思，我全放数字键上了"}
       - {speaker: B, text: "那你边走边按够得着吗", emote: 5}
       - {speaker: A, text: "我手大哈哈"}
@@ -714,7 +714,7 @@ conversations:
       - {speaker: A, text: "来来来大家集合拍个照！"}
       - {speaker: B, text: "等等，我换身好看的点券时装"}
       - {speaker: C, text: "截图键是哪个来着？"}
-      - {speaker: A, text: "Scroll Lock键", emote: 2}
+      - {speaker: A, text: "滚动锁定键", emote: 2}
       - {speaker: B, text: "好了我准备好了，帅不帅"}
       - {speaker: C, text: "帅得值一百万金币", emote: 2}
       - {speaker: A, text: "好，3……2……1……"}
@@ -728,7 +728,7 @@ conversations:
       - {speaker: C, text: "肯定被占了"}
       - {speaker: A, text: "「飞升」怎么样？"}
       - {speaker: C, text: "八成也被占了，起个独特点的"}
-      - {speaker: B, text: "那「xX公会名Xx」"}
+      - {speaker: B, text: "那「叉叉公会名叉叉」"}
       - {speaker: A, text: "我宣布把你踢出这场讨论", emote: 1}
       - {speaker: C, text: "哈哈哈", emote: 2}
       - {speaker: B, text: "干嘛呀？我开玩笑的！", emote: 2}
@@ -760,7 +760,7 @@ conversations:
     participants: 3
     lines:
       - {speaker: A, text: "打扰一下，有人知道怎么换频道吗？"}
-      - {speaker: B, text: "按ESC，然后点频道就行"}
+      - {speaker: B, text: "按退出键，然后点频道就行"}
       - {speaker: C, text: "或者用右上角的快捷换线"}
       - {speaker: A, text: "哦我看到了！太谢谢了"}
       - {speaker: B, text: "不客气！你是萌新吗？"}
@@ -791,7 +791,7 @@ conversations:
     lines:
       - {speaker: A, text: "你们角色名都是怎么起的？"}
       - {speaker: B, text: "我名字倒过来加几个数字哈哈"}
-      - {speaker: C, text: "我瞎敲键盘，前后再加Xx"}
+      - {speaker: C, text: "我瞎敲键盘，前后再加俩叉"}
       - {speaker: D, text: "我的是动漫角色名", emote: 3}
       - {speaker: A, text: "我的是我家猫的名字"}
       - {speaker: B, text: "老哥你角色叫「胡须」？？", emote: 2}
@@ -1101,15 +1101,15 @@ conversations:
       - {speaker: A, text: "你看《咒术回战》了吗"}
       - {speaker: B, text: "看了，第二季封神"}
       - {speaker: A, text: "对吧？？那作画质量", emote: 5}
-      - {speaker: B, text: "MAPPA是真的拼，就是苦了画师"}
+      - {speaker: B, text: "制作组是真的拼，就是苦了画师"}
       - {speaker: A, text: "哈哈确实，不过涩谷篇是真的顶"}
       - {speaker: B, text: "别剧透，有人还没看"}
 
   gaming_setup_brag:
     participants: 3
     lines:
-      - {speaker: A, text: "刚换了新显示器，144Hz的"}
-      - {speaker: B, text: "打冒险岛用144Hz？？老哥这是03年的2D游戏", emote: 2}
+      - {speaker: A, text: "刚换了新显示器，144赫兹的"}
+      - {speaker: B, text: "打冒险岛用144赫兹？？老哥这是03年的2D游戏", emote: 2}
       - {speaker: C, text: "让他高兴高兴吧"}
       - {speaker: A, text: "丝滑是真的丝滑，逛自由市场都顺滑了"}
       - {speaker: B, text: "你是魔怔了，但我佩服这份执着", emote: 3}
@@ -1172,7 +1172,7 @@ conversations:
       - {speaker: A, text: "有人追这季新番吗，还是说只有我陷进去了"}
       - {speaker: B, text: "我弃了一半了"}
       - {speaker: C, text: "一样，就剩那个恶魔题材的还在追"}
-      - {speaker: D, text: "那OP是真的顶，跳不过", emote: 3}
+      - {speaker: D, text: "那片头曲是真的顶，跳不过", emote: 3}
       - {speaker: A, text: "确实，但上一集结束得太快了"}
       - {speaker: B, text: "边开冒险岛边看，哪集都过得快"}
 
@@ -1222,7 +1222,7 @@ conversations:
       - {speaker: A, text: "写了一整天代码，现在只想在自由市场放空脑子"}
       - {speaker: B, text: "佩服，我试着写个小脚本，结果把我电脑整崩了"}
       - {speaker: C, text: "经典程序员名场面", emote: 2}
-      - {speaker: D, text: "有时候冒险岛比调bug简单多了"}
+      - {speaker: D, text: "有时候冒险岛比修BUG简单多了"}
       - {speaker: A, text: "确实，至少怪不会用全大写给你留言"}
       - {speaker: B, text: "但NPC对话有时候真像代码"}
 
@@ -1249,9 +1249,9 @@ conversations:
   console_vs_pc:
     participants: 2
     lines:
-      - {speaker: A, text: "你觉得主机现在还能碾压PC吗"}
+      - {speaker: A, text: "你觉得主机现在还能碾压电脑吗"}
       - {speaker: B, text: "看情况，休闲游戏还行"}
-      - {speaker: A, text: "不不，PC性能太猛了，而且冒险岛快捷键就是命"}
+      - {speaker: A, text: "不不，电脑性能太猛了，而且冒险岛快捷键就是命"}
       - {speaker: B, text: "也是，用手柄玩冒险岛不得乱成一锅粥"}
       - {speaker: A, text: "想象一下用摇杆捡东西", emote: 2}
       - {speaker: B, text: "直接告辞"}
@@ -1342,12 +1342,12 @@ conversations:
   runescape_vs_maple:
     participants: 3
     lines:
-      - {speaker: A, text: "这里有人玩RuneScape吗"}
+      - {speaker: A, text: "这里有人玩符文世界吗"}
       - {speaker: B, text: "当年免费服里扔地上转东西那会儿玩过哈哈"}
       - {speaker: C, text: "我小号还在那边砍树"}
       - {speaker: A, text: "可以呀，多少级了"}
       - {speaker: C, text: "72吧，比冒险岛慢，但莫名解压"}
-      - {speaker: B, text: "讲真，RuneScape的肝度让冒险岛像百米冲刺"}
+      - {speaker: B, text: "讲真，符文世界的肝度让冒险岛像百米冲刺"}
       - {speaker: A, text: "真的，那边随便一个99级都得肝好几个月"}
 
   pc_flex:
@@ -1355,10 +1355,10 @@ conversations:
     lines:
       - {speaker: A, text: "我的游戏主机终于装好了"}
       - {speaker: B, text: "配置咋样？", emote: 6}
-      - {speaker: A, text: "NVIDIA的，贼贵，要买就买顶配"}
+      - {speaker: A, text: "英伟达的，贼贵，要买就买顶配"}
       - {speaker: B, text: "老哥你用6090玩冒险岛？？？", emote: 2}
       - {speaker: A, text: "你不懂，显卡价格涨疯了。", emote: 3}
-      - {speaker: B, text: "帅就完事了，回头Discord发图"}
+      - {speaker: B, text: "帅就完事了，回头语音群发图"}
 
   gamer_fuel:
     participants: 2
@@ -1393,9 +1393,9 @@ conversations:
     participants: 4
     lines:
       - {speaker: A, text: "聊天里有程序员吗"}
-      - {speaker: B, text: "我在学校学Java"}
+      - {speaker: B, text: "我在学校学编程"}
       - {speaker: C, text: "软件开发，主要做网页"}
-      - {speaker: D, text: "我用GameMaker做点小游戏玩"}
+      - {speaker: D, text: "我用做游戏的工具捣鼓点小游戏玩"}
       - {speaker: A, text: "哦酷，什么类型的"}
       - {speaker: D, text: "就平台跳跃啥的，做着玩的"}
       - {speaker: C, text: "真羡慕，下班后我是没精力再写代码了哈哈"}
@@ -1455,7 +1455,7 @@ conversations:
   anime_hot_take:
     participants: 3
     lines:
-      - {speaker: A, text: "《鬼灭之刃》全靠ufotable的作画撑着"}
+      - {speaker: A, text: "《鬼灭之刃》全靠制作公司的作画撑着"}
       - {speaker: B, text: "好家伙，一上来就开团"}
       - {speaker: C, text: "他说的没错，剧情就是套路热血漫模板"}
       - {speaker: B, text: "但打戏燃啊，谁在乎剧情深不深"}
@@ -1605,10 +1605,10 @@ conversations:
   other_mmo_comparison:
     participants: 2
     lines:
-      - {speaker: A, text: "你以前玩过RuneScape吗"}
+      - {speaker: A, text: "你以前玩过符文世界吗"}
       - {speaker: B, text: "玩过，那是真的肝"}
       - {speaker: A, text: "相比之下冒险岛轻松多了"}
-      - {speaker: B, text: "是，但RS有它的自由感"}
+      - {speaker: B, text: "是，但符文世界有它的自由感"}
       - {speaker: A, text: "这赛季结束我可能回去看看"}
       - {speaker: B, text: "我也是"}
 
@@ -1618,7 +1618,7 @@ conversations:
       - {speaker: A, text: "终于换鼠标了，雷蛇的"}
       - {speaker: B, text: "打冒险岛用？有点大材小用"}
       - {speaker: C, text: "让他折腾去"}
-      - {speaker: A, text: "高DPI微操更跟手"}
+      - {speaker: A, text: "高鼠标灵敏度微操更跟手"}
       - {speaker: B, text: "你说话跟主播似的"}
       - {speaker: C, text: "下一步是啥，给2D游戏配机械键盘"}
 
@@ -1626,7 +1626,7 @@ conversations:
     participants: 2
     lines:
       - {speaker: A, text: "最近在重温《宝可梦·水晶》"}
-      - {speaker: B, text: "识货，我的GameBoy还留着呢"}
+      - {speaker: B, text: "识货，我的掌机还留着呢"}
       - {speaker: A, text: "情怀这玩意儿不一样"}
       - {speaker: B, text: "冒险岛和宝可梦都是我的童年"}
       - {speaker: A, text: "改天咱俩交换一下哈哈"}
@@ -1636,8 +1636,8 @@ conversations:
     participants: 2
     lines:
       - {speaker: A, text: "哈哈瓦罗兰特职业选手是真的猛"}
-      - {speaker: B, text: "冒险岛PK才是巅峰"}
-      - {speaker: A, text: "老哥冒险岛PK就是延迟加抢怪"}
+      - {speaker: B, text: "冒险岛单挑才是巅峰"}
+      - {speaker: A, text: "老哥冒险岛单挑就是延迟加抢怪"}
       - {speaker: B, text: "那也比看直播有意思"}
       - {speaker: A, text: "有点道理"}
       - {speaker: B, text: "好怀念当年的冒险岛比赛"}
@@ -1739,10 +1739,10 @@ conversations:
   runescape_comparison:
     participants: 2
     lines:
-      - {speaker: A, text: "你玩过RuneScape吗？"}
+      - {speaker: A, text: "你玩过符文世界吗？"}
       - {speaker: B, text: "玩过，很早以前，砍树一砍几小时哈哈"}
       - {speaker: A, text: "那边的肝度让冒险岛像休闲游戏"}
-      - {speaker: B, text: "至少冒险岛技能炫，RS就是看进度条涨"}
+      - {speaker: B, text: "至少冒险岛技能炫，符文世界就是看进度条涨"}
       - {speaker: A, text: "但莫名有种禅意"}
       - {speaker: B, text: "你说的那叫挂机哈哈", emote: 2}
 
@@ -2188,7 +2188,7 @@ conversations:
   el_nath_cold_complaints:
     participants: 2
     lines:
-      - {speaker: A, text: "雪域的寒冷debuff为啥每次都这么烦人"}
+      - {speaker: A, text: "雪域的寒冷负面状态为啥每次都这么烦人"}
       - {speaker: B, text: "是屏幕上的雪花吧，太碍眼了"}
       - {speaker: A, text: "整个人都感觉慢吞吞的，还丑"}
       - {speaker: B, text: "上去之前在下面NPC那买个御寒药呗"}
@@ -3122,7 +3122,7 @@ conversations:
   accidental_pk_provoke:
     participants: 2
     lines:
-      - {speaker: A, text: "我把一个人刷急眼了，他居然跑来PK我"}
+      - {speaker: A, text: "我把一个人刷急眼了，他居然跑来砍我"}
       - {speaker: B, text: "在哪……射手村？"}
       - {speaker: A, text: "我就正常练级，他破防了就要动手"}
       - {speaker: B, text: "他得手了吗"}
@@ -3155,7 +3155,7 @@ conversations:
       - {speaker: B, text: "你怎么现在才发现"}
       - {speaker: A, text: "我从来看属性面板哈哈，闷头放技能就完了"}
       - {speaker: B, text: "这打法其实没毛病", emote: 2}
-      - {speaker: A, text: "大数字biubiubiu"}
+      - {speaker: A, text: "大数字唰唰地跳"}
 
   wrong_job_advance:
     participants: 2

@@ -110,6 +110,9 @@ public class DoorObject extends AbstractMapObject {
     }
 
     public void sendSpawnData(Client client, boolean launched) {
+        if (client == null || client.getPlayer() == null) {
+            return;
+        }
         Character chr = client.getPlayer();
         if (this.getFrom().getId() == chr.getMapId()) {
             if (chr.getParty() != null && (this.getOwnerId() == chr.getId() || chr.getParty().getMemberById(this.getOwnerId()) != null)) {
@@ -125,6 +128,9 @@ public class DoorObject extends AbstractMapObject {
 
     @Override
     public void sendDestroyData(Client client) {
+        if (client == null || client.getPlayer() == null) {
+            return;
+        }
         Character chr = client.getPlayer();
         if (from.getId() == chr.getMapId()) {
             Party party = chr.getParty();
@@ -136,7 +142,7 @@ public class DoorObject extends AbstractMapObject {
     }
 
     public void sendDestroyData(Client client, boolean partyUpdate) {
-        if (client != null && from.getId() == client.getPlayer().getMapId()) {
+        if (client != null && client.getPlayer() != null && from.getId() == client.getPlayer().getMapId()) {
             client.sendPacket(PacketCreator.partyPortal(MapId.NONE, MapId.NONE, new Point(-1, -1)));
             client.sendPacket(PacketCreator.removeDoor(ownerId, inTown()));
         }

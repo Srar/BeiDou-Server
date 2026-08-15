@@ -3,8 +3,8 @@
 
     <Properties>
         <property name="basePath">logs</property>
-        <property name="console_log_pattern">%d{yyyy-MM-dd HH:mm:ss.SSS} [%5level] ==> %m%n</property>
-        <property name="log_pattern">%d{yyyy-MM-dd HH:mm:ss.SSS} [%5level] ==> %m%n</property>
+        <property name="console_log_pattern">%d{yyyy-MM-dd HH:mm:ss.SSS} [%5level] ==> %m%n%xEx</property>
+        <property name="log_pattern">%d{yyyy-MM-dd HH:mm:ss.SSS} [%5level] ==> %m%n%xEx</property>
         <property name="every_file_size">10MB</property>
         <property name="rolling_fileName">${basePath}/out.log</property>
         <property name="rolling_filePattern">${basePath}/%d{yyyyMMdd}/out%i.log</property>
@@ -39,12 +39,12 @@
     </appenders>
 
     <loggers>
-        <!-- ½µµÍ Druid µÄÈÕÖ¾¼¶±ð -->
+        <!-- ï¿½ï¿½ï¿½ï¿½ Druid ï¿½ï¿½ï¿½ï¿½Ö¾ï¿½ï¿½ï¿½ï¿½ -->
         <Logger name="com.alibaba.druid" level="ERROR">
             <AppenderRef ref="Console"/>
         </Logger>
 
-        <!-- ½µµÍ flyway µÄÈÕÖ¾¼¶±ð -->
+        <!-- ï¿½ï¿½ï¿½ï¿½ flyway ï¿½ï¿½ï¿½ï¿½Ö¾ï¿½ï¿½ï¿½ï¿½ -->
         <Logger name="org.flywaydb.core.internal.command.DbMigrate" level="INFO" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>

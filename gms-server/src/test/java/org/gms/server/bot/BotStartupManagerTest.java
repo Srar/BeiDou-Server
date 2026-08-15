@@ -2,12 +2,15 @@ package org.gms.server.bot;
 
 import org.gms.client.Character;
 import org.gms.server.bot.event.BotEventBus;
+import org.gms.server.bot.gcmove.GCMovement;
 import org.gms.server.maps.MapleMap;
 import org.gms.test.BotTestSupport;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 import java.awt.Point;
 import java.util.ArrayList;
@@ -65,6 +68,7 @@ class BotStartupManagerTest {
     private FakeBotServerAccess fakeAccess;
     private MapleMap map;
     private Character baseCharacter;
+    private MockedStatic<GCMovement> gcMovementStatic;
 
     @BeforeAll
     static void initSupport() {
@@ -79,6 +83,11 @@ class BotStartupManagerTest {
         baseCharacter = mock(Character.class);
         BotGeneration.setBaseCharacterSupplier(() -> baseCharacter);
         map = mock(MapleMap.class);
+        // spawnOne 现在会触发 createBot 装饰 + GCMovement.enable；两者都对 mock Character
+        // 无法承载（装饰触碰 inventory/静态池，enable 触碰真实导航图与 tick 线程）。
+        // 本类只测 spawnOne 的编排/注册顺序：装饰用注入接缝屏蔽，enable 用静态屏蔽。
+        BotGeneration.setDecorator((bot, baseClass, minLevel, maxLevel, forcedJobId) -> { });
+        gcMovementStatic = Mockito.mockStatic(GCMovement.class);
     }
 
     @AfterEach
@@ -94,6 +103,8 @@ class BotStartupManagerTest {
             BotStorage.removeActiveBot(id);
         }
         BotEventBus.getInstance().reset();
+        gcMovementStatic.close();
+        BotGeneration.setDecorator(null); // null = 恢复生产默认
         BotStartupManager.setServerAccess(null);
         BotGeneration.setServerAccess(DefaultBotServerAccess.INSTANCE);
         BotGeneration.setBaseCharacterSupplier(null);

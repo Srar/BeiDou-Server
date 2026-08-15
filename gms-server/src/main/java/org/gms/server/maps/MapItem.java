@@ -199,6 +199,9 @@ public class MapItem extends AbstractMapObject {
     }
 
     public final Client getOwnerClient() {
+        if (ownerClient == null || ownerClient.getPlayer() == null) {
+            return null;
+        }
         return (ownerClient.isLoggedIn() && !ownerClient.getPlayer().isAwayFromWorld()) ? ownerClient : null;
     }
 

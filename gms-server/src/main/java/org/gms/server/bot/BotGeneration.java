@@ -2,9 +2,11 @@ package org.gms.server.bot;
 
 import lombok.extern.slf4j.Slf4j;
 import org.gms.client.Character;
+import org.gms.client.inventory.InventoryType;
 import org.gms.client.SkinColor;
 import org.gms.client.creator.MakeCharInfo;
 import org.gms.client.creator.MakeCharInfoValidator;
+import org.gms.server.bot.decorate.BotDecorate;
 import org.gms.server.maps.MapleMap;
 import org.gms.util.I18nUtil;
 import org.gms.util.PacketCreator;
@@ -49,17 +51,39 @@ public final class BotGeneration {
     /** 基底角色工厂（测试注入点：替换为 mock 角色，避免触碰 GameConfig/WZ）。 */
     private static Supplier<Character> baseCharacterSupplier = BotGeneration::createBaseCharacter;
 
+    /** 装饰函数（测试注入点：生产默认走 BotDecorate；测试可替换为 no-op 隔离静态副作用）。 */
+    @FunctionalInterface
+    interface BotDecorator {
+        void decorate(Character bot, int baseClass, int minLevel, int maxLevel, int forcedJobId);
+    }
+
+    private static volatile BotDecorator decorator = BotGeneration::decorateBot;
+
     private BotGeneration() {
     }
 
     /** 测试注入接缝（传 null 恢复生产默认，与 BotStartupManager.setServerAccess 语义一致）。 */
-    static void setServerAccess(BotServerAccess access) {
+    public static void setServerAccess(BotServerAccess access) {
         serverAccess = access == null ? DefaultBotServerAccess.INSTANCE : access;
     }
 
     /** 测试注入接缝（传 null 恢复生产默认）。 */
-    static void setBaseCharacterSupplier(Supplier<Character> supplier) {
+    public static void setBaseCharacterSupplier(Supplier<Character> supplier) {
         baseCharacterSupplier = supplier == null ? BotGeneration::createBaseCharacter : supplier;
+    }
+
+    /** 测试注入接缝（传 null 恢复生产默认）。 */
+    static void setDecorator(BotDecorator decorator) {
+        BotGeneration.decorator = decorator == null ? BotGeneration::decorateBot : decorator;
+    }
+
+    /** 生产装饰实现：对齐 SoloMapling BotGeneration.createBot 的装饰分支。 */
+    private static void decorateBot(Character bot, int baseClass, int minLevel, int maxLevel, int forcedJobId) {
+        if (baseClass <= 0) {
+            BotDecorate.setBotVariables(bot);
+        } else {
+            BotDecorate.setBotVariables(bot, baseClass, minLevel, maxLevel, forcedJobId);
+        }
     }
 
     /** 生产实现：内存构造默认角色（level 1 初心者）+ 随机合法外观，不复用数据库基底。 */
@@ -102,12 +126,27 @@ public final class BotGeneration {
         return currentBotCount.get() - 100;
     }
 
+    /** 无 class/等级约束的默认生成：委托 6 参版走完整随机装饰（tier/level/job/body/equip/NX）。 */
+    public static int createBot(Point pos, MapleMap map) {
+        return createBot(pos, map, 0, 0, 0, 0);
+    }
+
+    /** 指定 baseClass 与等级区间的生成：委托 6 参版（forcedJobId 置 0 = 随机职业）。 */
+    public static int createBot(Point pos, MapleMap map, int baseClass, int minLevel, int maxLevel) {
+        return createBot(pos, map, baseClass, minLevel, maxLevel, 0);
+    }
+
     /**
      * 在指定地图/位置创建一个 bot 并注册进服务器（channel + world + 地图），
      * 返回新 bot 的角色 ID。方法本身快速返回（~毫秒级），出生编排跑异步。
      * 注册/落图任一步失败都会回滚已完成的注册，绝不残留「半注册幽灵 bot」。
+     * <p>
+     * 对齐 SoloMapling BotGeneration.createBot 语义：baseClass&lt;=0 走完整随机装饰
+     * （{@link BotDecorate#setBotVariables(Character)}）；否则按 baseClass/等级区间/强制职业装饰
+     * （{@link BotDecorate#setBotVariables(Character, int, int, int, int)}）。
+     * forcedJobId &gt; 0 钉死精确职业（GM trainhere 测试 spawn）；0 = 随机该 class 对应职业。
      */
-    public static int createBot(Point pos, MapleMap map) {
+    public static int createBot(Point pos, MapleMap map, int baseClass, int minLevel, int maxLevel, int forcedJobId) {
         Character bot = baseCharacterSupplier.get();
         int botId = BotHelpers.BOT_BASE_ID + currentBotCount.getAndIncrement();
         int world = DefaultBotServerAccess.resolveBotWorld();
@@ -118,7 +157,6 @@ public final class BotGeneration {
         bot.setName(randomUniqueBotName());
         bot.setFame(botId); // 调试标记：fame 值 == botId
         bot.setWorld(world);
-        bot.setLevel(Randomizer.rand(10, 40)); // 等级多样性（纯装饰；属性仍是初心者默认值）
         // 标记已进入频道世界：awayFromWorld 默认 true，不置 false 的话
         // MapleMap.cleanupGhostPlayers 会把 bot 当「断线未移除的幽灵玩家」误杀
         bot.setEnteredChannelWorld();
@@ -133,9 +171,18 @@ public final class BotGeneration {
             throw e;
         }
 
+        // 装饰在落图之后、出生编排之前执行（对齐源实现：bot 到场时已穿好装备）。
+        decorator.decorate(bot, baseClass, minLevel, maxLevel, forcedJobId);
+
         Character finalBot = bot;
         BotExecutors.runAsync(() -> playSpawnChoreography(finalBot));
-        log.info(I18nUtil.getLogMessage("BotGeneration.bot.created", botId, bot.getName()));
+        // 生成摘要（含装备状态）：用户无需 GM 命令即可在日志确认"这个 bot 有装备/有职业"
+        int level = bot.getLevel();
+        int jobId = bot.getJob() != null ? bot.getJob().getId() : 0;
+        boolean hasWeapon = bot.getInventory(InventoryType.EQUIPPED) != null
+                && bot.getInventory(InventoryType.EQUIPPED).getItem((short) -11) != null;
+        log.info(I18nUtil.getLogMessage("BotGeneration.bot.created", botId, bot.getName(),
+                level, jobId, hasWeapon));
         return botId;
     }
 

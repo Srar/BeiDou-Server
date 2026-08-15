@@ -3,15 +3,31 @@ package org.gms.server.bot;
 import lombok.extern.slf4j.Slf4j;
 import org.gms.client.Character;
 import org.gms.client.Client;
+import org.gms.client.inventory.InventoryType;
+import org.gms.server.Trade;
+import org.gms.server.bot.attack.ThrowingStarSelector;
 import org.gms.server.bot.event.BotEventBuffer;
 import org.gms.server.bot.event.BotEventBus;
 import org.gms.server.bot.event.EventSubscriber;
+import org.gms.server.bot.dialogue.BotDialogueHandler;
 import org.gms.server.bot.event.GameEvent;
+import org.gms.server.bot.gcmove.LodCounts;
+import org.gms.server.bot.messaging.ChatMessage;
+import org.gms.server.bot.messaging.MessageQueue;
+import org.gms.server.bot.trade.BotTradeHandler;
+import org.gms.server.bot.trade.BotTradeInventory;
+import org.gms.server.bot.trade.BotTradeLogic;
+import org.gms.server.bot.trade.BotTradeSM;
+import org.gms.server.bot.trade.BotTradeWants;
+import org.gms.server.bot.commands.SocialCommands;
+import org.gms.server.maps.MapObject;
 import org.gms.server.maps.MapleMap;
 import org.gms.util.I18nUtil;
+import org.gms.util.PacketCreator;
 import org.gms.util.Randomizer;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -43,6 +59,25 @@ public abstract class BotSM implements EventSubscriber {
     protected volatile BotState state;
     protected String botType;
 
+    // ── 交易 / 交互 / 调试（P5-A 按 SoloMapling BotSM 补齐；BotTrade* / MessageQueue 由
+    //    并行代理 P5-B / P5-C 移植，缺类属预期） ─────────────────────────────
+    private final int chosenStarId;
+    private BotDebugHandler debugger;
+    private BotInteractorsHandler interactors = new BotInteractorsHandler();
+    private BotTradeHandler tradeHandler;
+    protected String dialoguePath;
+    private BotDialogueHandler dialogueHandler;
+
+    private static MessageQueue messageQueue = MessageQueue.getInstance();
+
+    private BotTradeSM botTradeSM = null;
+    private BotTradeInventory tradeInventory = new BotTradeInventory();
+    private BotTradeWants tradeWants = new BotTradeWants();
+    private BotTradeSM.TradeMode currentTradeMode = BotTradeSM.TradeMode.NULL;
+    private volatile boolean movementInterrupted = false;
+    protected Trade.TradeResult lastTradeResult = null;
+    protected Character lastTradedCharacter = null;
+
     private static final long NUDGE_DEBOUNCE_MS = 1500;
     private static final int EVENT_BUFFER_CAPACITY = 100;
 
@@ -59,6 +94,15 @@ public abstract class BotSM implements EventSubscriber {
         this.state = BotState.IDLE;
         this.currentDelay = getRandomDelay();
         this.eventBuffer = new BotEventBuffer(EVENT_BUFFER_CAPACITY);
+        // 按源补齐：交易/调试/对话句柄与一次性星镖选择（源在构造期完成，createBot 装饰先于本构造）。
+        this.tradeHandler = new BotTradeHandler(chr);
+        this.debugger = new BotDebugHandler(chr);
+        this.dialogueHandler = new BotDialogueHandler(chr);
+        // 星镖选择需读已装备武器；单测用 Mockito 模拟的 Character 未初始化装备栏
+        //（getInventory 返回 null），此处先判空再选，避免 mock 角色构造期 NPE。
+        this.chosenStarId = chr.getInventory(InventoryType.EQUIPPED) != null
+                ? ThrowingStarSelector.selectFor(chr)
+                : 0;
     }
 
     /**
@@ -103,6 +147,11 @@ public abstract class BotSM implements EventSubscriber {
         return this.botType;
     }
 
+    /** 对话 YAML 资源路径（BotDialogueHandler 等子包调用方经此读取）。 */
+    public String getDialoguePath() {
+        return this.dialoguePath;
+    }
+
     public void setRunning(boolean running) {
         this.running = running;
     }
@@ -126,13 +175,16 @@ public abstract class BotSM implements EventSubscriber {
     }
 
     /**
-     * 「图上有真实玩家吗」——直接扫地图角色列表找非 bot（O(n)，n = 地图人数）。
-     * 遍历前拷贝快照：getCharacters() 返回底层集合的活视图，直接遍历会与
-     * 玩家进出图并发抛 ConcurrentModificationException（异常被 tickRunnable 吞掉
-     * 即整拍丢失，连掉线检测一起跳过）。
-     * 无 ObserverTracker（BeiDou 版未移植 LOD 系统）时这就是判定实现。
+     * 「图上有真实玩家吗」——优先走 LOD 观察器（O(1) 查 FULL tier，等价 SoloMapling
+     * {@code LodCounts.trackerRunning()} → {@code LodCounts.isMapFull(mapId)}），观察轮尚未
+     * 启动（无 GC-movement bot，如裸 dev 刷怪）时回退线性扫描。回退分支遍历前拷贝快照：
+     * getCharacters() 返回底层集合的活视图，直接遍历会与玩家进出图并发抛
+     * ConcurrentModificationException（异常被 tickRunnable 吞掉即整拍丢失，连掉线检测一起跳过）。
      */
     public boolean checkMainPlayersOnMap() {
+        if (LodCounts.trackerRunning()) {
+            return LodCounts.isMapFull(character.getMapId());
+        }
         MapleMap map = character.getMap();
         if (map == null) {
             return false;
@@ -150,6 +202,7 @@ public abstract class BotSM implements EventSubscriber {
      * 然后在 RUNNING 分支之后追加自己的子 FSM。
      */
     public void updateState() {
+        debugger.handleDebugPrints(this);
         switch (state) {
             case IDLE:
                 if (checkRunningOnline()) {
@@ -164,7 +217,14 @@ public abstract class BotSM implements EventSubscriber {
                     log.info(I18nUtil.getLogMessage("BotSM.state.finished", getChr().getName()));
                     break;
                 }
+                // 空闲站立刷新（等价 SoloMapling MovementCommands.BotIdleStandingUpdate）：
+                // gms 未移植录制引擎，用 Character.broadcastStance() 广播一次站立包，
+                // 让同图玩家看到的 bot 保持站立帧不僵死。
+                if (getChr().getMap() != null) {
+                    getChr().broadcastStance();
+                }
                 if (verifyTradePartner()) {
+                    tradeInitialized(getTradeMode());
                     setState(BotState.TRADING);
                 }
                 break;
@@ -183,17 +243,24 @@ public abstract class BotSM implements EventSubscriber {
                 }
                 break;
             case TRADING:
-                // 交易子系统为后续版本；verifyTradePartner 默认恒 false，此分支正常不可达。
-                // 掉线必须拆卸（TRADING 期间 bot 同样会被销毁）。
+                // 掉线必须拆卸（TRADING 期间 bot 同样会被销毁）—— gms 保留增强。
                 if (!checkRunningOnline()) {
                     cleanupTradeState();
                     setState(BotState.FINISHED);
                     log.info(I18nUtil.getLogMessage("BotSM.state.finished", getChr().getName()));
                     break;
                 }
-                if (!verifyTradePartner() && !isOfferAccepted()) {
+                /*
+                1. completed, has trade partner = should not be possible
+                2. not completed, has trade partner = still trading continuously - TRADING
+
+                3. completed, no trade partner = successfully finished trade. go to running
+                4. not completed, no partner = canceled / trade declined = go to running - RUNNING
+                 */
+                if (isTradeComplete() && !verifyTradePartner() ||
+                        !isTradeComplete() && !verifyTradePartner() && !isOfferAccepted()) {
                     cleanupTradeState();
-                    waitFor(2000); // 交易收尾的稳定拍（门控，不持有线程）
+                    waitFor(2000); // settle beat after the trade closes (gated, no thread held)
                     setState(BotState.RUNNING);
                     break;
                 }
@@ -202,6 +269,7 @@ public abstract class BotSM implements EventSubscriber {
             case FINISHED:
                 // 单次 tick 内的瞬态拆卸态：不阻塞、不停留，同拍落到 IDLE。
                 this.setRunning(false);
+                getInteractors().resetRespondant();
                 stopScheduledTask();
                 setState(BotState.IDLE);
                 break;
@@ -309,6 +377,11 @@ public abstract class BotSM implements EventSubscriber {
             log.info(I18nUtil.getLogMessage("BotSM.scheduler.stop", this.getChr().getName()));
         }
         BotEventBus.getInstance().unsubscribeAll(this);
+        // 对齐源：关停调度前清掉 bot 的粉笔黑板（等价 SoloMapling SocialCommands.botClearChalkboard）。
+        // 拆卸窗口内 map 可能已置 null，加判空避免 teardown NPE（源无此判空，属 gms 安全增强）。
+        if (getChr().getMap() != null) {
+            SocialCommands.botClearChalkboard(this.getChr());
+        }
         BotTickService.unregister(getChr().getId());
     }
 
@@ -356,23 +429,32 @@ public abstract class BotSM implements EventSubscriber {
         return !eventBuffer.isEmpty();
     }
 
-    // ── 交易挂钩（预留：9 态交易子机为后续版本，届时替换以下三个钩子） ──────
+    // ── 交易挂钩（P5-B 回填：对齐 SoloMapling BotSM 交易钩子） ──────────────
 
-    /** 是否有交易伙伴正在请求。v1 恒 false——TRADING 分支不可达。 */
+    /** 是否有交易伙伴正在请求。 */
     protected boolean verifyTradePartner() {
-        return false;
+        return tradeHandler.verifyTradePartner();
     }
 
     protected boolean isOfferAccepted() {
-        return false;
+        return botTradeSM != null && botTradeSM.isOfferAccepted();
+    }
+
+    protected boolean isTradeComplete() {
+        return botTradeSM != null && botTradeSM.isTradeComplete();
     }
 
     protected void updateTradeSM() {
-        throw new UnsupportedOperationException(I18nUtil.getExceptionMessage("BotSM.exception.trade_not_implemented"));
+        if (botTradeSM != null) {
+            botTradeSM.update();
+        }
     }
 
     protected void cleanupTradeState() {
-        // 预留：交易状态清理
+        botTradeSM = null;
+        BotTradeLogic.clearTradeRequest(getChr());
+        tradeHandler.resetTradePartner();
+        discardTradeSM();
     }
 
     // ── 测试/诊断访问器 ──
@@ -387,5 +469,149 @@ public abstract class BotSM implements EventSubscriber {
 
     public boolean isCadenceObserved() {
         return cadenceObserved;
+    }
+
+    // ── P5-A 补齐：SoloMapling BotSM 缺失的字段访问器与交易/交互挂钩 ─────────
+    // 逐方法对齐源实现（对照 SoloMapling BotSM 行号）；交易相关按源签名引用
+    // org.gms.server.bot.trade（P5-B 落地后编译），消息引用 org.gms.server.bot.messaging（P5-C）。
+
+    /** 该 bot 创建期选定的一次性星镖（非爪投掷手为 0）。 */
+    public int getChosenStarId() {
+        return this.chosenStarId;
+    }
+
+    public BotInteractorsHandler getInteractors() {
+        return interactors;
+    }
+
+    public BotTradeHandler getTradeHandler() {
+        return tradeHandler;
+    }
+
+    protected BotDebugHandler getDebugger() {
+        return debugger;
+    }
+
+    public BotDialogueHandler getDialogueHandler() {
+        return dialogueHandler;
+    }
+
+    public BotTradeInventory getTradeInventory() {
+        return tradeInventory;
+    }
+
+    public BotTradeWants getTradeWants() {
+        return tradeWants;
+    }
+
+    public void interruptMovement() {
+        this.movementInterrupted = true;
+    }
+
+    public boolean isMovementInterrupted() {
+        return this.movementInterrupted;
+    }
+
+    public void clearMovementInterrupt() {
+        this.movementInterrupted = false;
+    }
+
+    // 源内实现依赖 MessageQueue（P5-C 移植到 org.gms.server.bot.messaging）。
+    protected void processMessages() {
+        log.info("BotSM processMessages");
+        try {
+            ChatMessage message = messageQueue.getMessageNonBlocking("secondary");
+            if (message.getSender() == getInteractors().getRespondant()) {
+                log.info("This Message is from Respondant: {}, Msg: {}", getInteractors().getRespondant().getName(), message);
+            }
+        } catch (Exception e) {
+            log.warn("BotSM processMessages error for {}", getChr().getName(), e);
+        }
+    }
+
+    public List<MapObject> detectItems() {
+        // 源为空壳（todo），保持返回 null
+        return null;
+    }
+
+    protected boolean checkIfNotRunningOrPaused() {
+        if (!this.getRunning()) {
+            return true;
+        }
+        if (state == BotState.PAUSE) {
+            return true;
+        }
+        return false;
+    }
+
+    public void displayCommands(Character chr) {
+        List<String> hint = List.of(getChr().getName());
+        // 等价 SocialCommands.talkCygnusGuideCommands(chr, hint)：gms 用 PacketCreator.talkGuide
+        if (chr.getClient() != null) {
+            chr.getClient().sendPacket(PacketCreator.talkGuide("1. " + hint.get(0) + "\r\n"));
+        }
+    }
+
+    protected void checkForTrades() {
+        boolean acceptedTrade = BotTradeLogic.checkTradeQueue(getChr());
+        if (acceptedTrade) {
+            tradeHandler.setTradePartner(tradeHandler.getTradePartnerRaw());
+            log.debug("Accepted Trade");
+        }
+    }
+
+    public void setTradeMode(BotTradeSM.TradeMode tradeMode) {
+        this.currentTradeMode = tradeMode;
+    }
+
+    protected BotTradeSM.TradeMode getTradeMode() {
+        return this.currentTradeMode;
+    }
+
+    protected void tradeInitialized(BotTradeSM.TradeMode tradeMode) {
+        startTradeSM(tradeMode);
+    }
+
+    protected void startTradeSM() {
+        if (botTradeSM == null) {
+            botTradeSM = new BotTradeSM(this); // Create only when entering TRADING
+        }
+    }
+
+    protected void startTradeSM(BotTradeSM.TradeMode mode) {
+        botTradeSM = new BotTradeSM(this, mode);
+    }
+
+    protected void discardTradeSM() {
+        botTradeSM = null;
+    }
+
+    public void resetLastTradeResult() {
+        lastTradeResult = null;
+    }
+
+    public void setLastTradeResult(Trade.TradeResult result) {
+        lastTradeResult = result;
+    }
+
+    public Trade.TradeResult getLastTradeResult() {
+        return lastTradeResult;
+    }
+
+    public void setLastTradedCharacter(Character character) {
+        lastTradedCharacter = character;
+    }
+
+    public Character getLastTradedCharacter() {
+        return lastTradedCharacter;
+    }
+
+    public void resetLastTradedCharacter() {
+        lastTradedCharacter = null;
+    }
+
+    /** 环境氛围动作可用性（源为空壳，保持 false；子类可覆写）。 */
+    public boolean isAvailableForAmbientActions() {
+        return false;
     }
 }

@@ -795,7 +795,13 @@ public class MapleMap {
     }
 
     public void dropFromReactor(final Character chr, final Reactor reactor, Item drop, Point dropPos, short questid) {
-        spawnDrop(drop, this.calcDropPos(dropPos, reactor.getPosition()), reactor, chr, (byte) (chr.getParty() != null ? 1 : 0), questid);
+        dropFromReactor(chr, reactor, drop, dropPos, questid, (short) 0);
+    }
+
+    // SoloMapling dropFromReactor 7 参（源 804-808）：透传掉落 delay 给 item drop 包，
+    // 供喷泉（CustomReactor.delayedReactorDrops）阶梯延迟掉落使用。
+    public void dropFromReactor(final Character chr, final Reactor reactor, Item drop, Point dropPos, short questid, short delay) {
+        spawnDrop(drop, this.calcDropPos(dropPos, reactor.getPosition()), reactor, chr, (byte) (chr.getParty() != null ? 1 : 0), questid, delay);
     }
 
     private void stopItemMonitor() {
@@ -932,6 +938,10 @@ public class MapleMap {
 
     private void registerItemDrop(MapItem mdrop) {
         droppedItems.put(mdrop, !everlast ? Server.getInstance().getCurrentTime() + GameConfig.getServerLong("item_expire_time") : Long.MAX_VALUE);
+    }
+
+    private void registerItemDropNoExpire(MapItem mdrop) {
+        droppedItems.put(mdrop, Long.MAX_VALUE);
     }
 
     private void unregisterItemDrop(MapItem mdrop) {
@@ -1145,15 +1155,25 @@ public class MapleMap {
     }
 
     private void spawnDrop(final Item idrop, final Point dropPos, final MapObject dropper, final Character chr, final byte droptype, final short questid) {
+        spawnDrop(idrop, dropPos, dropper, chr, droptype, questid, (short) 0);
+    }
+
+    // SoloMapling spawnDrop 7 参（源 1074-1094）：透传 delay 到 dropItemFromMapObject。
+    private void spawnDrop(final Item idrop, final Point dropPos, final MapObject dropper, final Character chr, final byte droptype, final short questid, short delay) {
         final MapItem mdrop = new MapItem(idrop, dropPos, dropper, chr, chr.getClient(), droptype, false, questid);
         mdrop.setDropTime(Server.getInstance().getCurrentTime());
         spawnAndAddRangedMapObject(mdrop, c -> {
             Character chr1 = c.getPlayer();
+            // gms 适配：bot 共享无头 BotClient（sessionId=-1）没有绑定角色，getPlayer() 为 null；
+            // 掉落范围广播遍历到 bot 客户端时跳过，避免 needQuestItem NPE。
+            if (chr1 == null) {
+                return;
+            }
 
             if (chr1.needQuestItem(questid, idrop.getItemId())) {
                 mdrop.lockItem();
                 try {
-                    c.sendPacket(PacketCreator.dropItemFromMapObject(chr1, mdrop, dropper.getPosition(), dropPos, (byte) 1));
+                    c.sendPacket(PacketCreator.dropItemFromMapObject(chr1, mdrop, dropper.getPosition(), dropPos, (byte) 1, delay));
                 } finally {
                     mdrop.unlockItem();
                 }
@@ -1172,7 +1192,28 @@ public class MapleMap {
         spawnAndAddRangedMapObject(mdrop, c -> {
             mdrop.lockItem();
             try {
-                c.sendPacket(PacketCreator.dropItemFromMapObject(c.getPlayer(), mdrop, dropper.getPosition(), droppos, (byte) 1));
+                if (c.getPlayer() != null) {
+                    c.sendPacket(PacketCreator.dropItemFromMapObject(c.getPlayer(), mdrop, dropper.getPosition(), droppos, (byte) 1));
+                } // gms 适配：共享无头 BotClient 无绑定角色，跳过（同 spawnDrop quest 分支）
+            } finally {
+                mdrop.unlockItem();
+            }
+        }, null);
+
+        instantiateItemDrop(mdrop);
+    }
+
+    public final void spawnMesoDrop(final int meso, final Point position, final MapObject dropper,
+                                    final Character owner, final boolean playerDrop, final byte droptype, short delay) {
+        final Point droppos = calcDropPos(position, position);
+        final MapItem mdrop = new MapItem(meso, droppos, dropper, owner, owner.getClient(), droptype, playerDrop);
+        mdrop.setDropTime(Server.getInstance().getCurrentTime());
+
+        spawnAndAddRangedMapObject(mdrop, c -> {
+            mdrop.lockItem();
+            try {
+                // gms 移植：透传 delay（SoloMapling 同名方法写入包的掉落延迟位）。
+                c.sendPacket(PacketCreator.dropItemFromMapObject(owner, mdrop, dropper.getPosition(), droppos, (byte) 1, delay)); // formerly c.getPlayer()
             } finally {
                 mdrop.unlockItem();
             }
@@ -1456,6 +1497,9 @@ public class MapleMap {
                         ItemInformationProvider mii = ItemInformationProvider.getInstance();
                         for (MapObject mmo : this.getPlayers()) {
                             Character character = (Character) mmo;
+                            if (character.getClient() == null || character.getClient().getPlayer() == null) {
+                                continue;
+                            }
                             if (character.isAlive()) {
                                 StatEffect statEffect = mii.getItemEffect(buff);
                                 character.sendPacket(PacketCreator.showOwnBuffEffect(buff, 1));
@@ -1969,6 +2013,20 @@ public class MapleMap {
         }
     }
 
+    // Public read-only snapshot of every monster spawn point's position, from the static .wz spawn
+    // layout (the spawn lists themselves stay private). Used by the bot grind-spot scoring to find
+    // which walkable ledges have the densest spawns.
+    public List<java.awt.Point> getMonsterSpawnPositions() {
+        List<java.awt.Point> positions = new ArrayList<>();
+        for (SpawnPoint sp : getAllMonsterSpawn()) {
+            java.awt.Point p = sp.getPosition();
+            if (p != null) {
+                positions.add(new java.awt.Point(p));
+            }
+        }
+        return positions;
+    }
+
     public void spawnAllMonsterIdFromMapSpawnList(int id) {
         spawnAllMonsterIdFromMapSpawnList(id, 1, false);
     }
@@ -2197,7 +2255,9 @@ public class MapleMap {
         spawnAndAddRangedMapObject(mdrop, c -> {
             mdrop.lockItem();
             try {
-                c.sendPacket(PacketCreator.dropItemFromMapObject(c.getPlayer(), mdrop, dropper.getPosition(), droppos, (byte) 1));
+                if (c.getPlayer() != null) {
+                    c.sendPacket(PacketCreator.dropItemFromMapObject(c.getPlayer(), mdrop, dropper.getPosition(), droppos, (byte) 1));
+                } // gms 适配：共享无头 BotClient 无绑定角色，跳过（同 spawnDrop quest 分支）
             } finally {
                 mdrop.unlockItem();
             }
@@ -2212,6 +2272,67 @@ public class MapleMap {
 
         instantiateItemDrop(mdrop);
         activateItemReactors(mdrop, owner.getClient());
+    }
+
+    public final MapItem spawnItemDropNoExpire(final MapObject dropper, final Character owner, final Item item, Point pos,
+                                    final boolean ffaDrop, final boolean playerDrop) {
+        if (FieldLimit.DROP_LIMIT.check(this.getFieldLimit())) {
+            this.disappearingItemDrop(dropper, owner, item, pos);
+            return null;
+        }
+
+        final Point droppos = calcDropPos(pos, pos);
+        final MapItem mdrop = new MapItem(item, droppos, dropper, owner, owner.getClient(), (byte) (ffaDrop ? 2 : 0), playerDrop);
+        mdrop.setDropTime(Server.getInstance().getCurrentTime());
+
+        spawnAndAddRangedMapObject(mdrop, c -> {
+            mdrop.lockItem();
+            try {
+                if (c.getPlayer() != null) {
+                    c.sendPacket(PacketCreator.dropItemFromMapObject(c.getPlayer(), mdrop, dropper.getPosition(), droppos, (byte) 1));
+                } // gms 适配：共享无头 BotClient 无绑定角色，跳过（同 spawnDrop quest 分支）
+            } finally {
+                mdrop.unlockItem();
+            }
+        }, null);
+
+        mdrop.lockItem();
+        try {
+            broadcastItemDropMessage(mdrop, dropper.getPosition(), droppos, (byte) 0);
+        } finally {
+            mdrop.unlockItem();
+        }
+
+        // Use no-expire registration instead of standard
+        if (droppedItemCount.get() >= GameConfig.getServerInt("item_limit_on_map")) {
+            MapObject mapobj;
+            do {
+                mapobj = null;
+                objectWLock.lock();
+                try {
+                    while (mapobj == null) {
+                        if (registeredDrops.isEmpty()) {
+                            break;
+                        }
+                        mapobj = registeredDrops.remove(0).get();
+                    }
+                } finally {
+                    objectWLock.unlock();
+                }
+            } while (!makeDisappearItemFromMap(mapobj));
+        }
+
+        objectWLock.lock();
+        try {
+            registerItemDropNoExpire(mdrop);
+            registeredDrops.add(new WeakReference<>(mdrop));
+        } finally {
+            objectWLock.unlock();
+        }
+        droppedItemCount.incrementAndGet();
+
+        activateItemReactors(mdrop, owner.getClient());
+        return mdrop;
     }
 
     public final void spawnItemDropList(List<Integer> list, final MapObject dropper, final Character owner, Point pos) {
@@ -2716,11 +2837,10 @@ public class MapleMap {
         return null;
     }
 
-    /*
+    // GCMoveSystem: restored to let the dynamic nav-graph baker enumerate portals.
     public Collection<Portal> getPortals() {
         return Collections.unmodifiableCollection(portals.values());
     }
-    */
 
     public void addPlayerPuppet(Character player) {
         for (Monster mm : this.getAllMonsters()) {
@@ -3228,6 +3348,37 @@ public class MapleMap {
         return footholds;
     }
 
+    // ── GCMoveSystem (GreenCat dynamic movement) terrain model ──
+    // Populated by MapFactory from WZ (ladderRope / info.fs / info.swim). Read by the
+    // dynamic physics/nav engine off the LIVE map.
+    private final java.util.List<Rope> ropes = new java.util.ArrayList<>();
+    private float footholdSpeed = 1.0f;
+    private boolean swim = false;
+
+    public void addRope(Rope rope) {
+        ropes.add(rope);
+    }
+
+    public java.util.List<Rope> getRopes() {
+        return ropes;
+    }
+
+    public float getFootholdSpeed() {
+        return footholdSpeed;
+    }
+
+    public void setFootholdSpeed(float footholdSpeed) {
+        this.footholdSpeed = footholdSpeed;
+    }
+
+    public boolean isSwim() {
+        return swim;
+    }
+
+    public void setSwim(boolean swim) {
+        this.swim = swim;
+    }
+
     public void setMapPointBoundings(int px, int py, int h, int w) {
         mapArea.setBounds(px, py, w, h);
     }
@@ -3408,6 +3559,12 @@ public class MapleMap {
                 player.addVisibleMapObject(mo);
             }
         }
+    }
+
+    // SoloMapling MapleMap.moveBot（源 3314-3315）：仅 setPosition，不做可见性协调、
+    // 不 sendSpawnData。bot 无真实 client，走 movePlayer 会触发 sendSpawnData 造成 MapItem 噪音。
+    public void moveBot(Character player, Point newPosition) {
+        player.setPosition(newPosition);
     }
 
     public final void toggleEnvironment(final String ms) {

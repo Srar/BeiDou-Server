@@ -49,6 +49,9 @@ public class OnlineTimeTask implements Runnable {
     }
 
     private int getInitialOnlineTime(Character chr) {
+        if (chr == null || chr.getClient() == null || chr.getClient().getPlayer() == null) {
+            return 0;
+        }
         try {
             String timeStr = chr.getAbstractPlayerInteraction().getAccountExtendValue(ExtendKey.ONLINE_TIME.getKey(), true);
             return timeStr == null ? 0 : Integer.parseInt(timeStr);

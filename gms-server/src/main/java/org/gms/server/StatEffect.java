@@ -922,6 +922,16 @@ public class StatEffect {
         return applyTo(chr, chr, true, pos, false, 1);
     }
 
+    /**
+     * Grant this buff to {@code target} as if cast by {@code caster}, via the
+     * internal non-primary apply path: the target gets the real, working buff
+     * (stat + icons + foreign aura) with NO MP cost and NO cast animation on them.
+     * Lets bot combat grant party/support buffs to nearby players and bots.
+     */
+    public boolean applyToTarget(Character caster, Character target) {
+        return applyTo(caster, target, false, null, false, 1);
+    }
+
     // primary: the player caster of the buff
     private boolean applyTo(Character applyfrom, Character applyto, boolean primary, Point pos, boolean useMaxRange, int affectedPlayers) {
         if (skill && (sourceid == GM.HIDE || sourceid == SuperGM.HIDE)) {
@@ -929,14 +939,14 @@ public class StatEffect {
             return true;
         }
 
-        if (primary && isHeal()) {
-            affectedPlayers = applyBuff(applyfrom, useMaxRange);
-        }
+        // gms 适配：bot 复用共享无头客户端，getClient().getPlayer() 为 null。
+        // 此类目标不执行依赖真实角色(背包/传送/挂载)的副作用，仅保留 buff 状态与广播。
+        boolean applytoIsRealPlayer = applyto.getClient() != null && applyto.getClient().getPlayer() != null;
 
         int hpchange = calcHPChange(applyfrom, primary, affectedPlayers);
         int mpchange = calcMPChange(applyfrom, primary);
         if (primary) {
-            if (itemConNo != 0) {
+            if (itemConNo != 0 && applytoIsRealPlayer) {
                 if (!applyto.getAbstractPlayerInteraction().hasItem(itemCon, itemConNo)) {
                     applyto.sendPacket(PacketCreator.enableActions());
                     return false;
@@ -966,7 +976,7 @@ public class StatEffect {
             return false;
         }
 
-        if (moveTo != -1) {
+        if (moveTo != -1 && applytoIsRealPlayer) {
             if (moveTo != applyto.getMapId()) {
                 MapleMap target;
                 Portal pt;
@@ -999,7 +1009,7 @@ public class StatEffect {
                 return false;
             }
         }
-        if (isShadowClaw()) {
+        if (isShadowClaw() && applytoIsRealPlayer) {
             short projectileConsume = this.getBulletConsume();  // noticed by shavit
 
             Inventory use = applyto.getInventory(InventoryType.USE);
@@ -1076,7 +1086,10 @@ public class StatEffect {
                 door.getTarget().spawnDoor(door.getAreaDoor());
                 door.getTown().spawnDoor(door.getTownDoor());
             } else {
-                InventoryManipulator.addFromDrop(applyto.getClient(), new Item(ItemId.MAGIC_ROCK, (short) 0, (short) 1), false);
+                // gms 适配：bot 无真实背包，跳过魔法石返还/消耗。
+                if (applytoIsRealPlayer) {
+                    InventoryManipulator.addFromDrop(applyto.getClient(), new Item(ItemId.MAGIC_ROCK, (short) 0, (short) 1), false);
+                }
 
                 if (door.getOwnerId() == -3) {
                     applyto.dropMessage(5, "Mystic Door cannot be cast far from a spawn point. Nearest one is at " + door.getDoorStatus().getRight() + "pts " + door.getDoorStatus().getLeft());
@@ -1232,6 +1245,19 @@ public class StatEffect {
         return bounds;
     }
 
+    /**
+     * The skill's WZ attack rectangle, anchored at {@code from} and mirrored for facing
+     * (the same geometry the skill's own hit detection uses), or null if the skill defines
+     * no lt/rb range. Lets SoloMapling bots size their attack reach from real game data
+     * instead of hand-tuned boxes.
+     */
+    public Rectangle getAttackBox(Point from, boolean facingLeft) {
+        if (lt == null || rb == null) {
+            return null;
+        }
+        return calculateBoundingBox(from, facingLeft);
+    }
+
     public int getBuffLocalDuration() {
         return !GameConfig.getServerBoolean("use_buff_everlasting") ? duration : Integer.MAX_VALUE;
     }
@@ -1321,7 +1347,10 @@ public class StatEffect {
 
             // thanks inhyuk for noticing some skill mounts not acting properly for other players when changing maps
             givemount = applyto.mount(ridingMountId, sourceid);
-            applyto.getClient().getWorldServer().registerMountHunger(applyto);
+            // gms 适配：bot 无真实客户端，跳过坐骑饥饿度注册。
+            if (applyto.getClient() != null && applyto.getClient().getPlayer() != null) {
+                applyto.getClient().getWorldServer().registerMountHunger(applyto);
+            }
 
             localDuration = sourceid;
             localsourceid = ridingMountId;
@@ -1560,7 +1589,7 @@ public class StatEffect {
         return false;
     }
 
-    private boolean isPartyBuff() {
+    public boolean isPartyBuff() {
         if (lt == null || rb == null) {
             return false;
         }

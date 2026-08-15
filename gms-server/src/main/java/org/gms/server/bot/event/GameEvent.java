@@ -30,6 +30,11 @@ public final class GameEvent {
         return new GameEvent(EventType.MAP_ENTERED, world, channel, mapId, entererId, null);
     }
 
+    /** 角色升级事件（玩家或 bot）：sourceCharacterId 为升级角色 ID（由订阅方按需解析角色）。 */
+    public static GameEvent levelUp(int world, int channel, int mapId, int playerId) {
+        return new GameEvent(EventType.LEVEL_UP, world, channel, mapId, playerId, null);
+    }
+
     public EventType getType() {
         return type;
     }

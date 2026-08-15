@@ -1804,6 +1804,12 @@ public class PacketCreator {
     }
 
     public static Packet dropItemFromMapObject(Character player, MapItem drop, Point dropfrom, Point dropto, byte mod) {
+        // gms 移植：保留 5 参版本签名不变，委托给带 delay 的重载，delay 恒 0（与旧行为一致）。
+        return dropItemFromMapObject(player, drop, dropfrom, dropto, mod, (short) 0);
+    }
+
+    public static Packet dropItemFromMapObject(Character player, MapItem drop, Point dropfrom, Point dropto, byte mod,
+                                               short delay) {
         int dropType = drop.getDropType();
         if (drop.hasClientsideOwnership(player) && dropType < 3) {
             dropType = 2;
@@ -1821,7 +1827,7 @@ public class PacketCreator {
 
         if (mod != 2) {
             p.writePos(dropfrom);
-            p.writeShort(0);//Fh?
+            p.writeShort(delay);//Fh? (drop delay, 0 for instant - SoloMapling 同名方法透传 delay)
         }
         if (drop.getMeso() == 0) {
             addExpirationTime(p, drop.getItem().getExpiration());

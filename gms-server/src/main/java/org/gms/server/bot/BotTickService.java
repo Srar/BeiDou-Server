@@ -110,6 +110,7 @@ public final class BotTickService {
 
     private static final Map<Integer, Entry> ENTRIES = new ConcurrentHashMap<>();
     private static final AtomicBoolean DRIVER_STARTED = new AtomicBoolean(false);
+    private static final AtomicBoolean rejectionLogged = new AtomicBoolean(false);
     private static volatile ScheduledFuture<?> driverFuture;
 
     // ── Governor：自调节降载 ────────────────────────────────────────────────
@@ -173,6 +174,7 @@ public final class BotTickService {
         }
         ENTRIES.clear();
         DRIVER_STARTED.set(false);
+        rejectionLogged.set(false);
         throttleFactor = 1.0;
         governorWindowStartMs = 0;
         windowLagSumMs = 0;
@@ -252,9 +254,15 @@ public final class BotTickService {
             try {
                 BotExecutors.runAsync(() -> runTick(e));
             } catch (RejectedExecutionException ex) {
-                // 执行器已关停：回滚派发状态，避免条目永远卡在 ticking=true/nextDueMs=MAX
+                // 执行器已关停：回滚派发状态，避免条目永远卡在 ticking=true/nextDueMs=MAX。
+                // gms 增强：执行器关停后 driver 每 100ms 都会全部拒绝，形成刷屏风暴并拖慢停机。
+                // 首次拒绝即停轮（shutdown() 幂等），并只告警一次。
                 e.complete(now, throttleFactor);
-                log.warn(I18nUtil.getLogMessage("BotTickService.dispatch.rejected"), ex);
+                if (rejectionLogged.compareAndSet(false, true)) {
+                    log.warn(I18nUtil.getLogMessage("BotTickService.dispatch.rejected"), ex);
+                }
+                shutdown(); // 停 driver + 清空轮盘（虚拟线程执行器已关，tick 不可能再执行）
+                return;
             }
         }
         governorTick(now, lagSum, dispatched);

@@ -25,9 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.verify;
 
 /**
  * 生命周期组合场景（审查复盘补盲）：单测只覆盖单个操作，本类锁定跨操作组合——
@@ -102,13 +99,16 @@ class BotLifecycleCombinationTest {
         BotTypeManager.manuallyStartBot(chr);
         assertTrue(BotStorage.getBotById(botId).getRunning());
         assertTrue(BotTickService.isRegistered(botId));
-        assertEquals(1, BotEventBus.getInstance().subscriberCount(EventType.CHAT),
+        assertEquals(1, BotEventBus.getInstance().subscriberCount(EventType.LEVEL_UP),
                 "subscriber must survive two stop→start cycles");
 
-        // 订阅存活还不够——事件链路必须端到端可用
-        BotEventBus.getInstance().publish(GameEvent.chat(0, 1, MAP_ID, 5, "hi"));
-        BotStorage.getBotById(botId).updateState();
-        verify(map, atLeast(1)).broadcastMessage(any());
+        // 订阅存活还不够——事件链路必须端到端可用（发布 → onEvent 入队 → tick 消费）。
+        // 新 SocialBot 只消费 LEVEL_UP（祝贺），且反应是概率 + 错开延迟，故这里锁定确定性入队/出队路径。
+        BotEventBus.getInstance().publish(GameEvent.levelUp(0, 1, MAP_ID, 5));
+        BotSM bot = BotStorage.getBotById(botId);
+        assertTrue(bot.hasQueuedEvents(), "matched event must be queued to the bot's buffer");
+        bot.processQueuedEvents();
+        assertFalse(bot.hasQueuedEvents(), "processQueuedEvents must drain the buffered event through handleEvent");
     }
 
     @Test
@@ -116,19 +116,19 @@ class BotLifecycleCombinationTest {
         BotEventBus bus = BotEventBus.getInstance();
 
         BotTypeManager.BotType.SOCIAL_BOT.createAndSetBot(chr);
-        assertEquals(1, bus.subscriberCount(EventType.CHAT), "SocialBot must subscribe on creation");
+        assertEquals(1, bus.subscriberCount(EventType.LEVEL_UP), "SocialBot must subscribe on creation");
         assertInstanceOf(SocialBot.class, BotStorage.getBotById(botId));
 
         assertTrue(BotTypeManager.convertBotType(chr, BotTypeManager.BotType.IDLE_BOT));
-        assertEquals(0, bus.subscriberCount(EventType.CHAT), "converting to IDLE must drop the CHAT subscriber");
+        assertEquals(0, bus.subscriberCount(EventType.LEVEL_UP), "converting to IDLE must drop the LEVEL_UP subscriber");
         assertInstanceOf(IdleBot.class, BotStorage.getBotById(botId));
 
         assertTrue(BotTypeManager.convertBotType(chr, BotTypeManager.BotType.SOCIAL_BOT));
-        assertEquals(1, bus.subscriberCount(EventType.CHAT), "converting back must restore exactly one subscriber");
+        assertEquals(1, bus.subscriberCount(EventType.LEVEL_UP), "converting back must restore exactly one subscriber");
         assertInstanceOf(SocialBot.class, BotStorage.getBotById(botId));
 
         assertTrue(BotTypeManager.convertBotType(chr, BotTypeManager.BotType.IDLE_BOT));
-        assertEquals(0, bus.subscriberCount(EventType.CHAT), "second round trip must leave zero subscribers");
+        assertEquals(0, bus.subscriberCount(EventType.LEVEL_UP), "second round trip must leave zero subscribers");
         assertInstanceOf(IdleBot.class, BotStorage.getBotById(botId));
     }
 

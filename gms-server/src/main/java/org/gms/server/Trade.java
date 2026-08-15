@@ -45,6 +45,11 @@ import java.util.List;
 import java.util.StringJoiner;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.gms.server.bot.trade.BotTradeQueue;
+
+import static org.gms.server.bot.BotHelpers.isBot;
+import static org.gms.server.bot.BotHelpers.isBotId;
+
 /**
  * @author Matze
  * @author Ronan - concurrency safety + check available slots + trade results
@@ -160,7 +165,9 @@ public class Trade {
         boolean bothLocked = isLocked() && partner != null && partner.isLocked();
         if (!bothLocked) {
             for (Item item : items) {
-                InventoryManipulator.addFromDrop(chr.getClient(), item, show);
+                if (!isBot(chr)) {
+                    InventoryManipulator.addFromDrop(chr.getClient(), item, show);
+                }
             }
             if (meso > 0) {
                 chr.gainMeso(meso, show, true, show);
@@ -186,11 +193,11 @@ public class Trade {
         chr.sendPacket(PacketCreator.getTradeResult(number, result));
     }
 
-    private boolean isLocked() {
+    public boolean isLocked() {
         return locked.get();
     }
 
-    private int getMeso() {
+    public int getMeso() {
         return meso;
     }
 
@@ -214,6 +221,14 @@ public class Trade {
         }
     }
 
+    public void setMesoBot(int meso) {
+        this.meso = meso;
+        chr.sendPacket(PacketCreator.getTradeMesoSet((byte) 0, this.meso));
+        if (partner != null) {
+            partner.getChr().sendPacket(PacketCreator.getTradeMesoSet((byte) 1, this.meso));
+        }
+    }
+
     public boolean addItem(Item item) {
         synchronized (items) {
             if (items.size() > 9) {
@@ -225,6 +240,18 @@ public class Trade {
                 }
             }
 
+            items.add(item);
+        }
+
+        return true;
+    }
+
+    public boolean swapItem(Item item) {
+        synchronized (items) {
+            if (items.size() > 9) {
+                return false;
+            }
+            items.removeIf(it -> it.getPosition() == item.getPosition());
             items.add(item);
         }
 
@@ -270,7 +297,9 @@ public class Trade {
         for (Item item : exchangeItems) {
             tradeItems.add(new Pair<>(item, item.getInventoryType()));
         }
-
+        if (isBot(chr)) {
+            return true;
+        }
         return Inventory.checkSpotsAndOwnership(chr, tradeItems);
     }
 
@@ -394,11 +423,33 @@ public class Trade {
             }
 
             logTrade(local, partner);
-            local.completeTrade();
-            partner.completeTrade();
+            if (!isBot(local.getChr())) {
+                local.completeTrade();
+            }
+            if (!isBot(partner.getChr())) {
+                partner.completeTrade();
+            }
+
+            // 交易成功回调：仅 bot 侧触发（对齐 SoloMapling setCallbackSuccessfulTrade 调用点）
+            if (isBot(local.getChr())) {
+                local.setCallbackSuccessfulTrade();
+            }
+            if (isBot(partner.getChr())) {
+                partner.setCallbackSuccessfulTrade();
+            }
 
             partner.getChr().setTrade(null);
             chr.setTrade(null);
+            clearBotTradeQueue(partner.getChr());
+            clearBotTradeQueue(chr);
+        }
+    }
+
+    // Whenever a bot's trade dies, its BotTradeQueue entry (added in inviteTrade) must die with it.
+    // A stale entry NPEs the bot's next checkTradeQueue tick and blocks all future trade invites.
+    private static void clearBotTradeQueue(Character chr) {
+        if (isBotId(chr.getId())) {
+            BotTradeQueue.getInstance().removeTradeRequest(chr);
         }
     }
 
@@ -412,11 +463,13 @@ public class Trade {
         if (trade.getPartner() != null) {
             trade.getPartner().cancel(partnerResult);
             trade.getPartner().getChr().setTrade(null);
+            clearBotTradeQueue(trade.getPartner().getChr());
 
             InviteCoordinator.answerInvite(InviteType.TRADE, trade.getChr().getId(), trade.getPartner().getChr().getId(), false);
             InviteCoordinator.answerInvite(InviteType.TRADE, trade.getPartner().getChr().getId(), trade.getChr().getId(), false);
         }
         chr.setTrade(null);
+        clearBotTradeQueue(chr);
     }
 
     private static byte[] tradeResultsPair(byte result) {
@@ -526,6 +579,9 @@ public class Trade {
 
                 c1.sendPacket(PacketCreator.getTradeStart(c1.getClient(), c1.getTrade(), (byte) 0));
                 c2.sendPacket(PacketCreator.tradeInvite(c1));
+                if (isBot(c2)) {
+                    BotTradeQueue.getInstance().addTradeRequest(c2, c1);
+                }
             } else {
                 c1.message(I18nUtil.getMessage("Trade.inviteTrade.createInvite.msg1"));
                 cancelTrade(c1, TradeResult.NO_RESPONSE);
@@ -541,10 +597,12 @@ public class Trade {
         InviteResult inviteRes = InviteCoordinator.answerInvite(InviteType.TRADE, c1.getId(), c2.getId(), true);
 
         InviteResultType res = inviteRes.result;
-        if (res == InviteResultType.ACCEPTED) {
+        if (res == InviteResultType.ACCEPTED || isBot(c2)) {
             if (c1.getTrade() != null && c1.getTrade().getPartner() == c2.getTrade() && c2.getTrade() != null && c2.getTrade().getPartner() == c1.getTrade()) {
                 c2.sendPacket(PacketCreator.getTradePartnerAdd(c1));
-                c1.sendPacket(PacketCreator.getTradeStart(c1.getClient(), c1.getTrade(), (byte) 1));
+                if (!isBot(c1)) {
+                    c1.sendPacket(PacketCreator.getTradeStart(c1.getClient(), c1.getTrade(), (byte) 1));
+                }
                 c1.getTrade().setFullTrade(true);
                 c2.getTrade().setFullTrade(true);
             } else {
@@ -567,10 +625,12 @@ public class Trade {
 
                 other.getTrade().cancel(TradeResult.PARTNER_CANCEL.getValue());
                 other.setTrade(null);
+                clearBotTradeQueue(other);
 
             }
             trade.cancel(TradeResult.NO_RESPONSE.getValue());
             chr.setTrade(null);
+            clearBotTradeQueue(chr);
         }
     }
 
@@ -615,5 +675,24 @@ public class Trade {
             sj.add(I18nUtil.getLogMessage("Trade.info.inviteTrade.logTrade.msg3" , item.getQuantity(), itemName, item.getItemId()) + "\n");
         }
         return sj.toString();
+    }
+
+    /*
+    交易结果回调：让 Bot 得知本次交易是否成功（对齐 SoloMapling TradeResultCallback）。
+     */
+    public interface TradeResultCallback {
+        void onTradeResult(TradeResult result);
+    }
+
+    private TradeResultCallback callback;
+
+    public void setTradeResultCallback(TradeResultCallback callback) {
+        this.callback = callback;
+    }
+
+    private void setCallbackSuccessfulTrade() {
+        if (callback != null) {
+            callback.onTradeResult(TradeResult.SUCCESSFUL);
+        }
     }
 }

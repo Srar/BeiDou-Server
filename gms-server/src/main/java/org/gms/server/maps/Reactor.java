@@ -381,6 +381,13 @@ public class Reactor extends AbstractMapObject {
      * @param c 客户端
      */
     public void hitReactor(boolean wHit, int charPos, short stance, int skillid, Client c) {
+        if (c == null) {
+            return;
+        }
+        Character player = c.getPlayer();
+        if (player == null) {
+            return;
+        }
         try {
             if (!this.isActive()) {
                 return;  // 如果不活跃则直接返回
@@ -392,7 +399,6 @@ public class Reactor extends AbstractMapObject {
                     cancelReactorTimeout();  // 取消超时
                     attackHit = wHit;  // 设置击中标志
 
-                    Character player = c.getPlayer();
                     if (GameConfig.getServerBoolean("use_debug") && player.isGM()) {
                         player.dropMessage(5, "击中反应器 " + this.getId() + " 位置 " + charPos + " , 姿态 " + stance + " , 技能ID " + skillid + " , 状态 " + state + " 状态大小 " + stats.getStateSize(state));  // GM调试信息
                     }

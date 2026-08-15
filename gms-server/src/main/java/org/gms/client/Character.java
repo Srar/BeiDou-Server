@@ -70,6 +70,9 @@ import org.gms.scripting.item.ItemScriptManager;
 import org.gms.server.*;
 import org.gms.server.ExpLogger.ExpLogRecord;
 import org.gms.server.ItemInformationProvider.ScriptedItem;
+import org.gms.server.bot.BotTier;
+import org.gms.server.bot.event.BotEventBus;
+import org.gms.server.bot.event.GameEvent;
 import org.gms.server.events.Events;
 import org.gms.server.events.RescueGaga;
 import org.gms.server.events.gm.Fitness;
@@ -139,6 +142,16 @@ public class Character extends AbstractCharacterObject {
     @Setter
     @Getter
     private int gender;
+    // Bot tier (ported from SoloMapling Character: soloMapling.ArtificialPlayer.BotTier).
+    private BotTier botTier = BotTier.getDefaultTier();
+
+    public void setTier(BotTier newTier) {
+        this.botTier = BotTier.TierManager.safeTierSet(this.botTier, newTier);
+    }
+
+    public BotTier getTier() {
+        return BotTier.TierManager.getSafeTier(botTier);
+    }
     @Getter
     private int hair;
     @Setter
@@ -2993,6 +3006,7 @@ public class Character extends AbstractCharacterObject {
             if (show) {
                 announceExpGain(gain, equip, party, inChat, white);
             }
+            int levelBefore = level;
             while (exp.get() >= ExpTable.getExpNeededForLevel(level)) {
                 levelUp(true);
 
@@ -3013,6 +3027,13 @@ public class Character extends AbstractCharacterObject {
                     break;
                 }
                 if (GameConfig.getServerBoolean("use_level_up_protect")) break;
+            }
+
+            if (level > levelBefore) {
+                // 对齐 SoloMapling Character.gainExpInternal：升级事件在「等级确实提升」的最终出口
+                // 发布一次（多级连升只发一次，避免突发）。源不排除 bot（bot 升级同样被祝贺）；
+                // 自祝贺风险由 LevelUpCongrats.react 的 self 过滤挡住。levelUp(boolean) 内不再发布。
+                BotEventBus.getInstance().publish(GameEvent.levelUp(getWorld(), client.getChannel(), getMapId(), getId()));
             }
 
             if (leftover > 0) {
@@ -6876,7 +6897,7 @@ public class Character extends AbstractCharacterObject {
         }
     }
 
-    private void setChair(int chair) {
+    public void setChair(int chair) {
         this.chair.set(chair);
     }
 

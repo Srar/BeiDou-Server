@@ -1,0 +1,271 @@
+package org.gms.server.bot.types;
+
+import lombok.extern.slf4j.Slf4j;
+import org.gms.client.Character;
+import org.gms.server.bot.BotSM;
+import org.gms.server.bot.BotTypeManager;
+import org.gms.server.bot.dialogue.BotDialogueHandler;
+import org.gms.server.bot.gcmove.GCMovement;
+import org.gms.server.bot.messaging.ChatMessage;
+import org.gms.server.bot.messaging.MessageQueue;
+import org.gms.server.maps.MapleMap;
+import org.gms.util.Randomizer;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
+
+@Slf4j
+public class HenesysBot extends BotSM {
+    private HenesysBotState henesysBotState = HenesysBotState.RESET;
+    private List<String> hint = Collections.singletonList(getChr().getName());
+
+    private long startTime;
+    private long endTime;
+    private long lastMapChangeTime;
+
+    // Henesys Map IDs -
+    private static final int HENESYS_MAIN = 100000000;
+    private static final int HENESYS_MARKET = 100000100;
+    private static final int HENESYS_PARK = 100000200;
+    private static final int PET_PARK = 100000202;
+    private static final List<Integer> HENESYS_MAPS = List.of(HENESYS_MAIN, HENESYS_MARKET, HENESYS_PARK, PET_PARK);
+
+    // Portal IDs for connecting maps (kept for reference; gcmove 负责实际跨图导航) -
+    private static final int PORTAL_MAIN_TO_MARKET = 23;
+    private static final int PORTAL_MAIN_TO_PARK = 24;
+    private static final int PORTAL_MARKET_TO_MAIN = 14;
+    private static final int PORTAL_PARK_TO_MAIN = 18;
+    private static final int PORTAL_PARK_TO_MARKET = 19;
+    private static final int PORTAL_MARKET_TO_PARK = 15;
+    private static final int PORTAL_PARK_TO_PETPARK = 13;
+    private static final int PORTAL_PETPARK_TO_PARK = 5;
+
+    private static final long JQ_CONVERSION_COOLDOWN_MS = 10 * 60 * 1000;
+    private long lastJQConversionTime = 0;
+
+    // Cooldown between map changes (3 minutes)
+    private static final long MAP_CHANGE_COOLDOWN_MS = 3 * 60 * 1000;
+
+    public HenesysBot(Character character) {
+        super(character);
+        dialoguePath = "HenesysBotDialogue.yaml";
+        botType = "HenesysBot";
+        lastMapChangeTime = 0;
+    }
+
+    private void setHenesysBotState(HenesysBotState state) {
+        this.henesysBotState = state;
+    }
+
+    private enum HenesysBotState {
+        RESET,
+        IDLE,
+        WANDER,
+        EMOTE,
+        CHANGE_MAP
+    }
+
+    private void resetHenesysBotState() {
+        setHenesysBotState(HenesysBotState.RESET);
+        startTime = System.currentTimeMillis();
+        endTime = 0;
+    }
+
+    @Override
+    public void updateState() {
+        super.updateState();
+        if (checkIfNotRunningOrPaused()) {
+            return;
+        }
+        getDebugger().debugLoggingFull(String.format("%s HenesysBotState: %s", this.getChr().getName(), henesysBotState), String.format("%s", henesysBotState));
+
+        switch (henesysBotState) {
+            case RESET:
+                resetHenesysBotState();
+                setHenesysBotState(HenesysBotState.IDLE);
+                break;
+            case IDLE:
+                decideNextAction();
+                break;
+            case WANDER:
+                wanderPlatforms();
+                doRandomEmote();
+                doRandomChat("WanderChat");
+                setHenesysBotState(HenesysBotState.IDLE);
+                break;
+            case EMOTE:
+                doRandomEmote();
+                doRandomChat("EmoteReaction");
+                setHenesysBotState(HenesysBotState.IDLE);
+                break;
+            case CHANGE_MAP:
+                doRandomChat("MapTransition");
+                changeMap();
+                lastMapChangeTime = System.currentTimeMillis();
+                doRandomEmote();
+                wanderToRandomLedge();
+                setHenesysBotState(HenesysBotState.IDLE);
+                break;
+            default:
+                log.info("Unexpected state: " + henesysBotState);
+                state = BotState.FINISHED;
+                resetHenesysBotState();
+                throw new IllegalStateException("Unexpected state: " + state);
+        }
+    }
+
+    /**
+     * Decides what action the bot takes this tick.
+     * Weighted rolls determine whether it wanders, changes maps, or just idles.
+     */
+    private void decideNextAction() {
+        if (getChr().getMapId() == PET_PARK
+                && (System.currentTimeMillis() - lastJQConversionTime) > JQ_CONVERSION_COOLDOWN_MS
+                && Randomizer.nextInt(4) == 0) {
+            convertToJQBot();
+            return;
+        }
+
+        boolean mapChangeCooledDown = (System.currentTimeMillis() - lastMapChangeTime) > MAP_CHANGE_COOLDOWN_MS;
+
+        if (mapChangeCooledDown && Randomizer.nextInt(10) == 0) {
+            setHenesysBotState(HenesysBotState.CHANGE_MAP);
+            return;
+        }
+
+        // ~33% chance to wander on any given tick
+        if (Randomizer.nextInt(3) == 0) {
+            setHenesysBotState(HenesysBotState.WANDER);
+            return;
+        }
+
+        // 10% chance to do an emote even while staying put
+        if (Randomizer.nextInt(5) == 0) {
+            setHenesysBotState(HenesysBotState.EMOTE);
+            return;
+        }
+
+        // Otherwise stay idle - do nothing this tick
+    }
+
+    /**
+     * Moves the bot to another platform on the current map (gcmove 图导航随机游走，
+     * 替代 SoloMapling PlatformPlacement 的平台行走).
+     */
+    private void wanderPlatforms() {
+        MapleMap map = getChr().getMap();
+        if (map == null) return;
+        List<GCMovement.Ledge> ledges = GCMovement.walkableLedges(map);
+        if (ledges.isEmpty()) return;
+
+        if (Randomizer.nextInt(5) == 0 || Randomizer.nextInt(10) == 0 || Randomizer.nextInt(35) == 0) {
+            GCMovement.Ledge ledge = ledges.get(Randomizer.nextInt(ledges.size()));
+            GCMovement.move(getChr(), ledge.centerX(), ledge.centerY());
+        }
+    }
+
+    private void doRandomEmote() {
+        if (Randomizer.nextInt(10) == 0) {
+            int emoteId = Randomizer.nextInt(50) == 0 ? 2 : 3;
+            BotGameSupport.botEmote(getChr(), emoteId);
+        }
+    }
+
+    private void doRandomChat(String dialogueNode) {
+        if (Randomizer.nextInt(20) == 0) {
+            try {
+                String line = BotDialogueHandler.getRandomResolvedLine(this, dialogueNode);
+                if (line != null) BotGameSupport.botSpeak(getChr(), line);
+            } catch (Exception e) {
+                // dialogue YAML node missing, skip
+            }
+        }
+    }
+
+    // gcmove 图导航跨图：从 HENESYS_MAPS 里挑最不拥挤的一张，交由 GCTravel 走世界图。
+    private void changeMap() {
+        List<Integer> options = new ArrayList<>();
+        for (int mapId : HENESYS_MAPS) {
+            if (mapId != getChr().getMapId()) {
+                options.add(mapId);
+            }
+        }
+        if (options.isEmpty()) return;
+
+        int chosen = pickLeastCrowdedMap(options);
+        try {
+            GCMovement.travel(getChr(), chosen);
+            checkPrioritySpeed();
+            log.info(getChr().getName() + " changing map to " + chosen);
+        } catch (Exception e) {
+            log.info("HenesysBot map change failed: " + e.getMessage());
+        }
+    }
+
+    private int pickLeastCrowdedMap(List<Integer> mapIds) {
+        Random rng = new Random();
+        double[] weights = new double[mapIds.size()];
+        double total = 0;
+
+        for (int i = 0; i < mapIds.size(); i++) {
+            int population = mapPlayerCount(mapIds.get(i));
+            weights[i] = 1.0 / (1 + population);
+            total += weights[i];
+        }
+
+        double roll = rng.nextDouble() * total;
+        double cumulative = 0;
+        for (int i = 0; i < weights.length; i++) {
+            cumulative += weights[i];
+            if (roll < cumulative) return mapIds.get(i);
+        }
+        return mapIds.get(mapIds.size() - 1);
+    }
+
+    private int mapPlayerCount(int mapId) {
+        MapleMap current = getChr().getMap();
+        if (current == null) return 0;
+        MapleMap target = current.getChannelServer().getMapFactory().getMap(mapId);
+        return target == null ? 0 : target.getCharacters().size();
+    }
+
+    private void wanderToRandomLedge() {
+        MapleMap map = getChr().getMap();
+        if (map == null) return;
+        List<GCMovement.Ledge> ledges = GCMovement.walkableLedges(map);
+        if (!ledges.isEmpty()) {
+            GCMovement.Ledge ledge = ledges.get(Randomizer.nextInt(ledges.size()));
+            GCMovement.move(getChr(), ledge.centerX(), ledge.centerY());
+        }
+    }
+
+    private void convertToJQBot() {
+        doRandomChat("MapTransition");
+        log.info("[HenesysBot] " + getChr().getName() + " converting to JQ bot on Pet Park.");
+        BotTypeManager.convertBotType(getChr(), BotTypeManager.BotType.HENESYS_JQ_BOT);
+    }
+
+    public void setLastJQConversionTime(long time) {
+        this.lastJQConversionTime = time;
+    }
+
+    @Override
+    public void displayCommands(Character chr) {
+        BotGameSupport.displayPlayerChatCommands(chr, hint);
+    }
+
+    @Override
+    public void processMessages() {
+        try {
+            ChatMessage message = MessageQueue.getInstance().getMessageWithTimeout("secondary", 1, TimeUnit.SECONDS);
+            if (message == null) {
+                return;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

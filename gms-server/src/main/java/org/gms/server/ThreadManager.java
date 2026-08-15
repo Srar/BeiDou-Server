@@ -24,7 +24,7 @@ import lombok.Getter;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * @author Ronan
@@ -49,9 +49,14 @@ public class ThreadManager {
     public void stop() {
         executorService.shutdown();
         try {
-            boolean ignore = executorService.awaitTermination(5, MINUTES);
+            // 缩短停机等待：5 分钟过长，虚拟线程执行器空转时也会拖慢停机。
+            // 30 秒后仍未结束则强制 shutdownNow，中断仍在途的任务，避免停机挂起。
+            if (!executorService.awaitTermination(30, SECONDS)) {
+                executorService.shutdownNow();
+            }
         } catch (InterruptedException ignore) {
-
+            Thread.currentThread().interrupt();
+            executorService.shutdownNow();
         }
     }
 

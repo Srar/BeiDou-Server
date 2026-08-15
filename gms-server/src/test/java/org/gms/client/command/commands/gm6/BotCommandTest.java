@@ -71,6 +71,14 @@ class BotCommandTest {
     }
 
     @Test
+    void supportedSubcommandForwardsToArtificialPlayerCommand() {
+        // "help" 不在 gm6 的 7 个子命令内，应转发给 ArtificialPlayerCommand 并打印其帮助首行
+        command.execute(client, new String[]{"help"});
+
+        verify(player).yellowMessage("---- Bot Commands (!bot) ----");
+    }
+
+    @Test
     void countShowsTotal() {
         command.execute(client, new String[]{"count"});
 

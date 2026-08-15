@@ -7,5 +7,7 @@ public enum EventType {
     /** 真实玩家在非命令频道聊天。 */
     CHAT,
     /** 真实玩家进入某张地图。 */
-    MAP_ENTERED
+    MAP_ENTERED,
+    /** 角色升级（玩家或 bot 都发布）。 */
+    LEVEL_UP
 }

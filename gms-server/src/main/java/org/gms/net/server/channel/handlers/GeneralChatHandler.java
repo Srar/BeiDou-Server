@@ -27,6 +27,7 @@ import org.gms.client.autoban.AutobanFactory;
 import org.gms.client.command.CommandsExecutor;
 import org.gms.net.AbstractPacketHandler;
 import org.gms.net.packet.InPacket;
+import org.gms.server.bot.buffrequest.BotBuffRequestHandler;
 import org.gms.server.bot.event.BotEventBus;
 import org.gms.server.bot.event.GameEvent;
 import org.slf4j.Logger;
@@ -76,6 +77,10 @@ public final class GeneralChatHandler extends AbstractPacketHandler {
             // 隐身 GM 的发言只对 GM 可见，不进 bot 事件流（否则 bot 公开应答会暴露 GM 隐身）。
             if (!chr.isHidden()) {
                 BotEventBus.getInstance().publish(GameEvent.chat(chr.getWorld(), chr.getClient().getChannel(), chr.getMapId(), chr.getId(), s));
+                // 求 buff 入口：对齐 SoloMapling 源（普通聊天分支，事件/队列处理之后再 tryHandle）。
+                // tryHandle 内部已有 isBot 守卫（bot 聊天永不回喂）；此处与 CHAT 事件同处 !isHidden 分支，
+                // 保证隐身 GM 发言不触发 bot 反应（bot 公开 emote/气泡会暴露 GM 隐身）。
+                BotBuffRequestHandler.tryHandle(chr, s);
             }
         }
     }

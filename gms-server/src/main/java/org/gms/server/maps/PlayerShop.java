@@ -258,8 +258,15 @@ public class PlayerShop extends AbstractMapObject {
      * @param quantity
      */
     public boolean buy(Client c, int item, short quantity) {
+        if (c == null) {
+            return false;
+        }
+        Character buyer = c.getPlayer();
+        if (buyer == null) {
+            return false;
+        }
         synchronized (items) {
-            if (isVisitor(c.getPlayer())) {
+            if (isVisitor(buyer)) {
                 if (quantity < 1 || item < 0 || item >= items.size()) {
                     c.sendPacket(PacketCreator.enableActions());
                     return false;
@@ -285,19 +292,19 @@ public class PlayerShop extends AbstractMapObject {
                 try {
                     int price = (int) Math.min((float) pItem.getPrice() * quantity, Integer.MAX_VALUE);
 
-                    if (c.getPlayer().getMeso() >= price) {
+                    if (buyer.getMeso() >= price) {
                         if (!owner.canHoldMeso(price)) {    // thanks Rohenn for noticing owner hold check misplaced
-                            c.getPlayer().dropMessage(1, "Transaction failed since the shop owner can't hold any more mesos.");
+                            buyer.dropMessage(1, "Transaction failed since the shop owner can't hold any more mesos.");
                             c.sendPacket(PacketCreator.enableActions());
                             return false;
                         }
 
                         if (canBuy(c, newItem)) {
-                            c.getPlayer().gainMeso(-price, false);
+                            buyer.gainMeso(-price, false);
                             price -= Trade.getFee(price);  // thanks BHB for pointing out trade fees not applying here
                             owner.gainMeso(price, true);
 
-                            SoldItem soldItem = new SoldItem(c.getPlayer().getName(), pItem.getItem().getItemId(), quantity, price);
+                            SoldItem soldItem = new SoldItem(buyer.getName(), pItem.getItem().getItemId(), quantity, price);
                             owner.sendPacket(PacketCreator.getPlayerShopOwnerUpdate(soldItem, item));
 
                             synchronized (sold) {
@@ -315,12 +322,12 @@ public class PlayerShop extends AbstractMapObject {
                                 }
                             }
                         } else {
-                            c.getPlayer().dropMessage(1, "Your inventory is full. Please clear a slot before buying this item.");
+                            buyer.dropMessage(1, "Your inventory is full. Please clear a slot before buying this item.");
                             c.sendPacket(PacketCreator.enableActions());
                             return false;
                         }
                     } else {
-                        c.getPlayer().dropMessage(1, "You don't have enough mesos to purchase this item.");
+                        buyer.dropMessage(1, "You don't have enough mesos to purchase this item.");
                         c.sendPacket(PacketCreator.enableActions());
                         return false;
                     }

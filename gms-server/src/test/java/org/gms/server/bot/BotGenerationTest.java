@@ -83,10 +83,14 @@ class BotGenerationTest {
         BotGeneration.setServerAccess(fakeAccess);
         BotGeneration.setBaseCharacterSupplier(BotGenerationTest::newBaseCharacter);
         map = mock(MapleMap.class);
+        // createBot 现在会走装饰管线（baseClass<=0 -> setBotVariables）；本类只测生命周期，
+        // 装饰是 mock Character 无法承载的静态副作用，用注入接缝屏蔽（跨线程安全，装饰有独立语义）。
+        BotGeneration.setDecorator((bot, baseClass, minLevel, maxLevel, forcedJobId) -> { });
     }
 
     @AfterEach
     void tearDown() {
+        BotGeneration.setDecorator(null); // null = 恢复生产默认
         BotGeneration.setServerAccess(DefaultBotServerAccess.INSTANCE);
         BotGeneration.setBaseCharacterSupplier(null); // null = 恢复生产默认
     }

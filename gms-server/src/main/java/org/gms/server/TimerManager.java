@@ -64,6 +64,8 @@ public class TimerManager implements TimerManagerMBean {
             public Thread newThread(Runnable r) {
                 Thread t = new Thread(r);
                 t.setName("TimerManager-Worker-" + threadNumber.getAndIncrement());
+                // daemon 化：即使停机钩子未走完，JVM 也能退出（治本：不因残留调度器挂起进程）。
+                t.setDaemon(true);
                 return t;
             }
         });

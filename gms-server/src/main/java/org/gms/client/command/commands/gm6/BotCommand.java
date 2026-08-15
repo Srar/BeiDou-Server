@@ -3,13 +3,19 @@ package org.gms.client.command.commands.gm6;
 import org.gms.client.Character;
 import org.gms.client.Client;
 import org.gms.client.command.Command;
+import org.gms.client.command.commands.gm4.ArtificialPlayerCommand;
 import org.gms.server.bot.BotGeneration;
+import org.gms.server.bot.BotHelpers;
 import org.gms.server.bot.BotStorage;
 import org.gms.server.bot.BotTypeManager;
 import org.gms.server.bot.BotSM;
 import org.gms.server.bot.DefaultBotServerAccess;
+import org.gms.server.bot.gcmove.GCMovement;
 import org.gms.server.maps.MapleMap;
 import org.gms.util.I18nUtil;
+
+import java.awt.Point;
+import java.util.List;
 
 /**
  * GM6 命令 !bot：人工玩家 Bot 的生命周期管理。
@@ -35,12 +41,24 @@ public class BotCommand extends Command {
             case "stop" -> startStop(c, params, false);
             case "type" -> convert(c, params);
             case "dc" -> dc(c, params);
-            default -> player.yellowMessage(I18nUtil.getMessage("BotCommand.message2"));
+            default -> {
+                if (ArtificialPlayerCommand.supports(params[0])) {
+                    new ArtificialPlayerCommand().execute(c, params);
+                } else {
+                    player.yellowMessage(I18nUtil.getMessage("BotCommand.message2"));
+                }
+            }
         }
     }
 
     private void spawn(Client c, String[] params) {
         Character player = c.getPlayer();
+        // 源 !bot spawn <class> <tier> [n] = idle class-spawn（ArtificialPlayerCommand.handleSpawn）。
+        // gm6 的 BotType.valueOf 无法解析 class 名，识别到 class 白名单即转发回 gm4 命令。
+        if (params.length > 1 && ArtificialPlayerCommand.isSpawnClass(params[1])) {
+            new ArtificialPlayerCommand().execute(c, params);
+            return;
+        }
         String typeName = params.length > 1 ? params[1] : "social_bot";
         BotTypeManager.BotType type;
         try {
@@ -71,7 +89,13 @@ public class BotCommand extends Command {
         }
 
         try {
-            int botId = BotGeneration.createBot(player.getPosition(), map);
+            // 对齐源 create 命令的随机撒点语义：以 GM 脚下为锚点沿 X 分桶随机 + getPointBelow
+            // 地面修正，bot 同图多次 spawn 会自然错开，不再全部堆在 GM 脚下。
+            Point anchor = player.getPosition();
+            List<Point> spots = BotHelpers.pickGroundSpots(map, anchor, 1);
+            Point spawnAt = spots.isEmpty() ? anchor : spots.get(0);
+
+            int botId = BotGeneration.createBot(spawnAt, map);
             Character bot = DefaultBotServerAccess.INSTANCE.getCharacterById(botId);
             if (bot == null) {
                 player.yellowMessage(I18nUtil.getMessage("BotCommand.message9", botId));
@@ -79,6 +103,8 @@ public class BotCommand extends Command {
             }
             type.createAndSetBot(bot);
             BotTypeManager.manuallyStartBot(bot);
+            // 保证手动生成的 bot 也能动：首次 enable 启动 ObserverTracker 观察轮询并异步 warm 导航图（幂等）。
+            GCMovement.enable(bot);
             player.yellowMessage(I18nUtil.getMessage("BotCommand.message6", bot.getName(), botId));
         } catch (RuntimeException e) {
             player.yellowMessage(I18nUtil.getMessage("BotCommand.message17"));
@@ -176,6 +202,7 @@ public class BotCommand extends Command {
                 player.yellowMessage(I18nUtil.getMessage("BotCommand.message9", botId));
                 return;
             }
+            BotTypeManager.manuallyStopBot(bot);
             BotGeneration.removeBotFromServer(bot);
             player.yellowMessage(I18nUtil.getMessage("BotCommand.message14", botId));
         } catch (NumberFormatException e) {

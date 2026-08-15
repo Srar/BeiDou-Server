@@ -60,6 +60,13 @@ import org.gms.server.SkillbookInformationProvider;
 import org.gms.server.ThreadManager;
 import org.gms.server.TimerManager;
 import org.gms.server.bot.BotTickService;
+import org.gms.server.bot.BotTypeManager;
+import org.gms.server.bot.decorate.BotDecorationQueue;
+import org.gms.server.bot.gcmove.GCMovement;
+import org.gms.server.bot.itempool.DesirableEquipList;
+import org.gms.server.bot.itempool.EquipMetadataCache;
+import org.gms.server.bot.messaging.Dispatcher;
+import org.gms.server.bot.types.TrainingBot;
 import org.gms.server.expeditions.ExpeditionBossLog;
 import org.gms.server.life.PlayerNPC;
 import org.gms.server.quest.Quest;
@@ -685,6 +692,8 @@ public class Server {
             futures.add(initExecutor.submit(CashItemFactory::loadAllCashItems));
             futures.add(initExecutor.submit(Quest::loadAllQuests));
             futures.add(initExecutor.submit(SkillbookInformationProvider::loadAllSkillbookInformation));
+            futures.add(initExecutor.submit(DesirableEquipList::load));
+            futures.add(initExecutor.submit(EquipMetadataCache::initialize));
             // Wait on all async tasks to complete
             for (Future<?> future : futures) {
                 future.get();
@@ -1678,12 +1687,24 @@ public class Server {
 
         resetServerWorlds();
 
-        ThreadManager.getInstance().stop();
+        // ── Bot 停机钩子：先停生产者调度器（逐个 stopScheduledTask + GCMovement.disable），
+        // 再停 TimerManager 调度器，最后停虚拟线程执行器（ThreadManager）。顺序不能颠倒：
+        // 若先停执行器，轮盘/移动 tick 会向已关停的池疯狂派发；若先停 TimerManager 前的
+        // bot 调度未走完，残留轮盘条目会在停机后继续空转。单个钩子失败不阻断停机。
+        runShutdownHook("BotTypeManager.stopAllBots", BotTypeManager::stopAllBots);
+        runShutdownHook("Dispatcher.shutdown", () -> Dispatcher.getInstance().shutdown());
+        runShutdownHook("BotDecorationQueue.stop", BotDecorationQueue::stop);
+        runShutdownHook("GCMovement.shutdown", GCMovement::shutdown);
+        runShutdownHook("TrainingBot.resetCombatTicker", TrainingBot::resetCombatTicker);
+
         TimerManager.getInstance().purge();
         TimerManager.getInstance().stop();
         // Bot 框架：复位中央 tick 轮（TimerManager 已 shutdownNow，旧 driver 被取消；
         // 不复位 DRIVER_STARTED/ENTRIES 的话，重启后 bot 将注册成功但永不 tick）
         BotTickService.shutdown();
+
+        ThreadManager.getInstance().stop();
+
         loginServer.stop();
         online = false;
         log.info(I18nUtil.getLogMessage("Server.shutdownInternal.info4"));
@@ -1693,6 +1714,15 @@ public class Server {
             // 重置标志，让 init() 重新启动后能再次响应关停调用
             shuttingDown = false;
             getInstance().init();
+        }
+    }
+
+    /** 停机钩子：每个钩子独立 try/catch 兜底，单个失败不阻断停机。 */
+    private static void runShutdownHook(String name, Runnable hook) {
+        try {
+            hook.run();
+        } catch (Throwable t) {
+            log.warn("Bot shutdown hook failed: {}", name, t);
         }
     }
 

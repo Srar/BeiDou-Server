@@ -56,6 +56,7 @@ class BotTypeManagerTest {
         }
         BotStorage.removeActiveBot(botId);
         BotTickService.unregister(botId);
+        BotEventBus.getInstance().reset();
     }
 
     @Test
@@ -65,7 +66,7 @@ class BotTypeManagerTest {
         BotSM bot = BotStorage.getBotById(botId);
         assertNotNull(bot, "bot must be registered in storage");
         assertInstanceOf(SocialBot.class, bot);
-        assertEquals("SOCIAL_BOT", bot.getBotType());
+        assertEquals("SocialBot", bot.getBotType());
     }
 
     @Test
@@ -134,13 +135,13 @@ class BotTypeManagerTest {
     void convertBotTypeCleansOldSubscriptions() {
         BotTypeManager.BotType.SOCIAL_BOT.createAndSetBot(chr);
         BotTypeManager.manuallyStartBot(chr);
-        assertEquals(1, BotEventBus.getInstance().subscriberCount(EventType.CHAT),
+        assertEquals(1, BotEventBus.getInstance().subscriberCount(EventType.LEVEL_UP),
                 "social bot must subscribe on construction");
 
         BotTypeManager.convertBotType(chr, BotTypeManager.BotType.IDLE_BOT);
 
-        assertEquals(0, BotEventBus.getInstance().subscriberCount(EventType.CHAT),
-                "converting away from SocialBot must unsubscribe the old CHAT subscription");
+        assertEquals(0, BotEventBus.getInstance().subscriberCount(EventType.LEVEL_UP),
+                "converting away from SocialBot must unsubscribe the old LEVEL_UP subscription");
     }
 
     @Test
@@ -148,12 +149,12 @@ class BotTypeManagerTest {
         BotTypeManager.BotType.SOCIAL_BOT.createAndSetBot(chr);
         BotTypeManager.manuallyStartBot(chr);
         BotTypeManager.manuallyStopBot(chr);
-        assertEquals(0, BotEventBus.getInstance().subscriberCount(EventType.CHAT),
+        assertEquals(0, BotEventBus.getInstance().subscriberCount(EventType.LEVEL_UP),
                 "stopping must unsubscribe");
 
         BotTypeManager.manuallyStartBot(chr);
-        assertEquals(1, BotEventBus.getInstance().subscriberCount(EventType.CHAT),
-                "re-starting a SocialBot must re-subscribe its CHAT listener (onScheduledStart hook)");
+        assertEquals(1, BotEventBus.getInstance().subscriberCount(EventType.LEVEL_UP),
+                "re-starting a SocialBot must re-subscribe its LEVEL_UP listener (onScheduledStart hook)");
     }
 
     @Test

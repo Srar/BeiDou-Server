@@ -1,5 +1,6 @@
 package org.gms.client;
 
+import io.netty.handler.timeout.IdleStateEvent;
 import org.gms.net.packet.Packet;
 
 /**
@@ -33,6 +34,16 @@ public class BotClient extends Client {
         return true;
     }
 
+    /**
+     * no-op：无头客户端绝不能写登录态。基类会向 accounts 表写 loggedin 行
+     * （按 getAccID() 定位，bot 的 accId 为 -4，会污染真实数据）并注册/注销
+     * 在线会话；bot 没有账号行、没有会话，此处直接跳过。
+     */
+    @Override
+    public void updateLoginState(int state) {
+        // headless：绝不写 accounts loggedin 行、不注册在线会话
+    }
+
     /** no-op：基类会 ioChannel.disconnect()。bot 永不掉线。 */
     @Override
     public void disconnectSession() {
@@ -43,6 +54,16 @@ public class BotClient extends Client {
     @Override
     public void closeSession() {
         // 没有会话可关
+    }
+
+    /**
+     * no-op：基类 idle 检查会 ping 后引用 ioChannel.isActive() 并可能断开。
+     * bot 没有 ioChannel，永不在 netty pipeline 中——此覆写保证闲置回收器
+     * 绝不可能碰到共享 bot client。
+     */
+    @Override
+    public void checkIfIdle(final IdleStateEvent event) {
+        // 无 ioChannel，永不回收共享无头客户端
     }
 
     /**

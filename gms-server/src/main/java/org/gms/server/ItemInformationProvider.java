@@ -35,6 +35,7 @@ import org.gms.client.inventory.WeaponType;
 import org.gms.config.GameConfig;
 import org.gms.constants.id.ItemId;
 import org.gms.constants.inventory.EquipSlot;
+import org.gms.constants.inventory.EquipType;
 import org.gms.constants.inventory.ItemConstants;
 import org.gms.constants.skills.Assassin;
 import org.gms.constants.skills.Gunslinger;
@@ -51,6 +52,7 @@ import org.gms.provider.DataProviderFactory;
 import org.gms.provider.DataTool;
 import org.gms.provider.wz.WZFiles;
 import org.gms.server.MakerItemFactory.MakerItemCreateEntry;
+import org.gms.server.bot.itempool.EquipMetadataCache;
 import org.gms.server.life.LifeFactory;
 import org.gms.server.life.MonsterInformationProvider;
 
@@ -60,6 +62,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -2374,6 +2377,157 @@ public class ItemInformationProvider {
         public int maxDays;
         public long addTime;
 
+    }
+
+    // ── Bot decoration equip selection (aligned with SoloMapling) ────────
+
+    // 装备 id 区间已迁移到 org.gms.server.bot.itempool.EquipMetadataCache（一次性缓存），
+    // 此处不再维护重复的区间表。reqJob bitmask mapping 仍保留在下方供 getReqJobForJobStyle 使用。
+
+    // reqJob bitmask mapping, copied from SoloMapling
+    // ItemInformationProviderUtilities#getReqJobViaJobStyle
+    // (ItemInformationProviderUtilities.java:144-162).
+    private static final Map<Job, Integer> JOB_TO_REQ_MAP = Map.of(
+            Job.WARRIOR, 1,
+            Job.MAGICIAN, 2,
+            Job.BOWMAN, 4,
+            Job.THIEF, 8,
+            Job.PIRATE, 16
+    );
+
+    /**
+     * Picks a random non-cash equip of {@code type} that {@code chr} could equip
+     * (level window, exact reqJob, gender), biased towards lower item ids.
+     *
+     * <p>Aligned with SoloMapling
+     * {@code ItemInformationProviderUtilities#getRandomEquip(EquipType, Character)}
+     * (ItemInformationProviderUtilities.java:349-354). Returns 0 when nothing
+     * matches (SoloMapling returns {@code null} instead).
+     */
+    public int getRandomEquip(EquipType type, Character chr) {
+        return getRandomEquipForStyle(type, chr.getLevel(), chr.getJobStyle(), chr.getGender());
+    }
+
+    /**
+     * Tries a job-specific random equip first, falling back to classless
+     * (reqJob 0 / beginner) gear when no job-specific piece exists. Aligned with
+     * SoloMapling
+     * {@code ItemInformationProviderUtilities#getRandomEquipForWearing}
+     * (ItemInformationProviderUtilities.java:359-368).
+     */
+    public int getRandomEquipForWearing(EquipType type, Character chr) {
+        int equipId = getRandomEquip(type, chr);
+        if (equipId > 0) {
+            return equipId;
+        }
+        return getRandomEquipForStyle(type, chr.getLevel(), Job.BEGINNER, chr.getGender());
+    }
+
+    private int getRandomEquipForStyle(EquipType type, int maxLevel, Job jobStyle, int gender) {
+        int reqJob = getReqJobForJobStyle(jobStyle);
+
+        // Primary window (SoloMapling ItemInformationProviderUtilities.java:189-198):
+        // maxLevel - max(25% of maxLevel, 10) <= reqLevel <= maxLevel.
+        int minLevel = maxLevel - Math.max((int) (maxLevel * 0.25), 10);
+        List<EquipMetadataCache.EquipEntry> candidates = filterEquips(type, gender, minLevel, maxLevel, reqJob);
+
+        // Fallback for bots above the gear ceiling (SoloMapling lines 205-214):
+        // re-window around the highest reqLevel that exists at-or-below level.
+        if (candidates.isEmpty()) {
+            List<EquipMetadataCache.EquipEntry> belowCap = filterEquips(type, gender, null, maxLevel, reqJob);
+            candidates = highestLevelBand(belowCap);
+        }
+
+        // SoloMapling additionally skips EquipOmitList entries before the weighted
+        // pick (ItemInformationProviderUtilities.java:219-227); that blocklist is
+        // SoloMapling-specific and is not ported here.
+        List<Integer> validEquips = new ArrayList<>(candidates.size());
+        for (EquipMetadataCache.EquipEntry entry : candidates) {
+            validEquips.add(entry.id);
+        }
+        return selectWeightedRandom(validEquips);
+    }
+
+    private List<EquipMetadataCache.EquipEntry> filterEquips(EquipType type, int gender, Integer minLevel, int maxLevel, int reqJob) {
+        // 纯内存过滤：缓存按升序 id 构建，selectWeightedRandom 依赖该顺序。
+        List<EquipMetadataCache.EquipEntry> ret = new ArrayList<>();
+        for (EquipMetadataCache.EquipEntry entry : EquipMetadataCache.get().nonCash(type)) {
+            if (entry.gender != 2 && entry.gender != gender) {
+                continue;
+            }
+            if (minLevel != null && entry.reqLevel < minLevel) {
+                continue;
+            }
+            if (entry.reqLevel > maxLevel) {
+                continue;
+            }
+            if (entry.reqJob != reqJob) {
+                continue;
+            }
+            ret.add(entry);
+        }
+        return ret;
+    }
+
+    private static int getReqJobForJobStyle(Job jobStyle) {
+        // getJobStyle() resolves the crossbow line to CROSSBOWMAN; normalize to
+        // BOWMAN (reqJob 4) so crossbowmen wear bowman gear, mirroring SoloMapling
+        // (ItemInformationProviderUtilities.java:155-161).
+        if (jobStyle == Job.CROSSBOWMAN) {
+            jobStyle = Job.BOWMAN;
+        }
+        return JOB_TO_REQ_MAP.getOrDefault(jobStyle, 0);
+    }
+
+    private List<EquipMetadataCache.EquipEntry> highestLevelBand(List<EquipMetadataCache.EquipEntry> entries) {
+        if (entries.isEmpty()) {
+            return entries;
+        }
+        int cap = 0;
+        for (EquipMetadataCache.EquipEntry entry : entries) {
+            cap = Math.max(cap, entry.reqLevel);
+        }
+        int floor = cap - Math.max((int) (cap * 0.25), 10);
+        List<EquipMetadataCache.EquipEntry> band = new ArrayList<>();
+        for (EquipMetadataCache.EquipEntry entry : entries) {
+            if (entry.reqLevel >= floor) {
+                band.add(entry);
+            }
+        }
+        return band;
+    }
+
+    private static int selectWeightedRandom(List<Integer> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return 0;
+        }
+        int intervalPercentage = 20;
+        int listSize = ids.size();
+        int intervalSize = Math.max(1, (listSize * intervalPercentage) / 100);
+        int numIntervals = (int) Math.ceil((double) listSize / intervalSize);
+
+        double[] intervalWeights = new double[numIntervals];
+        double totalWeight = 0;
+        for (int i = 0; i < numIntervals; i++) {
+            intervalWeights[i] = numIntervals - i; // linear decay toward later (higher-id) intervals
+            totalWeight += intervalWeights[i];
+        }
+
+        double randomValue = Randomizer.nextDouble() * totalWeight;
+        int selectedInterval = 0;
+        double cumulativeWeight = 0;
+        for (int i = 0; i < numIntervals; i++) {
+            cumulativeWeight += intervalWeights[i];
+            if (randomValue <= cumulativeWeight) {
+                selectedInterval = i;
+                break;
+            }
+        }
+
+        int startIndex = selectedInterval * intervalSize;
+        int endIndex = Math.min(startIndex + intervalSize, listSize);
+        int randomIndex = startIndex + Randomizer.nextInt(endIndex - startIndex);
+        return ids.get(randomIndex);
     }
 
     public static ArrayList<Pair<Integer, String>> getItemsIDsFromName(String search) {

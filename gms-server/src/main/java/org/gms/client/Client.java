@@ -1003,6 +1003,14 @@ public class Client extends ChannelInboundHandlerAdapter {
     }
 
     private void disconnectInternal(boolean shutdown, boolean cashshop) {//once per Client instance
+        // 无头短路：共享单例 BotClient 没有网络会话，绝不能走正常断开链。
+        // 基类 disconnect()/forceDisconnect() 为 final 无法覆写，只能在此基类入口短路；
+        // 否则 clear()（macs/engines/player 清空）与 updateLoginState(LOGIN_NOTLOGGEDIN)
+        // （写 accounts 表 WHERE id=-4）会污染共享实例。instanceof 只命中 bot，
+        // 玩家路径不受影响；bot 的注销由 BotGeneration.removeBotFromServer 负责，不走客户端断开链。
+        if (this instanceof BotClient) {
+            return;
+        }
         if (player != null && player.isLoggedIn() && player.getClient() != null) {
             final int messengerid = player.getMessenger() == null ? 0 : player.getMessenger().getId();
             //final int fid = player.getFamilyId();

@@ -41,8 +41,9 @@ public final class BotExecutors {
         ThreadManager.getInstance().newTask(task);
     }
 
-    /** 服务器关停路径调用：允许下一次 ensureStarted 重新引导执行器。 */
+    /** 服务器关停路径调用：允许下一次 ensureStarted 重新引导执行器，并复位共享 bot client。 */
     public static void resetForShutdown() {
         STARTED.set(false);
+        BotClientHolder.reset();
     }
 }

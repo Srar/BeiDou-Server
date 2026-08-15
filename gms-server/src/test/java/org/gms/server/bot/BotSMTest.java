@@ -2,6 +2,7 @@ package org.gms.server.bot;
 
 import org.gms.client.Character;
 import org.gms.client.Client;
+import org.gms.server.bot.gcmove.LodCounts;
 import org.gms.server.bot.event.GameEvent;
 import org.gms.server.bot.types.IdleBot;
 import org.gms.server.maps.MapleMap;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import java.util.Collections;
@@ -40,6 +42,7 @@ class BotSMTest {
     private Client client;
     private MapleMap map;
     private IdleBot bot;
+    private MockedStatic<LodCounts> lodCountsMock;
 
     @BeforeAll
     static void initSupport() {
@@ -62,11 +65,20 @@ class BotSMTest {
         Mockito.when(map.getCharacters()).thenReturn(Collections.emptyList());
         Mockito.when(chr.getMap()).thenReturn(map);
 
+        // 本类用例断言的是「观察者轮询未运行时」的线性扫描回退路径；
+        // 显式钉死 trackerRunning()==false，避免同一 fork 中其他测试
+        //（如 MovementExecutionTest）先启动 ObserverTracker 造成顺序污染。
+        lodCountsMock = Mockito.mockStatic(LodCounts.class);
+        lodCountsMock.when(LodCounts::trackerRunning).thenReturn(false);
+
         bot = new IdleBot(chr);
     }
 
     @AfterEach
     void tearDown() {
+        if (lodCountsMock != null) {
+            lodCountsMock.close();
+        }
         bot.setRunning(false);
         bot.stopScheduledTask();
         BotStorage.removeActiveBot(botId);

@@ -4,7 +4,6 @@ import org.gms.client.Character;
 import org.gms.client.Client;
 import org.gms.server.bot.BotStorage;
 import org.gms.server.bot.event.BotEventBus;
-import org.gms.server.bot.event.GameEvent;
 import org.gms.server.maps.MapleMap;
 import org.gms.test.BotTestSupport;
 import org.junit.jupiter.api.AfterEach;
@@ -14,30 +13,26 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.awt.Point;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Collections;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 /**
- * SocialBot 的时间语义边界测试。
+ * SocialBot（SoloMapling 649 行版）的时间语义边界测试。
  * <p>
- * 行为测试（{@link SocialBotTest}）只能断言静态边界：动作间隔与应答冷却的语义
- * 取决于 {@code nextActionMs}/{@code lastReplyMs} 两个时间字段，不注入时间就无法
- * 确定性地测「到期/未到期/恰到期/冷却内/冷却外」。本类通过反射读写这两个私有
- * 字段（不修改主代码），对每个时间语义边界做确定性断言。
+ * 旧简化版的 {@code nextActionMs}/{@code lastReplyMs} 已不存在，其「应答冷却 /
+ * 动作间隔」意图由两个源常量接管：{@code CONVERSATION_TIMEOUT_MS = 35_000}
+ * （会话超时）与 {@code InteractionTracker.COOLDOWN_MS = 300_000}（反骚扰冷却）。
+ * 本类通过反射验证这两个时间边界，不驱动 ambient tick（其需要真实导航图/观察者）。
  */
 class SocialBotTimingTest {
 
-    /** 本测试类的 bot id 段位：965_000_000，与 SocialBotTest 的 20101 隔离（BotStorage 是全局注册表）。 */
     private static final int BOT_ID = 965_000_000;
     private static final int MAP_ID = 100000000;
 
@@ -53,13 +48,11 @@ class SocialBotTimingTest {
 
     @BeforeEach
     void setUp() {
-        // 与 SocialBotTest 相同的 mock 套路
         chr = Mockito.mock(Character.class);
         Mockito.when(chr.getId()).thenReturn(BOT_ID);
         Mockito.when(chr.getName()).thenReturn("TimingBot");
         Mockito.when(chr.getWorld()).thenReturn(0);
         Mockito.when(chr.getPosition()).thenReturn(new Point(0, 0));
-        Mockito.when(chr.getStance()).thenReturn(0);
         Mockito.when(chr.getWhiteChat()).thenReturn(false);
         Mockito.when(chr.getMapId()).thenReturn(MAP_ID);
 
@@ -80,103 +73,112 @@ class SocialBotTimingTest {
     @AfterEach
     void tearDown() {
         bot.setRunning(false);
-        bot.stopScheduledTask(); // 退订事件 + 取消轮盘
+        bot.stopScheduledTask();
         BotStorage.removeActiveBot(BOT_ID);
         BotEventBus.getInstance().reset();
     }
 
-    /** 图上放一个真实玩家（id=5，非 bot 区段），让观察门槛放行动作路径。 */
-    private void putRealPlayerOnMap() {
+    private Character newPlayer() {
         Character player = Mockito.mock(Character.class);
         Mockito.when(player.getId()).thenReturn(5);
-        Mockito.when(map.getCharacters()).thenReturn(List.of(player));
+        return player;
+    }
+
+    // ── 会话超时（CONVERSATION_TIMEOUT_MS = 35_000） ──
+
+    @Test
+    void conversationTimeoutResetsConversation() {
+        bot.getInteractors().setRespondant(newPlayer());
+        setField(bot, "lastRespondantMessageTime", System.currentTimeMillis() - 36_000); // 已过 35s
+
+        invokeCheckConversationTimeout(bot);
+
+        assertFalse(bot.hasActiveRespondant(), "超过 35s 会话超时必须重置 respondant");
+        assertEquals(0L, getField(bot, "lastRespondantMessageTime"),
+                "超时重置后 lastRespondantMessageTime 必须归零");
     }
 
     @Test
-    void actionFiresAtLeastOnceWhenNextActionDue() {
-        putRealPlayerOnMap();
-        long now = System.currentTimeMillis();
-        setField(bot, "nextActionMs", now - 1); // 到期（now < nextActionMs 为 false）
+    void conversationNotTimedOutBeforeThreshold() {
+        bot.getInteractors().setRespondant(newPlayer());
+        setField(bot, "lastRespondantMessageTime", System.currentTimeMillis() - 10_000); // 10s < 35s
 
-        bot.updateState();
+        invokeCheckConversationTimeout(bot);
 
-        verify(map, atLeast(1)).broadcastMessage(any());
-        assertTrue(getField(bot, "nextActionMs") > now,
-                "动作触发后 nextActionMs 必须一次性掷定到未来");
+        assertTrue(bot.hasActiveRespondant(), "未到 35s 会话超时不得重置 respondant");
+    }
+
+    // ── InteractionTracker 反骚扰冷却（COOLDOWN_MS = 300_000） ──
+
+    @Test
+    void interactionTrackerEscalatesThenIgnores() throws Exception {
+        Object tracker = newTracker();
+
+        assertEquals("NORMAL", trackerLevel(tracker), "1-3 次交互为 NORMAL");
+        trackerIncrement(tracker);
+        trackerIncrement(tracker);
+        trackerIncrement(tracker);
+        assertEquals("NORMAL", trackerLevel(tracker));
+
+        trackerIncrement(tracker); // 第 4 次
+        assertEquals("REDUCED", trackerLevel(tracker));
+
+        trackerIncrement(tracker); // 第 5 次
+        assertEquals("NONVERBAL", trackerLevel(tracker));
+
+        trackerIncrement(tracker); // 第 6 次
+        assertEquals("IGNORE", trackerLevel(tracker), "6 次及以上进入 IGNORE 反骚扰");
     }
 
     @Test
-    void actionSuppressedBeforeNextActionMs() {
-        putRealPlayerOnMap();
-        long due = System.currentTimeMillis() + 60_000;
-        setField(bot, "nextActionMs", due); // 未到期
+    void interactionTrackerCooldownResetsToNormal() throws Exception {
+        Object tracker = newTracker();
+        for (int i = 0; i < 6; i++) {
+            trackerIncrement(tracker);
+        }
+        assertEquals("IGNORE", trackerLevel(tracker));
 
-        bot.updateState();
-
-        verify(map, never()).broadcastMessage(any());
-        assertEquals(due, getField(bot, "nextActionMs"),
-                "间隔未到不得动作，也不得推进 nextActionMs");
+        // 超过 300s 冷却：getLevel 触发 reset 回到 NORMAL
+        setTrackerLastInteraction(tracker, System.currentTimeMillis() - 300_001L);
+        assertEquals("NORMAL", trackerLevel(tracker), "超过 300s 冷却后应重置为 NORMAL");
     }
 
-    @Test
-    void actionBoundaryExactDue() {
-        putRealPlayerOnMap();
-        long now = System.currentTimeMillis();
-        setField(bot, "nextActionMs", now); // 恰到期：now < nextActionMs 为 false → 动作
+    // ── 反射工具 ──
 
-        bot.updateState();
-
-        verify(map, atLeast(1)).broadcastMessage(any());
-        assertTrue(getField(bot, "nextActionMs") > now,
-                "恰到期触发动作后 nextActionMs 应推进到未来");
+    private static void invokeCheckConversationTimeout(SocialBot bot) {
+        try {
+            Method m = SocialBot.class.getDeclaredMethod("checkConversationTimeout");
+            m.setAccessible(true);
+            m.invoke(bot);
+        } catch (ReflectiveOperationException e) {
+            fail("无法调用 checkConversationTimeout: " + e.getMessage());
+        }
     }
 
-    @Test
-    void replyCooldownBlocksSecondReply() {
-        // 空图：主动动作不参与，本用例 broadcast 全部来自应答
-        long now = System.currentTimeMillis();
-        setField(bot, "lastReplyMs", now); // 冷却起点：now - lastReplyMs ≈ 0 < 20s
-        BotEventBus.getInstance().publish(GameEvent.chat(0, 1, MAP_ID, 5, "你好"));
-
-        bot.updateState();
-
-        verify(map, never()).broadcastMessage(any());
-
-        setField(bot, "lastReplyMs", now - 21_000); // 冷却已过
-        BotEventBus.getInstance().publish(GameEvent.chat(0, 1, MAP_ID, 5, "还在吗？"));
-
-        bot.updateState();
-
-        verify(map, times(1)).broadcastMessage(any());
+    private static Object newTracker() throws Exception {
+        Class<?> c = Class.forName("org.gms.server.bot.types.SocialBot$InteractionTracker");
+        Constructor<?> ctor = c.getDeclaredConstructor();
+        ctor.setAccessible(true);
+        return ctor.newInstance();
     }
 
-    @Test
-    void replyDoesNotHappenWhenMapNull() {
-        Mockito.when(chr.getMap()).thenReturn(null); // 已离图/销毁窗口
-        setField(bot, "lastReplyMs", 0); // 冷却早已满足：若 map 非 null 必应答
-        BotEventBus.getInstance().publish(GameEvent.chat(0, 1, MAP_ID, 5, "你好"));
-
-        bot.updateState();
-
-        verify(map, never()).broadcastMessage(any());
-        assertEquals(0, getField(bot, "lastReplyMs"),
-                "map null 时不应答，也不消耗冷却（lastReplyMs 不得被写入）");
+    private static void trackerIncrement(Object tracker) throws Exception {
+        Method m = tracker.getClass().getDeclaredMethod("increment");
+        m.setAccessible(true);
+        m.invoke(tracker);
     }
 
-    @Test
-    void repliedTickSkipsActiveAction() {
-        putRealPlayerOnMap();
-        setField(bot, "lastReplyMs", 0); // 冷却已过 → 本 tick 必应答
-        setField(bot, "nextActionMs", System.currentTimeMillis() - 1); // 主动动作同时到期
-        BotEventBus.getInstance().publish(GameEvent.chat(0, 1, MAP_ID, 5, "你好"));
-
-        bot.updateState();
-
-        // 恰好 1 次广播：应答发生，主动动作被「本 tick 刚应答过」分支抑制
-        verify(map, times(1)).broadcastMessage(any());
+    private static String trackerLevel(Object tracker) throws Exception {
+        Method m = tracker.getClass().getDeclaredMethod("getLevel");
+        m.setAccessible(true);
+        return String.valueOf(m.invoke(tracker));
     }
 
-    // ── 反射工具：注入/读取时间语义字段（字段缺失/不可见时 fail 并给出字段名） ──
+    private static void setTrackerLastInteraction(Object tracker, long ms) throws Exception {
+        Field f = tracker.getClass().getDeclaredField("lastInteractionTime");
+        f.setAccessible(true);
+        f.setLong(tracker, ms);
+    }
 
     private static void setField(Object target, String name, long value) {
         try {

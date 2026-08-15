@@ -289,6 +289,13 @@ public class HiredMerchant extends AbstractMapObject {
     }
 
     public void buy(Client c, int item, short quantity) {
+        if (c == null) {
+            return;
+        }
+        Character buyer = c.getPlayer();
+        if (buyer == null) {
+            return;
+        }
         synchronized (items) {
             if (quantity < 1 || item < 0 || item >= items.size()) {   // thanks xiaokelvin for pointing out slot check missing
                 c.sendPacket(PacketCreator.enableActions());
@@ -312,13 +319,13 @@ public class HiredMerchant extends AbstractMapObject {
             KarmaManipulator.toggleKarmaFlagToUntradeable(newItem);
 
             int price = (int) Math.min((float) pItem.getPrice() * quantity, Integer.MAX_VALUE);
-            if (c.getPlayer().getMeso() >= price) {
+            if (buyer.getMeso() >= price) {
                 if (canBuy(c, newItem)) {
-                    c.getPlayer().gainMeso(-price, false);
+                    buyer.gainMeso(-price, false);
                     price -= Trade.getFee(price);  // thanks BHB for pointing out trade fees not applying here
 
                     synchronized (sold) {
-                        sold.add(new SoldItem(c.getPlayer().getName(), pItem.getItem().getItemId(), newItem.getQuantity(), price));
+                        sold.add(new SoldItem(buyer.getName(), pItem.getItem().getItemId(), newItem.getQuantity(), price));
                     }
 
                     pItem.setBundles((short) (pItem.getBundles() - quantity));
@@ -356,12 +363,12 @@ public class HiredMerchant extends AbstractMapObject {
                         }
                     }
                 } else {
-                    c.getPlayer().dropMessage(1, "Your inventory is full. Please clear a slot before buying this item.");
+                    buyer.dropMessage(1, "Your inventory is full. Please clear a slot before buying this item.");
                     c.sendPacket(PacketCreator.enableActions());
                     return;
                 }
             } else {
-                c.getPlayer().dropMessage(1, "You don't have enough mesos to purchase this item.");
+                buyer.dropMessage(1, "You don't have enough mesos to purchase this item.");
                 c.sendPacket(PacketCreator.enableActions());
                 return;
             }

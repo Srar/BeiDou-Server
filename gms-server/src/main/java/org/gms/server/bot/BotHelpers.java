@@ -1,11 +1,15 @@
 package org.gms.server.bot;
 
 import org.gms.client.Character;
+import org.gms.server.ItemInformationProvider;
+import org.gms.server.maps.MapItem;
+import org.gms.server.maps.MapObject;
 import org.gms.server.maps.MapleMap;
 import org.gms.util.I18nUtil;
 import org.gms.util.Randomizer;
 
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -123,5 +127,76 @@ public final class BotHelpers {
             }
         }
         return false;
+    }
+
+    // ── BotLogic 依赖的公共工具（1:1 对齐 SoloMapling BotHelpers） ──────────
+
+    /** 物品 ID → 名称（WZ 缺失时回退 "NULL"，与参考实现一致）。 */
+    public static String convertItemIdToName(int itemId) {
+        String itemName = ItemInformationProvider.getInstance().getName(itemId);
+        if (itemName == null) {
+            return "NULL";
+        }
+        return itemName;
+    }
+
+    /**
+     * 判断 list2（如玩家掉落物）是否全部包含于 list1（如地板现有物）。
+     * 元素按 itemId + ownerId + quantity 三元组等价判定（MapItem 身份，非引用身份）。
+     */
+    public static boolean checkSecondListInsideFirstList(List<MapObject> list1, List<MapObject> list2) {
+        if (list1.size() < list2.size()) {
+            return false;
+        }
+        for (MapObject obj2 : list2) {
+            boolean found = false;
+            for (MapObject obj1 : list1) {
+                if (areObjectsEqual(obj1, obj2)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean areObjectsEqual(MapObject obj1a, MapObject obj2b) {
+        MapItem obj1 = (MapItem) obj1a;
+        MapItem obj2 = (MapItem) obj2b;
+        if (obj1 == obj2) {
+            return true;
+        }
+        if (obj1 == null || obj2 == null) {
+            return false;
+        }
+        return obj1.getItemId() == obj2.getItemId()
+                && obj1.getOwnerId() == obj2.getOwnerId()
+                && obj1.getItem().getQuantity() == obj2.getItem().getQuantity();
+    }
+
+    /** 以中心点构造矩形（高度 20% 垂直下偏，与参考实现一致）。 */
+    public static Rectangle createRectangle(Point center, int width, int height) {
+        int halfWidth = width / 2;
+        int halfHeight = height / 2;
+        int verticalOffset = (int) (height * 0.2);
+        int centerYAdjusted = center.y - halfHeight + verticalOffset;
+        int topLeftX = center.x - halfWidth;
+        int topLeftY = centerYAdjusted - halfHeight;
+        return new Rectangle(topLeftX, topLeftY, width, height);
+    }
+
+    /**
+     * 等价 SoloMapling BotHelpers.blockingSleep：刻意阻塞当前线程（数据驱动的编排）。
+     * 仅供 BotCommandsPack 等已在独立虚拟线程上运行的编排路径使用。
+     */
+    public static void blockingSleep(long milliseconds) {
+        try {
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 }

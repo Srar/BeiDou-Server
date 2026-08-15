@@ -2,8 +2,26 @@ package org.gms.server.bot;
 
 import lombok.extern.slf4j.Slf4j;
 import org.gms.client.Character;
+import org.gms.server.bot.types.BuyingMerchantBot;
+import org.gms.server.bot.types.DiceBot;
+import org.gms.server.bot.types.DropGameBot;
+import org.gms.server.bot.types.FMBot;
+import org.gms.server.bot.types.FollowerBot;
+import org.gms.server.bot.types.GachaBot;
+import org.gms.server.bot.types.GameZoneHostBot;
+import org.gms.server.bot.types.HenesysBot;
+import org.gms.server.bot.types.HenesysJQBot;
 import org.gms.server.bot.types.IdleBot;
+import org.gms.server.bot.types.NXMerchantBot;
+import org.gms.server.bot.types.ScrollingBot;
+import org.gms.server.bot.types.SellingMerchantBot;
 import org.gms.server.bot.types.SocialBot;
+import org.gms.server.bot.types.TestAttackBot;
+import org.gms.server.bot.types.TownWandererBot;
+import org.gms.server.bot.types.TrainingBot;
+import org.gms.server.bot.types.TutorialBot;
+import org.gms.server.bot.types.blackjack.BlackjackDealerBot;
+import org.gms.server.bot.types.opq.OPQBot;
 import org.gms.util.I18nUtil;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -25,10 +43,118 @@ public final class BotTypeManager {
                 BotStorage.addActiveBot(character.getId(), new IdleBot(character));
             }
         },
+        DICE_BOT {
+            @Override
+            public void createAndSetBot(Character character) {
+                BotStorage.addActiveBot(character.getId(), new DiceBot(character));
+            }
+        },
+        TUTORIAL_BOT {
+            @Override
+            public void createAndSetBot(Character character) {
+                BotStorage.addActiveBot(character.getId(), new TutorialBot(character));
+            }
+        },
+        FM_BOT {
+            @Override
+            public void createAndSetBot(Character character) {
+                BotStorage.addActiveBot(character.getId(), new FMBot(character));
+            }
+        },
+        SCROLL_BOT {
+            @Override
+            public void createAndSetBot(Character character) {
+                BotStorage.addActiveBot(character.getId(), new ScrollingBot(character));
+            }
+        },
+        SELLING_MERCHANT_BOT {
+            @Override
+            public void createAndSetBot(Character character) {
+                BotStorage.addActiveBot(character.getId(), new SellingMerchantBot(character));
+            }
+        },
+        BUYING_MERCHANT_BOT {
+            @Override
+            public void createAndSetBot(Character character) {
+                BotStorage.addActiveBot(character.getId(), new BuyingMerchantBot(character));
+            }
+        },
+        NX_MERCHANT_BOT {
+            @Override
+            public void createAndSetBot(Character character) {
+                BotStorage.addActiveBot(character.getId(), new NXMerchantBot(character));
+            }
+        },
+        GACHA_BOT {
+            @Override
+            public void createAndSetBot(Character character) {
+                BotStorage.addActiveBot(character.getId(), new GachaBot(character));
+            }
+        },
+        HENESYS_BOT {
+            @Override
+            public void createAndSetBot(Character character) {
+                BotStorage.addActiveBot(character.getId(), new HenesysBot(character));
+            }
+        },
+        HENESYS_JQ_BOT {
+            @Override
+            public void createAndSetBot(Character character) {
+                BotStorage.addActiveBot(character.getId(), new HenesysJQBot(character));
+            }
+        },
+        GAME_ZONE_HOST_BOT {
+            @Override
+            public void createAndSetBot(Character character) {
+                BotStorage.addActiveBot(character.getId(), new GameZoneHostBot(character));
+            }
+        },
+        BLACKJACK_DEALER {
+            @Override
+            public void createAndSetBot(Character character) {
+                BotStorage.addActiveBot(character.getId(), new BlackjackDealerBot(character));
+            }
+        },
+        DROP_GAME_BOT {
+            @Override
+            public void createAndSetBot(Character character) {
+                BotStorage.addActiveBot(character.getId(), new DropGameBot(character));
+            }
+        },
+        OPQ_BOT {
+            @Override
+            public void createAndSetBot(Character character) {
+                BotStorage.addActiveBot(character.getId(), new OPQBot(character));
+            }
+        },
         SOCIAL_BOT {
             @Override
             public void createAndSetBot(Character character) {
                 BotStorage.addActiveBot(character.getId(), new SocialBot(character));
+            }
+        },
+        TOWN_WANDERER_BOT {
+            @Override
+            public void createAndSetBot(Character character) {
+                BotStorage.addActiveBot(character.getId(), new TownWandererBot(character));
+            }
+        },
+        TEST_ATTACK_BOT {
+            @Override
+            public void createAndSetBot(Character character) {
+                BotStorage.addActiveBot(character.getId(), new TestAttackBot(character));
+            }
+        },
+        TRAINING_BOT {
+            @Override
+            public void createAndSetBot(Character character) {
+                BotStorage.addActiveBot(character.getId(), new TrainingBot(character));
+            }
+        },
+        FOLLOWER_BOT {
+            @Override
+            public void createAndSetBot(Character character) {
+                BotStorage.addActiveBot(character.getId(), new FollowerBot(character));
             }
         };
 

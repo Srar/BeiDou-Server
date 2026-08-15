@@ -34,6 +34,8 @@ import org.gms.net.server.world.Party;
 import org.gms.net.server.world.PartyCharacter;
 import org.gms.net.server.world.PartyOperation;
 import org.gms.net.server.world.World;
+import org.gms.server.bot.BotHelpers;
+import org.gms.server.bot.party.BotPartyQueue;
 import org.gms.util.PacketCreator;
 
 import java.util.List;
@@ -97,6 +99,9 @@ public final class PartyOperationHandler extends AbstractPacketHandler {
                         if (party.getMembers().size() < 6) {
                             if (InviteCoordinator.createInvite(InviteType.PARTY, player, party.getId(), invited.getId())) {
                                 invited.sendPacket(PacketCreator.partyInvite(player));
+                                if (BotHelpers.isBot(invited)) {
+                                    BotPartyQueue.getInstance().addPartyInvite(invited, player, party.getId());
+                                }
                             } else {
                                 c.sendPacket(PacketCreator.partyStatusMessage(22, invited.getName()));
                             }

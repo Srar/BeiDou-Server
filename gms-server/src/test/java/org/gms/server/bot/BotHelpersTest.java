@@ -79,16 +79,18 @@ class BotHelpersTest {
 
     @Test
     void randomBotNameComesFromPool() {
-        String pool = I18nUtil.getMessage("bot.name.pool");
-        assertNotNull(pool);
-        Set<String> poolNames = new HashSet<>(Arrays.asList(pool.split(",")));
-        assertFalse(poolNames.isEmpty(), "name pool must not be empty");
+        // 大池无放回轮盘（对齐 SoloMapling FMShopDescGen 语义）：名字必须来自池，
+        // 且连续发放绝不重名（旧实现 20 个小池有放回随机导致满屏「豆豆2/云朵11」）。
+        Set<String> poolNames = BotHelpers.loadedNamePoolSnapshot();
+        assertFalse(poolNames.isEmpty(), "bot name pool resource must not be empty");
 
-        for (int i = 0; i < 50; i++) {
+        Set<String> issued = new HashSet<>();
+        for (int i = 0; i < 500; i++) {
             String name = BotHelpers.randomBotName();
             assertNotNull(name);
             assertFalse(name.isBlank(), "generated name must not be blank");
             assertTrue(poolNames.contains(name), "generated name not from pool: " + name);
+            assertTrue(issued.add(name), "duplicate name issued: " + name);
         }
     }
 

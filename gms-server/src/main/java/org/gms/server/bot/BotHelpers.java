@@ -10,8 +10,14 @@ import org.gms.util.Randomizer;
 
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -29,6 +35,18 @@ public final class BotHelpers {
     private static final int MIN_SPACING = 30;
 
     private static final String NAME_POOL_KEY = "bot.name.pool";
+
+    /** 中国游戏风名字池资源（每行一个名字，生成器见 scripts/genBotNames.py 同源说明）。 */
+    private static final String NAME_POOL_RESOURCE = "/org/gms/server/bot/namepool/bot_names.txt";
+
+    /**
+     * 无放回名字轮盘（对齐 SoloMapling FMShopDescGen.getRandomIGN 语义）：
+     * 池加载后洗牌，按顺序逐个发放，发完整个池才重新洗牌——同一轮内绝不重名，
+     * 避免旧实现「20 个小池有放回随机 + 数字后缀避重」造成的满屏豆豆2/云朵11。
+     */
+    private static final List<String> NAME_POOL = new ArrayList<>();
+    private static int namePoolIndex = 0;
+    private static String lastIssuedName = null;
 
     private BotHelpers() {
     }
@@ -56,16 +74,64 @@ public final class BotHelpers {
     }
 
     /**
-     * 从 i18n 名字池随机取一个 bot 名字（逗号分隔池，过滤空白项；池缺失/全空时
-     * 回退默认名）。查重由调用方（BotGeneration）负责。
+     * 发一个 bot 名字：优先走大池无放回轮盘（洗牌顺序发放，不重复），
+     * 资源缺失时回退 i18n 小池 + 随机后缀。synchronized：波内并行 spawn 并发取名。
+     * 查重由调用方（BotGeneration）负责（兜底真人同名/异常重名）。
      */
-    public static String randomBotName() {
+    public static synchronized String randomBotName() {
+        if (NAME_POOL.isEmpty()) {
+            loadNamePool();
+        }
+        if (!NAME_POOL.isEmpty()) {
+            if (namePoolIndex >= NAME_POOL.size()) {
+                Collections.shuffle(NAME_POOL);
+                namePoolIndex = 0;
+                // 跨周期防重：重洗后队首若与刚发过的名字相同则跳过，保证任意连续两次发放不重名
+                if (NAME_POOL.get(0).equals(lastIssuedName) && NAME_POOL.size() > 1) {
+                    namePoolIndex = 1;
+                }
+            }
+            String name = NAME_POOL.get(namePoolIndex++);
+            lastIssuedName = name;
+            return name;
+        }
+        return fallbackName();
+    }
+
+    /** 一次性加载并洗牌名字池（每行一个，过滤空白与超长行）。 */
+    private static void loadNamePool() {
+        try (InputStream in = BotHelpers.class.getResourceAsStream(NAME_POOL_RESOURCE)) {
+            if (in == null) {
+                return;
+            }
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String name = line.trim();
+                    if (!name.isEmpty() && name.length() <= 12) {
+                        NAME_POOL.add(name);
+                    }
+                }
+            }
+            Collections.shuffle(NAME_POOL);
+        } catch (IOException e) {
+            // 资源缺失/损坏：保留空池，randomBotName 走 i18n 回退
+        }
+    }
+
+    /** i18n 小池兜底（资源缺失场景）：随机取一个并加随机数字后缀降低撞名率。 */
+    private static String fallbackName() {
         String pool = I18nUtil.getMessage(NAME_POOL_KEY);
         List<String> names = parsePool(pool);
         if (names.isEmpty()) {
             return "Bot" + Randomizer.nextInt(100000);
         }
-        return names.get(Randomizer.nextInt(names.size()));
+        return names.get(Randomizer.nextInt(names.size())) + Randomizer.nextInt(1000);
+    }
+
+    /** 供测试断言：名字是否来自大池资源（资源缺失返回空集）。 */
+    static java.util.Set<String> loadedNamePoolSnapshot() {
+        return NAME_POOL.isEmpty() ? java.util.Set.of() : new java.util.HashSet<>(NAME_POOL);
     }
 
     private static List<String> parsePool(String pool) {

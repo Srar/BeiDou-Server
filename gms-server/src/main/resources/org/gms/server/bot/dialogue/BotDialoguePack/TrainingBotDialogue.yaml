@@ -14,150 +14,150 @@ TrainingBot:
 
   GrindAmbient:
     text:
-      - "ok just a couple more levels then i log"
-      - {line: "grinding {MOB} is so chill", emote: 2}
-      - {line: "these {MOB}s never drop the {DROP} ugh", emote: 5}
-      - "brb getting water, mobs can wait lol"
-      - {line: "farming {MOB} all day i swear i see them when i close my eyes", emote: 6}
-      - "almost dinner time but ill grind till then ^^"
-      - {line: "{MAP} is so quiet today, just me n the mobs", emote: 0}
-      - "honestly i could fall asleep doing this"
-      - {line: "ooh a {DROP} dropped finally!! ty rng :)", emote: 2}
-      - "just one more level... ok maybe two"
-      - {line: "love how peaceful {MAP} is", emote: 2}
-      - "inv almost full again, ugh"
-      - {line: "come on {MOB} drop something good already", emote: 5}
-      - "raining outside, perfect grinding weather ^^"
-      - {line: "if i get this {DROP} im gonna scroll it so hard", emote: 3}
-      - "man i forgot to eat again xD"
-      - {line: "{MOB} go down so easy now, leveling feels nice", emote: 3}
-      - "hmm should i pot or just risk it"
-      - "almost out of pots, gotta hit the FM soon"
-      - {line: "another {DROP}? thats two today, lucky me ^^", emote: 2}
-      - "ahh i love this grind spot, no one ever comes here"
-      - {line: "wonder how much {DROP} sells for in FM these days", emote: 0}
-      - "...wait what time is it"
-      - "just gonna finish this round then take a break, promise"
-      - {line: "{MAP} music kinda makes me sleepy", emote: 6}
-      - {line: "these {MOB} keep KSing each others spawns lol", emote: 6}
-      - "so close to job adv, cant stop now"
-      - "tea's gone cold and im still grinding"
-      - {line: "respawns are slow today, c'mon {MOB} where u at", emote: 6}
-      - "five more then im out"
-      - "ooh shiny xD"
+      - "ok 再刷两级就下线"
+      - {line: "刷{MOB}也太放松了", emote: 2}
+      - {line: "这{MOB}怎么老不掉{DROP}啊 麻了", emote: 5}
+      - "去接杯水 怪又不会跑 哈哈"
+      - {line: "刷了一天{MOB} 闭眼全是它们 离谱", emote: 6}
+      - "快到饭点了 先刷到点再说 ^^"
+      - {line: "今天{MAP}好安静 就我和怪", emote: 0}
+      - "说实话 这么刷我都能睡着"
+      - {line: "哦哦 终于掉{DROP}了!! 感谢老天爷 :)", emote: 2}
+      - "就再升一级... 好吧 两级"
+      - {line: "就喜欢{MAP}这份清净", emote: 2}
+      - "背包又快满了 麻了"
+      - {line: "求你了{MOB} 掉点好东西吧", emote: 5}
+      - "外面下雨 正是刷怪好天气 ^^"
+      - {line: "要是刷到{DROP} 我卷轴直接拉满", emote: 3}
+      - "完了 又忘了吃饭 xD"
+      - {line: "{MOB}现在一碰就倒 升级的感觉真好", emote: 3}
+      - "嗯 嗑药还是赌一把呢"
+      - "药水快见底了 得去趟自由市场"
+      - {line: "又掉{DROP}? 今天第二件 血赚 ^^", emote: 2}
+      - "啊 我爱这个刷怪点 压根没人来"
+      - {line: "不知道现在{DROP}在自由市场能卖多少", emote: 0}
+      - "...等等 现在几点了"
+      - "刷完这轮就休息 真的"
+      - {line: "{MAP}这bgm听得人犯困", emote: 6}
+      - {line: "这些{MOB}还互相抢怪 笑死", emote: 6}
+      - "马上就能转职了 现在停不下来"
+      - "茶都凉了 我还在刷"
+      - {line: "今天刷怪好慢 快点{MOB} 你人呢", emote: 6}
+      - "再刷五只就撤"
+      - "哦哦 闪光 xD"
       - "zzz"
-      - "brb snack"
-      - "lemme just clear this pack real quick"
-      - "ok ok last one for real this time"
-      - {line: "drop rate hates me today", emote: 4}
-      - "gonna afk if i hear this song one more loop lol"
-      - {line: "yesss finally something good", emote: 2}
-      - "hmm... did i lock the door irl"
-      - "anyone else still up or just me ^^"
-      - {line: "stop hitting me i was here first", emote: 5}
-      - "soft mobs go down easy, love it"
-      - "mp's getting low, slow down lil guy"
-      - {line: "i keep telling myself one more hour", emote: 6}
-      - "phone buzzing, ignoring it"
-      - "kinda hungry but the grind calls"
-      - {line: "missed the last hit ugh", emote: 4}
-      - "warm blanket plus grinding equals best night"
-      - "i blink and another levels gone, wild"
-      - {line: "look at all these mesos pile up hehe", emote: 3}
-      - "no one online this late, peaceful"
-      - "ill scroll my gear once i save up enough"
-      - "mobs respawning right on top of me lol perfect"
-      - {line: "this spot's my little secret", emote: 3}
-      - "brain power: zero"
-      - "ouch my wrists lol"
-      - "break time... or maybe five more"
-      - "this hit different tho"
-      - "dude im totally wiped out"
-      - "might actually stay up past midnight lol"
-      - "just my keyboard and mobs soundtracking my life"
-      - "ok but why is grinding so cozy tho"
-      - {line: "{MOB} respawning every 2 seconds, perfect", emote: 2}
-      - {line: "{MAP} gets cozy after midnight", emote: 0}
-      - {line: "can {DROP} just show up already", emote: 5}
-      - {line: "grinding {MOB} in my hoodie all night, this is the life", emote: 2}
-      - {line: "that {MOB} tried to KS me lol", emote: 6}
-      - {line: "{MAP} just feels safe right now", emote: 2}
-      - {line: "one more batch of {DROP} then bed i promise", emote: 4}
-      - {line: "{MOB} go down smooth when im in the zone", emote: 0}
-      - "nothing in this map can touch me"
-      - {line: "ONE {MOB} CRITTED ME FOR LIKE 300. three hundred. i need to sit down.", emote: 5}
-      - "good map."
-      - {line: "{MOB} GO DOWN SO EASY THIS IS AMAZING", emote: 2}
-      - "ugh same mobs same drops same everything"
-      - {line: "{MAP} is hands down the best grind spot at this range", emote: 3}
-      - "wonder what level ill be by the end of tonight"
-      - {line: "been killing {MOB} so long they should know my name by now", emote: 3}
-      - {line: "I JUST GOT A {DROP} I CANT BELIEVE IT", emote: 2}
-      - "whatever."
-      - {line: "if {DROP} doesnt drop this hour im switching maps", emote: 5}
-      - "autopilot mode engaged"
-      - {line: "grinding {MOB} with the window open, nice breeze tonight", emote: 2}
-      - {line: "everyone sleeps on {MAP} but the exp here is actually insane", emote: 3}
-      - "the mobs keep coming and so do i"
-      - "kind of just stuck in autopilot at this point"
-      - "every pull the same, kinda comforting honestly"
-      - "nothing like late night grinding to clear ur head"
-      - "inventory's getting messy, should organize after this"
-      - "starting to forget what the town looks like"
-      - "grind or be ground, thats the motto"
-      - "ok coffee number three, lets go"
-      - {line: "wait i already did this pull", emote: 6}
-      - "feels like ive been here forever and i kinda love it"
-      - "the grind never stops and neither do i"
-      - "mesos slowly piling up, this is the way"
-      - "nothing else to do, might as well level"
-      - "quietly becoming the best player no one notices"
-      - "blink and another 10 minutes gone"
-      - {line: "ok {MOB} if u drop {DROP} right now ill be ur best friend", emote: 2}
-      - {line: "{MAP} this late is actually so peaceful", emote: 0}
-      - {line: "the {MOB} here just dont stop coming, perfect", emote: 0}
-      - {line: "still no {DROP}, the rng is personally targeting me", emote: 5}
-      - {line: "grinding {MOB} in silence, just the bgm and me", emote: 0}
-      - {line: "{MAP} never disappoints for steady exp", emote: 3}
-      - {line: "pretty sure {MOB} know my schedule at this point", emote: 6}
-      - {line: "{DROP} dropped!! ok this makes up for the last hour", emote: 2}
-      - {line: "told myself id log off after one batch of {MOB} and here we are", emote: 7}
-      - {line: "the {MOB} spawn is so consistent here i love it", emote: 2}
-      - {line: "every time i think about leaving {MAP} it drops a good mob", emote: 6}
-      - {line: "clearing {MOB} on loop, could do this in my sleep", emote: 0}
-      - {line: "{DROP} better drop tonight or im taking it personally", emote: 5}
-      - {line: "{MAP} is just home at this point", emote: 2}
-      - {line: "{MOB} go down like butter when ur in the zone", emote: 3}
-      - "something about grinding solo just hits different sometimes"
-      - {line: "farming {MOB} in my sleep at this point", emote: 0}
-      - "the hours blend together when ur in the zone"
-      - {line: "{MAP} has become part of my identity lol", emote: 2}
-      - "head kinda empty just vibes and mobs"
-      - {line: "these {MOB} know my rhythm better than i do", emote: 3}
-      - "my reflexes are faster than my brain at this point"
-      - {line: "{DROP} rate has been blessing me all day", emote: 2}
-      - "autopilot mode but make it productive"
-      - {line: "the {MOB} respawn timer is music to my ears", emote: 2}
-      - "nothing but grinding and vibes this whole session"
-      - {line: "if i see {MOB} in my dreams tonight im not shocked", emote: 6}
-      - "could do this with my eyes closed honestly"
-      - {line: "{MAP} music is now my ringtone in real life", emote: 0}
-      - "lost in the grind is my natural state"
-      - {line: "{MOB} and me against the world", emote: 0}
-      - "the flow state is real and im in it"
-      - {line: "every {DROP} feels like a little victory", emote: 2}
-      - "grinding is my love language apparently"
-      - {line: "these {MOB} are predictable but comforting", emote: 2}
-      - "permanent indent forming where i sit"
-      - {line: "the {MAP} vibe at this hour is unmatched", emote: 0}
-      - "my fingers know the patterns without thinking"
-      - {line: "{MOB} go down like clockwork, satisfying", emote: 3}
-      - "peace and mobs, thats the life"
-      - {line: "{DROP} just dropped mid-thought and made me smile", emote: 2}
-      - "completely zoned in and its perfect"
-      - {line: "could stay in {MAP} forever honestly", emote: 2}
-      - "grinding hits the spot every single time"
-      - {line: "{MOB} spawn timing feels like a friend at this point", emote: 6}
+      - "吃点东西 马上回来"
+      - "让我先把这波怪清完"
+      - "行行 这次真的是最后一只了"
+      - {line: "今天的爆率在针对我", emote: 4}
+      - "这歌再循环一遍我就要挂机了 哈哈"
+      - {line: "耶耶耶 终于掉好东西了", emote: 2}
+      - "嗯... 我现实里锁门了吗"
+      - "这点了还有人没睡吗 不会就我一个吧 ^^"
+      - {line: "别打我 这怪是我先看到的", emote: 5}
+      - "脆皮怪一碰就碎 太爽了"
+      - "蓝不多了 慢点啊小老弟"
+      - {line: "我一直跟自己说 再刷一小时", emote: 6}
+      - "手机在响 假装没听见"
+      - "有点饿 但刷怪的召唤更大"
+      - {line: "补刀没补到 麻了", emote: 4}
+      - "暖被窝加刷怪 就是完美夜晚"
+      - "一眨眼又升一级 离谱"
+      - {line: "看着金币一点点堆起来 嘿嘿", emote: 3}
+      - "这点了没人上线 清净"
+      - "攒够金币就去给装备砸卷"
+      - "怪直接刷我脸上 笑死 完美"
+      - {line: "这地方可是我的小秘密", emote: 3}
+      - "大脑已宕机"
+      - "哎哟 手腕好酸 哈哈"
+      - "休息一下... 算了 再刷五只"
+      - "这波感觉不一样"
+      - "兄弟 我彻底人没了"
+      - "说不定真能刷过半夜 哈哈"
+      - "只有键盘声和怪叫声给我伴奏"
+      - "不是 刷怪怎么能这么治愈呢"
+      - {line: "{MOB}两秒一刷 完美", emote: 2}
+      - {line: "过了半夜{MAP}就变得特别治愈", emote: 0}
+      - {line: "{DROP}你能不能快点出来啊", emote: 5}
+      - {line: "穿着卫衣刷一晚上{MOB} 这才是生活", emote: 2}
+      - {line: "那只{MOB}想抢我人头 笑死", emote: 6}
+      - {line: "此刻的{MAP}让人很安心", emote: 2}
+      - {line: "再刷出一件{DROP}就睡 真的", emote: 4}
+      - {line: "状态来了 {MOB}倒得跟切菜一样", emote: 0}
+      - "这图里没一个怪能碰到我"
+      - {line: "一只{MOB}暴击我300。三百啊。我得缓缓。", emote: 5}
+      - "好图。"
+      - {line: "{MOB}倒得也太快了 爽飞了", emote: 2}
+      - "哎 同样的怪同样的掉落 一切照旧"
+      - {line: "这等级段{MAP}妥妥是最佳刷怪点", emote: 3}
+      - "不知道今晚结束时我能到多少级"
+      - {line: "{MOB}杀了这么久 它们都该认识我了", emote: 3}
+      - {line: "我居然刷到{DROP}了 我不敢信", emote: 2}
+      - "随便了。"
+      - {line: "这小时再不掉{DROP}我就换图", emote: 5}
+      - "进入自动托管模式"
+      - {line: "开着窗刷{MOB} 今晚的风真舒服", emote: 2}
+      - {line: "大家都不待见{MAP} 但这儿的经验离谱地高", emote: 3}
+      - "怪不停来 我也不停手"
+      - "现在完全就是托管状态"
+      - "每波怪都一样 说实话还挺安心"
+      - "没什么比深夜刷怪更能放空脑子了"
+      - "背包乱糟糟的 刷完这波整理下"
+      - "都快忘了镇子长啥样了"
+      - "不刷就挨刷 这就是座右铭"
+      - "ok 第三杯咖啡 走起"
+      - {line: "等等 这波我不是刷过了吗", emote: 6}
+      - "感觉在这待了一辈子 居然还挺喜欢"
+      - "刷怪不停 我也不停"
+      - "金币慢慢攒起来了 这才对嘛"
+      - "反正没事干 不如升升级"
+      - "默默成为无人知晓的大佬"
+      - "一眨眼十分钟又没了"
+      - {line: "行 {MOB} 你现在掉个{DROP} 咱俩就是好兄弟", emote: 2}
+      - {line: "这么晚的{MAP}也太安静了", emote: 0}
+      - {line: "这儿的{MOB}根本刷不完 完美", emote: 0}
+      - {line: "还是没{DROP} 这概率就在针对我", emote: 5}
+      - {line: "安静刷着{MOB} 只有bgm和我", emote: 0}
+      - {line: "论稳定经验 {MAP}从没让人失望", emote: 3}
+      - {line: "我寻思{MOB}都摸清我的作息了", emote: 6}
+      - {line: "掉{DROP}了!! 行 这一小时的苦没白受", emote: 2}
+      - {line: "本来说刷完一批{MOB}就下线 结果刷到现在", emote: 7}
+      - {line: "这儿的{MOB}刷新稳得一批 我爱了", emote: 2}
+      - {line: "每次想离开{MAP} 它就刷一只肥怪出来", emote: 6}
+      - {line: "循环刷{MOB} 闭着眼都能刷", emote: 0}
+      - {line: "今晚不掉{DROP}我就当它在针对我", emote: 5}
+      - {line: "现在{MAP}就是我家了", emote: 2}
+      - {line: "状态来了 {MOB}切起来跟切黄油似的", emote: 3}
+      - "单刷有时候就是有种说不出的爽"
+      - {line: "现在梦里都在刷{MOB}", emote: 0}
+      - "状态一来 时间都糊成一团"
+      - {line: "{MAP}已经成了我身份的一部分 哈哈", emote: 2}
+      - "脑子放空 只剩节奏和怪"
+      - {line: "这些{MOB}比我还懂我的节奏", emote: 3}
+      - "现在手速比脑子还快"
+      - {line: "今天的{DROP}爆率简直在眷顾我", emote: 2}
+      - "托管模式 但产出拉满"
+      - {line: "{MOB}的刷新倒计时就是我的BGM", emote: 2}
+      - "这一整场就只有刷怪和节奏"
+      - {line: "今晚梦见{MOB}我一点都不意外", emote: 6}
+      - "说实话闭着眼都能刷"
+      - {line: "{MAP}的bgm已经成了我现实里的铃声", emote: 0}
+      - "沉浸在刷怪里才是我的常态"
+      - {line: "{MOB}和我 与世界为敌", emote: 0}
+      - "心流是真的 我进去了"
+      - {line: "每件{DROP}都是一场小胜利", emote: 2}
+      - "看来刷怪就是我的爱之语言"
+      - {line: "这些{MOB}套路固定 但莫名治愈", emote: 2}
+      - "我坐的地方已经压出个坑了"
+      - {line: "这个点的{MAP}氛围没得比", emote: 0}
+      - "手指不用过脑就知道该怎么按"
+      - {line: "{MOB}倒得跟上了发条一样 解压", emote: 3}
+      - "有怪有清净 这才是生活"
+      - {line: "正走神呢{DROP}突然掉了 直接给我整笑了", emote: 2}
+      - "完全入定 完美"
+      - {line: "说实话能在{MAP}待一辈子", emote: 2}
+      - "刷怪每次都精准治愈"
+      - {line: "现在{MOB}的刷新时间都像个老朋友了", emote: 6}
     emote:
       - 0
       - 6
@@ -166,82 +166,82 @@ TrainingBot:
 
   GrindStart:
     text:
-      - "alright {MOB} time, lets get these levels"
-      - {line: "ok {MAP} im here, lets grind", emote: 2}
-      - "back to the grind ^^"
-      - {line: "lvling at {MAP} today, comfy spot", emote: 2}
-      - {line: "ok lets farm {MOB} for a bit", emote: 0}
-      - {line: "kinda sleepy but the grind calls", emote: 4}
-      - {line: "{MAP} again lol, my second home", emote: 2}
-      - "ok one more level then i log, promise"
-      - {line: "lets gooo {MOB} dont stand a chance", emote: 3}
-      - {line: "got my pots, got my stars, lets grind", emote: 2}
-      - "brb gonna camp {MOB} for a while"
-      - {line: "mmm just gonna chill n farm here", emote: 0}
-      - {line: "{MAP} is so quiet, perfect for grinding", emote: 2}
-      - "ok focus, {MOB} wont kill themselves"
-      - {line: "hyped for this grind sesh lets go ^^", emote: 2}
-      - {line: "ty for the spot, time to farm {MOB}", emote: 2}
-      - "just gonna do a few {MOB} rounds then dinner lol"
-      - {line: "honestly love grinding at {MAP}", emote: 2}
-      - {line: "ok im awake now, {MOB} lets dance", emote: 0}
-      - "back at it, same map same {MOB} ^^"
-      - "lets get it"
-      - {line: "ahh missed this map", emote: 2}
-      - "okok warming up, here we go"
-      - {line: "yawn... 5 mins then i try", emote: 4}
-      - "home sweet grind"
-      - {line: "stocked up on pots, lets eat", emote: 3}
-      - "ok no distractions this time"
-      - {line: "morning everyone, clocking in lol", emote: 2}
-      - "wave 1 lets see"
-      - {line: "been waiting all day to camp here", emote: 2}
-      - {line: "kinda dead map but ill take it", emote: 0}
-      - {line: "deep breath, lets push to next job adv", emote: 0}
-      - "time to make these mobs wish they never spawned"
-      - {line: "GRINDING TIME LETS GOOOO ^^", emote: 2}
-      - "here we go again"
-      - {line: "ok {MAP}... dont let me down today", emote: 0}
-      - {line: "round two with {MOB}, fight me", emote: 3}
-      - "same spot same grind"
-      - {line: "{MOB} better drop something good this time or im gonna be so upset", emote: 5}
-      - {line: "{MAP} AGAIN AND IM SO HYPED ABOUT IT", emote: 2}
-      - "mmk lets do this"
-      - {line: "settling in at {MAP}, got snacks n everything", emote: 2}
-      - "grinding is just meditation with more clicking lol"
-      - {line: "alright {MOB}, ur about to have a very bad day", emote: 3}
-      - "sure hope this session goes better than last time"
-      - {line: "starting the {MOB} grind, pray for drops ^^", emote: 2}
-      - "lets see how far i get before i run outta pots"
-      - "ok lets go, no distractions this time i mean it"
-      - "pots packed, scrolls ready, lets grind"
-      - "logged on just to grind, no small talk today"
-      - {line: "this is gonna be a good session i can feel it", emote: 2}
-      - "ok lets get productive before i lose motivation"
-      - "warming up the fingers lol"
-      - "game time, everyone else can wait"
-      - "ok one more session just to see how far i get"
-      - {line: "ok {MOB}, lets see who gets tired first", emote: 3}
-      - {line: "back at {MAP} again, where else would i be lol", emote: 2}
-      - {line: "charging into {MOB}, no hesitation", emote: 3}
-      - {line: "{MAP} is quiet this time of day, perfect grinding weather", emote: 2}
-      - {line: "time to make {MOB} very unhappy", emote: 3}
-      - {line: "found a clean spot at {MAP}, camping here til i run outta pots", emote: 2}
-      - {line: "ok {MOB}... im warning u, i need this exp", emote: 0}
-      - {line: "fresh session at {MAP}, lets see what today brings ^^", emote: 2}
-      - "ready to grind, mind is clear, pots are full"
-      - {line: "back to farm {MOB}, lets get some good drops", emote: 0}
-      - "energy is up, exp is calling, lets go"
-      - {line: "ok {MAP}, im back and ready", emote: 2}
-      - {line: "{MOB} better watch out, im focused today", emote: 3}
-      - "starting strong, gonna level hard this session"
-      - {line: "time to make {MOB} regret everything", emote: 3}
-      - "fresh mindset, peak grinding hours ahead"
-      - {line: "{MAP} is calling and im answering ^^", emote: 2}
-      - "ready to dominate this grind session"
-      - {line: "lets farm {MOB} and get these levels", emote: 2}
-      - "fired up, focused, and ready for exp"
-      - {line: "ok {MOB}, the grind starts now", emote: 0}
+      - "好嘞 {MOB} 开刷开刷 今天多升几级"
+      - {line: "ok {MAP}我来了 开刷", emote: 2}
+      - "继续刷起 ^^"
+      - {line: "今天在{MAP}练级 舒服的地方", emote: 2}
+      - {line: "ok 刷会儿{MOB}", emote: 0}
+      - {line: "有点困 但刷怪的召唤更大", emote: 4}
+      - {line: "又是{MAP} 哈哈 我的第二故乡", emote: 2}
+      - "ok 再升一级就下线 说真的"
+      - {line: "冲鸭 {MOB}根本不是对手", emote: 3}
+      - {line: "药水带齐 飞镖带齐 开刷", emote: 2}
+      - "我去蹲会儿{MOB}"
+      - {line: "嗯 就在这随便刷会儿", emote: 0}
+      - {line: "{MAP}好安静 太适合刷怪了", emote: 2}
+      - "ok 专注 {MOB}可不会自己死掉"
+      - {line: "这波刷怪必须支棱起来 走起 ^^", emote: 2}
+      - {line: "谢谢让位 该刷{MOB}了", emote: 2}
+      - "先刷几轮{MOB} 再吃晚饭 哈哈"
+      - {line: "说实话 超爱在{MAP}刷怪", emote: 2}
+      - {line: "ok 我清醒了 {MOB} 来battle", emote: 0}
+      - "又回来了 老地方 老{MOB} ^^"
+      - "开冲"
+      - {line: "啊 想念这图了", emote: 2}
+      - "okok 先热热手 开整"
+      - {line: "哈欠... 再眯五分钟就开刷", emote: 4}
+      - "甜蜜的刷怪窝"
+      - {line: "药水备满 开吃", emote: 3}
+      - "ok 这次不摸鱼了"
+      - {line: "各位早上好 上班打卡 哈哈", emote: 2}
+      - "第一波 让我看看"
+      - {line: "等了一整天就为了来这蹲点", emote: 2}
+      - {line: "图有点冷清 不过我要了", emote: 0}
+      - {line: "深呼吸 冲刺下一次转职", emote: 0}
+      - "该让这些怪后悔自己刷出来了"
+      - {line: "开刷啦 冲鸭鸭鸭 ^^", emote: 2}
+      - "又来了又来了"
+      - {line: "ok {MAP}... 今天别让我失望", emote: 0}
+      - {line: "和{MOB}的第二回合 放马过来", emote: 3}
+      - "老位置 老刷法"
+      - {line: "{MOB}这次再不掉好东西 我可真要破防了", emote: 5}
+      - {line: "又是{MAP} 我好兴奋啊", emote: 2}
+      - "行吧 开干"
+      - {line: "在{MAP}安顿下来 零食都备好了", emote: 2}
+      - "刷怪就是带点点击的冥想 哈哈"
+      - {line: "行 {MOB} 你们今天要倒霉了", emote: 3}
+      - "希望这趟比上趟强点"
+      - {line: "开始刷{MOB} 祈祷出好东西 ^^", emote: 2}
+      - "看看我能刷到药水耗尽为止"
+      - "ok 开整 这次真的不摸鱼了 我说真的"
+      - "药水备好 卷轴备好 开刷"
+      - "上线只为刷怪 今天不聊天"
+      - {line: "这场刷怪我有预感 一定很顺", emote: 2}
+      - "ok 趁干劲还在 赶紧产出"
+      - "先热热手指 哈哈"
+      - "开整 其他人都靠边"
+      - "ok 再来一场 看看能走多远"
+      - {line: "ok {MOB} 看看谁先累", emote: 3}
+      - {line: "又回{MAP}了 不然我还能去哪 哈哈", emote: 2}
+      - {line: "冲向{MOB} 不带犹豫", emote: 3}
+      - {line: "这个点{MAP}很安静 刷怪好天气", emote: 2}
+      - {line: "该让{MOB}难受一下了", emote: 3}
+      - {line: "在{MAP}找到个干净位置 蹲到药水用完为止", emote: 2}
+      - {line: "ok {MOB}... 警告你 我真的很需要这波经验", emote: 0}
+      - {line: "{MAP}新开一局 看看今天有什么 ^^", emote: 2}
+      - "准备好开刷 头脑清醒 药水满仓"
+      - {line: "回来刷{MOB} 给我掉点好东西", emote: 0}
+      - "精力充沛 经验在召唤 走起"
+      - {line: "ok {MAP} 我回来了 准备好了", emote: 2}
+      - {line: "{MOB}最好小心点 我今天很专注", emote: 3}
+      - "开局就要猛 这场狠狠升级"
+      - {line: "该让{MOB}后悔一切了", emote: 3}
+      - "状态全新 刷怪黄金时段来了"
+      - {line: "{MAP}在召唤 我来了 ^^", emote: 2}
+      - "准备好统治这场刷怪了"
+      - {line: "开刷{MOB} 把等级刷上去", emote: 2}
+      - "燃起来了 专注 经验走起"
+      - {line: "ok {MOB} 现在正式开刷", emote: 0}
     emote:
       - 0
       - 2
@@ -249,80 +249,80 @@ TrainingBot:
 
   LevelUp:
     text:
-      - {line: "LEVEL {LEVEL} lets gooo", emote: 2}
-      - "ding! finally leveled"
-      - {line: "level {LEVEL} not bad if i say so myself", emote: 3}
-      - {line: "ayy hit {LEVEL} ^^", emote: 2}
-      - {line: "level up \\o/", emote: 2}
-      - {line: "ok {LEVEL} now just one more lvl then i sleep", emote: 2}
-      - {line: "all that grinding paid off lol", emote: 2}
-      - {line: "{LEVEL} babyyy", emote: 2}
-      - {line: "phew finally dinged, was stuck forever", emote: 2}
-      - {line: "free AP lets gooo", emote: 2}
-      - {line: "lvl {LEVEL}, told u id catch up xD", emote: 3}
-      - {line: "that level felt good", emote: 2}
-      - {line: "another one ^^", emote: 2}
-      - {line: "level {LEVEL}, job advance soon hehe", emote: 2}
-      - {line: "smooth, didnt even die this time", emote: 3}
-      - {line: "ding ding, AP/SP time", emote: 2}
-      - {line: "{LEVEL} already? didnt even notice lol", emote: 3}
-      - {line: "kinda proud of that grind", emote: 2}
-      - {line: "level {LEVEL} and still going \\o/", emote: 2}
-      - {line: "ez level, told u id get there", emote: 3}
-      - "ding!"
-      - "lets gooo \\o/"
-      - "finally"
-      - {line: "another one for the books ^^", emote: 2}
-      - "ooh new level just dropped"
-      - {line: "knew i had it in me", emote: 3}
-      - "stronger already hehe"
-      - {line: "putting these AP somewhere good lol", emote: 2}
-      - "wooo \\o/"
-      - "felt that one, big grind for it"
-      - {line: "yep yep, climbing nice and steady ^^", emote: 2}
-      - {line: "barely broke a sweat for that one", emote: 3}
-      - {line: "LEVEL {LEVEL} ARE U KIDDING ME LETS GOOOOO", emote: 2}
-      - "yep. another level. cool."
-      - {line: "level {LEVEL}, obviously, did u expect anything less", emote: 3}
-      - {line: "I CANT BELIEVE I ACTUALLY HIT {LEVEL} IM SHAKING", emote: 2}
-      - "ding. nice."
-      - {line: "level {LEVEL}, i earned every single exp point for that one", emote: 2}
-      - "woo level up, time for more AP decisions ill regret later"
-      - {line: "{LEVEL}! bet no one else grinded as hard as me for this one", emote: 3}
-      - {line: "DING DING DING {LEVEL} BABY", emote: 2}
-      - "finally."
-      - {line: "level {LEVEL}... that one took ages but worth it", emote: 2}
-      - "new level new me lol"
-      - {line: "hitting {LEVEL} at 3am alone feels kinda poetic", emote: 0}
-      - "honestly didnt think id make it today but here we are"
-      - {line: "level {LEVEL} and the exp bar resets to zero again", emote: 7}
-      - "leveled while half asleep lol"
-      - {line: "ok NOW i can log off. maybe.", emote: 3}
-      - "heck yeah, finally"
-      - {line: "felt the exp bar hit and got so happy lol", emote: 2}
-      - "worth every single mob"
-      - "ok that felt really good, im not gonna lie"
-      - "there we go, thats the stuff"
-      - "new level new me (same grind)"
-      - {line: "LEVEL {LEVEL}!! ok all that grinding wasnt for nothing", emote: 2}
-      - {line: "level {LEVEL}, another step toward job advance", emote: 2}
-      - {line: "ding! {LEVEL} and still grinding, what a life", emote: 2}
-      - {line: "yeah yeah {LEVEL}, no big deal, totally planned this", emote: 3}
-      - {line: "{LEVEL}. logged. moving on.", emote: 0}
-      - {line: "oh {LEVEL}? thought i was further behind lol, nice", emote: 6}
-      - {line: "level {LEVEL} and the grind resets like always", emote: 7}
-      - {line: "hitting {LEVEL} feels so good rn", emote: 2}
-      - {line: "{LEVEL}!! that one was smooth", emote: 2}
-      - {line: "level {LEVEL} baby, thats another one in the books", emote: 3}
-      - {line: "ding ding {LEVEL}, clean level", emote: 2}
-      - {line: "level {LEVEL} im flying through these levels", emote: 2}
-      - {line: "{LEVEL} achieved, feels amazing", emote: 3}
-      - {line: "another level another chance to get better at {LEVEL}", emote: 2}
-      - {line: "level {LEVEL} and looking good", emote: 2}
-      - {line: "hit {LEVEL} pretty quick this time", emote: 3}
-      - {line: "level {LEVEL} is where im at now, feeling strong", emote: 2}
-      - {line: "ding! level {LEVEL} has been achieved", emote: 2}
-      - {line: "getting closer to job adv, hit {LEVEL} today", emote: 3}
+      - {line: "{LEVEL}级了 冲鸭", emote: 2}
+      - "叮! 终于升级了"
+      - {line: "{LEVEL}级 不是我吹 还行吧", emote: 3}
+      - {line: "耶 到{LEVEL}级了 ^^", emote: 2}
+      - {line: "升级咯 \\o/", emote: 2}
+      - {line: "ok {LEVEL}级了 再升一级就睡", emote: 2}
+      - {line: "刷了这么久总算没白刷 哈哈", emote: 2}
+      - {line: "{LEVEL}级 冲鸭", emote: 2}
+      - {line: "呼 终于升级了 卡了好久了", emote: 2}
+      - {line: "白送AP 走起", emote: 2}
+      - {line: "{LEVEL}级了 说了我能追上吧 xD", emote: 3}
+      - {line: "这级升得舒服", emote: 2}
+      - {line: "又一级 ^^", emote: 2}
+      - {line: "{LEVEL}级了 快能转职了 嘿嘿", emote: 2}
+      - {line: "顺滑 这次还没死过", emote: 3}
+      - {line: "叮叮 加点时间到", emote: 2}
+      - {line: "都{LEVEL}级了? 我都没注意 哈哈", emote: 3}
+      - {line: "对这波刷怪还挺自豪", emote: 2}
+      - {line: "{LEVEL}级 继续冲 \\o/", emote: 2}
+      - {line: "轻松升级 说了能到吧", emote: 3}
+      - "叮!"
+      - "冲鸭 \\o/"
+      - "终于"
+      - {line: "又一个里程碑 ^^", emote: 2}
+      - "哦 新鲜出炉的一级"
+      - {line: "我就知道我行", emote: 3}
+      - "又变强了 嘿嘿"
+      - {line: "这AP得加在刀刃上 哈哈", emote: 2}
+      - "耶耶 \\o/"
+      - "这一级有感觉 刷了好久的"
+      - {line: "嗯嗯 稳稳往上爬 ^^", emote: 2}
+      - {line: "这级升得毫不费力", emote: 3}
+      - {line: "{LEVEL}级了 不是吧 冲鸭鸭鸭", emote: 2}
+      - "嗯。又一级。行。"
+      - {line: "{LEVEL}级 那必须的 你还能指望我啥", emote: 3}
+      - {line: "我居然真的到{LEVEL}级了 手都在抖", emote: 2}
+      - "叮。不错。"
+      - {line: "{LEVEL}级 这一级的每一点经验都是我拼来的", emote: 2}
+      - "耶 升级了 又到了做加点决定然后日后后悔的环节"
+      - {line: "{LEVEL}级! 我敢说没人刷得比我狠", emote: 3}
+      - {line: "叮叮叮 {LEVEL}级啦", emote: 2}
+      - "终于。"
+      - {line: "{LEVEL}级... 这级磨了好久 不过值了", emote: 2}
+      - "新等级 新的我 哈哈"
+      - {line: "凌晨三点独自升到{LEVEL}级 有点小诗意", emote: 0}
+      - "说实话今天没指望能成 结果还真成了"
+      - {line: "{LEVEL}级了 经验条又归零了", emote: 7}
+      - "半睡半醒间升级了 哈哈"
+      - {line: "ok 现在可以下线了。也许。", emote: 3}
+      - "爽 终于"
+      - {line: "感觉到经验条满了 直接开心到飞起 哈哈", emote: 2}
+      - "每一只怪都值了"
+      - "ok 这感觉真好 不骗你"
+      - "对味了 就是这个感觉"
+      - "新等级 新的我 (还是同一个刷怪人)"
+      - {line: "{LEVEL}级了!! ok 刷这么久没白刷", emote: 2}
+      - {line: "{LEVEL}级 离转职又近一步", emote: 2}
+      - {line: "叮! {LEVEL}级 接着刷 这日子真不错", emote: 2}
+      - {line: "行行 {LEVEL}级 没啥大不了 全在我计划内", emote: 3}
+      - {line: "{LEVEL}级。记下了。下一站。", emote: 0}
+      - {line: "哦 {LEVEL}级了? 我还以为差得远呢 哈哈 不错", emote: 6}
+      - {line: "{LEVEL}级 刷怪循环照旧重启", emote: 7}
+      - {line: "这一刻升到{LEVEL}级 太爽了", emote: 2}
+      - {line: "{LEVEL}级!! 这波顺滑", emote: 2}
+      - {line: "{LEVEL}级啦 又一个里程碑", emote: 3}
+      - {line: "叮叮 {LEVEL}级 干净利落", emote: 2}
+      - {line: "{LEVEL}级了 这升级速度要起飞", emote: 2}
+      - {line: "{LEVEL}级达成 爽翻天", emote: 3}
+      - {line: "又一级 又一次变强的机会 {LEVEL}级", emote: 2}
+      - {line: "{LEVEL}级了 状态不错", emote: 2}
+      - {line: "这次升到{LEVEL}级挺快的", emote: 3}
+      - {line: "现在{LEVEL}级 感觉浑身是劲", emote: 2}
+      - {line: "叮! {LEVEL}级达成", emote: 2}
+      - {line: "今天升到{LEVEL}级 离转职越来越近了", emote: 3}
     emote:
       - 2
       - 3
@@ -330,90 +330,90 @@ TrainingBot:
 
   Damage:
     text:
-      - {line: "ow, that {MOB} hits hard", emote: 5}
-      - {line: "oof almost wasnt watching my hp", emote: 7}
-      - "where did my pots go lol"
-      - {line: "ow ow ow {MOB} pls", emote: 5}
-      - {line: "ugh that {MOB} keeps hitting me", emote: 5}
-      - {line: "that one hurt T_T", emote: 4}
-      - {line: "yikes didnt mean to walk into that {MOB}", emote: 7}
-      - "ow my hp"
-      - {line: "ok rude, {MOB}", emote: 5}
-      - {line: "oof i fell again lol", emote: 7}
-      - {line: "that {MOB} came outta nowhere", emote: 6}
-      - {line: "ouch my poor little hp bar", emote: 4}
-      - {line: "stop hitting me {MOB} im grinding here", emote: 5}
-      - {line: "welp guess i need more pots", emote: 6}
-      - {line: "ow that fall hurt T_T", emote: 4}
-      - {line: "didnt see that {MOB} oops", emote: 7}
-      - "ow ow gimme a sec"
-      - {line: "{MOB} really got me lol so embarrassing", emote: 7}
-      - {line: "down to half hp from one {MOB} smh", emote: 5}
-      - "oof"
-      - "ow that stings"
-      - {line: "spiked me right off the ledge, cool cool", emote: 5}
-      - {line: "hp going down faster than i can pot lol", emote: 6}
-      - "yikes"
-      - {line: "ok that one i deserved", emote: 7}
-      - {line: "every time i look away it gets me smh", emote: 5}
-      - "ow ow"
-      - {line: "missed the landing again whoops", emote: 7}
-      - {line: "gonna sit and pot a sec before i drop", emote: 0}
-      - "ow no"
-      - "{MOB} ow"
-      - "brb potting"
-      - "not cool"
-      - "that hurt more than expected"
-      - "gonna need so many pots for this"
-      - "maybe i should grind somewhere easier"
-      - "that {MOB} is stronger than i thought"
-      - "need to stop getting hit so much"
-      - "took a hit, now im healing up"
-      - "fell down, need to be more careful"
-      - {line: "THAT {MOB} JUST HIT ME FOR HOW MUCH?? excuse me???", emote: 5}
-      - "tis but a scratch"
-      - "ow."
-      - {line: "{MOB} REALLY JUST WALKED UP AND HIT ME. wow ok.", emote: 5}
-      - {line: "lol that {MOB} thinks it can hurt me, cute", emote: 3}
-      - "ouch ok that one i felt"
-      - {line: "i am NEVER going near that {MOB} again. ever.", emote: 5}
-      - "meh, barely felt it"
-      - {line: "{MOB} got a lucky shot, wont happen again", emote: 3}
-      - "ow ok fine ill pot"
-      - {line: "that {MOB} has it out for me specifically i swear", emote: 5}
-      - "potted thru it np"
-      - "my hp bar is a suggestion at this point"
-      - {line: "walked right into {MOB} like a genius", emote: 7}
-      - {line: "just got clapped by {MOB} and im choosing to pretend it didnt happen", emote: 7}
-      - "ow lol that was dumb of me"
-      - {line: "ok ow, wasnt expecting that", emote: 7}
-      - "barely noticed, totally fine, this is fine"
-      - {line: "great now i gotta pot, ty very much", emote: 5}
-      - "one slip and half my hp gone, amazing"
-      - "that'll teach me to stop paying attention"
-      - "ok ow. rude."
-      - "brb having a moment about my hp"
-      - {line: "{MOB} got me while i was spacing out smh", emote: 7}
-      - {line: "ok {MOB} that was uncalled for", emote: 5}
-      - {line: "that {MOB} keeps targeting me specifically, im convinced", emote: 5}
-      - {line: "{MOB} crit me and i actually said ow out loud lol", emote: 7}
-      - {line: "nice shot {MOB}, wont happen again tho", emote: 3}
-      - {line: "did {MOB} just drain my whole pot supply, wow", emote: 5}
-      - {line: "fell right into {MOB} territory, my own fault honestly", emote: 7}
-      - {line: "{MOB} caught me off guard honestly", emote: 6}
-      - {line: "that {MOB} pack got me good", emote: 5}
-      - {line: "oops walked into {MOB} attack radius", emote: 7}
-      - "gotta watch my hp better"
-      - {line: "{MOB} is faster than i thought", emote: 5}
-      - {line: "yeah that {MOB} caught me slipping lol", emote: 6}
-      - "note to self dont get greedy"
-      - {line: "ok {MOB} i feel u, im potting up", emote: 0}
-      - {line: "damage taken, moving on", emote: 0}
-      - {line: "{MOB} got me but ill get them back", emote: 3}
-      - "taking it slow for a sec"
-      - {line: "{MOB} hitting harder than expected", emote: 6}
-      - {line: "ok that was my fault, {MOB} didnt even", emote: 7}
-      - {line: "potting up, {MOB} surprise attack", emote: 0}
+      - {line: "哎哟 这{MOB}打人好疼", emote: 5}
+      - {line: "糟糕 没注意看血条", emote: 7}
+      - "我药水去哪了 哈哈"
+      - {line: "疼疼疼 {MOB}你轻点", emote: 5}
+      - {line: "啊 这{MOB}一直捶我", emote: 5}
+      - {line: "这一下真疼 T_T", emote: 4}
+      - {line: "嘶 没想往{MOB}身上撞的", emote: 7}
+      - "哎哟 我的血"
+      - {line: "行 没礼貌 {MOB}", emote: 5}
+      - {line: "又摔了 哈哈", emote: 7}
+      - {line: "这{MOB}从哪冒出来的", emote: 6}
+      - {line: "哎哟 我可怜的小血条", emote: 4}
+      - {line: "别打我了{MOB} 我刷怪呢", emote: 5}
+      - {line: "得 看来得多买点药水", emote: 6}
+      - {line: "哎 这一摔好疼 T_T", emote: 4}
+      - {line: "没看见那只{MOB} 完蛋", emote: 7}
+      - "疼疼 等我缓一下"
+      - {line: "{MOB}真给我干趴了 哈哈 太丢人了", emote: 7}
+      - {line: "一只{MOB}就干掉我半管血 无语", emote: 5}
+      - "哎哟"
+      - "疼 火辣辣的"
+      - {line: "直接把我从台子上顶下去了 行 可以", emote: 5}
+      - {line: "血掉得比吃药还快 哈哈", emote: 6}
+      - "嘶"
+      - {line: "行 这一下是我活该", emote: 7}
+      - {line: "每次一转头它就偷袭我 无语", emote: 5}
+      - "疼疼"
+      - {line: "落地又没落好 完蛋", emote: 7}
+      - {line: "坐会儿嗑点药 不然要凉", emote: 0}
+      - "哎哟 别"
+      - "{MOB} 哎哟"
+      - "先嗑个药"
+      - "过分了"
+      - "这一下比想象中疼"
+      - "这得嗑多少药才顶得住"
+      - "我是不是该换个简单点的地方刷"
+      - "这{MOB}比我想的猛"
+      - "不能再这么挨打了"
+      - "挨了一下 先回回血"
+      - "摔下来了 得小心点了"
+      - {line: "这{MOB}刚打了我多少伤害?? 你没事吧???", emote: 5}
+      - "只是皮外伤"
+      - "疼。"
+      - {line: "{MOB}居然真走过来给我一拳。行。可以。", emote: 5}
+      - {line: "哈哈 这{MOB}以为能伤到我 真可爱", emote: 3}
+      - "哎哟 行 这一下我有感觉了"
+      - {line: "我再也再也不会靠近那只{MOB}了。永不。", emote: 5}
+      - "还行 几乎没感觉"
+      - {line: "{MOB}运气好 不会有下次了", emote: 3}
+      - "哎 行行 我嗑药"
+      - {line: "我发誓那只{MOB}就是冲我来的", emote: 5}
+      - "嗑药顶过去了 小意思"
+      - "我的血条现在就是个摆设"
+      - {line: "直接一头撞进{MOB}怀里 我可真是天才", emote: 7}
+      - {line: "刚被{MOB}秒了 我选择当无事发生", emote: 7}
+      - "哎 哈哈 我真傻"
+      - {line: "行 疼 没想到啊", emote: 7}
+      - "几乎没注意 完全没事 我没事"
+      - {line: "好 现在还得嗑药 谢谢你啊", emote: 5}
+      - "脚一滑半管血没了 绝了"
+      - "看吧 走神是要付出代价的"
+      - "行。疼。过分。"
+      - "我得为我的血条伤感一会儿"
+      - {line: "我走神的时候被{MOB}偷袭了 无语", emote: 7}
+      - {line: "行 {MOB} 这波大可不必", emote: 5}
+      - {line: "我确信那只{MOB}就盯着我一个人打", emote: 5}
+      - {line: "{MOB}暴击我的时候 我居然喊出声了 哈哈", emote: 7}
+      - {line: "打得不错 {MOB} 不过没有下次了", emote: 3}
+      - {line: "{MOB}这是把我整包药水都干空了啊 服了", emote: 5}
+      - {line: "直接摔进{MOB}堆里 老实说是我自己的问题", emote: 7}
+      - {line: "{MOB}打了我个措手不及 说实话", emote: 6}
+      - {line: "这一群{MOB}真够我喝一壶的", emote: 5}
+      - {line: "完了 走进{MOB}的攻击范围了", emote: 7}
+      - "得看好我的血条了"
+      - {line: "{MOB}比我想的快", emote: 5}
+      - {line: "行 这{MOB}抓到我走神了 哈哈", emote: 6}
+      - "记住 不能贪"
+      - {line: "行 {MOB} 我懂你意思了 我嗑药", emote: 0}
+      - {line: "挨打了 继续", emote: 0}
+      - {line: "{MOB}打了我 但我会打回去的", emote: 3}
+      - "先缓一缓"
+      - {line: "{MOB}比想象中猛啊", emote: 6}
+      - {line: "行 是我的锅 {MOB}根本没动手", emote: 7}
+      - {line: "嗑药了 {MOB}搞偷袭", emote: 0}
     emote:
       - 5
       - 7
@@ -422,82 +422,82 @@ TrainingBot:
 
   NearDeath:
     text:
-      - {line: "omg almost died lol", emote: 6}
-      - "ok ok backing off for a sec"
-      - {line: "phew that was close, outta pots too", emote: 7}
-      - {line: "AAA my hp T_T", emote: 6}
-      - {line: "nope nope nope brb retreating", emote: 6}
-      - {line: "potting potting come on come on", emote: 6}
-      - {line: "ok that scared me", emote: 7}
-      - {line: "red hp red hp RED HP omg", emote: 6}
-      - "gimme a sec to heal up"
-      - {line: "wow i really almost lost exp there", emote: 7}
-      - {line: "ty pots ty pots T_T", emote: 7}
-      - {line: "yikes too many mobs at once", emote: 6}
-      - "backing into the corner to rest"
-      - {line: "lol my heart actually skipped", emote: 7}
-      - {line: "ok lesson learned dont over pull", emote: 7}
-      - "just gonna sit here and breathe for a bit"
-      - {line: "phew, gonna need to restock soon", emote: 0}
-      - {line: "that mob hit waaay harder than i thought", emote: 6}
-      - {line: "ok i panicked a lil there sry", emote: 7}
-      - {line: "made it out alive, barely tho", emote: 0}
-      - "phew"
-      - "owowow ok ok"
-      - {line: "had like one hp left omg", emote: 6}
-      - "nooo not my exp bar T_T"
-      - {line: "scrolling back to town brb", emote: 0}
-      - "ok breathe, breathe"
-      - {line: "one more hit n i was toast lol", emote: 7}
-      - {line: "my hands are kinda shaking", emote: 6}
-      - {line: "thought i was a goner for sure", emote: 4}
-      - {line: "way too close, gonna slow it down", emote: 0}
-      - {line: "my whole life flashed before me lol", emote: 7}
-      - {line: "those mobs came outta nowhere, almost lost a whole bar T_T", emote: 4}
-      - {line: "I ALMOST DIED. I. ALMOST. DIED. im taking a walk.", emote: 6}
-      - "whatever its fine"
-      - {line: "pfft, planned that, had it under control the whole time", emote: 3}
-      - {line: "MY HP BAR IS LITERALLY A SLIVER OMG", emote: 6}
+      - {line: "我的天 差点死了 哈哈", emote: 6}
+      - "行行 先往后撤一撤"
+      - {line: "呼 太险了 药水也见底了", emote: 7}
+      - {line: "啊啊啊 我的血条 T_T", emote: 6}
+      - {line: "不行不行不行 先撤了", emote: 6}
+      - {line: "嗑药嗑药 快点快点", emote: 6}
+      - {line: "行 吓死我了", emote: 7}
+      - {line: "红血红血红血 我的天", emote: 6}
+      - "给我几秒回个血"
+      - {line: "我去 差点把经验赔进去", emote: 7}
+      - {line: "感谢药水感谢药水 T_T", emote: 7}
+      - {line: "嘶 怪一次拉太多了", emote: 6}
+      - "退到角落缓一缓"
+      - {line: "哈哈 心脏真的漏跳了一拍", emote: 7}
+      - {line: "行 教训学到了 别拉太多", emote: 7}
+      - "就坐这喘口气"
+      - {line: "呼 得赶紧补货了", emote: 0}
+      - {line: "那怪打得比我想的疼太多了", emote: 6}
+      - {line: "行 我刚刚有点慌了 抱歉", emote: 7}
+      - {line: "活着出来了 就差一点点", emote: 0}
+      - "呼"
+      - "哎呦喂 行行"
+      - {line: "就剩一滴血了 我的天", emote: 6}
+      - "别啊 我的经验条 T_T"
+      - {line: "回城卷回城 稍等", emote: 0}
+      - "行 深呼吸 深呼吸"
+      - {line: "再挨一下我就人没了 哈哈", emote: 7}
+      - {line: "我的手都在抖", emote: 6}
+      - {line: "真以为要交代在这了", emote: 4}
+      - {line: "太险了 放慢节奏吧", emote: 0}
+      - {line: "我的游戏生涯在眼前走马灯了 哈哈", emote: 7}
+      - {line: "那些怪突然冒出来 差点一整条经验没了 T_T", emote: 4}
+      - {line: "我差点死了。差点。死了。我要去散个步。", emote: 6}
+      - "行吧 无所谓"
+      - {line: "切 我计划好的 全程尽在掌握", emote: 3}
+      - {line: "我的血条就剩一丝了 我的天", emote: 6}
       - "..."
-      - "that was way too close for comfort"
-      - {line: "this is the second time today. THE SECOND TIME.", emote: 5}
-      - {line: "almost lost exp there and i wouldve cried for real", emote: 7}
-      - "potting potting potting"
-      - {line: "ok {MOB} won that round, next time tho", emote: 5}
-      - "brb telling my friends about this near death experience"
-      - "my heart is going so fast omg"
-      - {line: "survived that somehow, dont ask me how", emote: 7}
-      - "im literally shaking at my desk lol"
-      - {line: "note to self: dont pull the whole map next time", emote: 7}
-      - {line: "ok i need to be more careful, that was so close", emote: 6}
-      - "barely alive, this is why i dont pull so many at once"
-      - "slamming every pot i have, brb"
-      - {line: "i should really not do that again T_T", emote: 7}
-      - "ok i need a moment and maybe a snack"
-      - {line: "my hands are sweating lol thats how close that was", emote: 6}
-      - "if my pots ran out there id have lost real exp, terrifying"
-      - "ok breathing. im fine. we're good."
-      - {line: "note to self: one pull at a time", emote: 7}
-      - "that was NOT the vibe, starting over"
-      - "almost went back to town the hard way"
-      - "hp went from full to nothing in like 2 seconds, terrifying"
-      - {line: "ok {MOB} made me genuinely scared for a second there", emote: 6}
-      - "logged on to grind, almost logged off permanently"
-      - {line: "{MOB} almost ended me. that's embarrassing.", emote: 7}
-      - "wait wait im actually gonna die"
-      - {line: "that was TOO close for comfort", emote: 7}
-      - "nope backing off immediately"
-      - {line: "HP DROP INCOMING", emote: 6}
-      - {line: "potting like crazy right now", emote: 6}
-      - {line: "i actually got terrified for a second lol", emote: 7}
-      - {line: "ok never doing that again", emote: 6}
-      - "that woke me up real quick"
-      - {line: "almost lost a whole level there omg", emote: 6}
-      - "time out, im getting healed up"
-      - {line: "holy that was scary", emote: 6}
-      - {{line: "potting potting POTTING", emote: 6}}
-      - {{line: "ok im retreating to safety", emote: 0}}
-      - {{line: "way way too close that time", emote: 7}}
+      - "这也太悬了 心脏受不了"
+      - {line: "今天第二次了。第二次。", emote: 5}
+      - {line: "差点经验就没了 那我是真会哭的", emote: 7}
+      - "嗑药嗑药嗑药"
+      - {line: "行 {MOB} 这回合算你赢 下回再说", emote: 5}
+      - "我要去跟朋友讲讲这次濒死体验"
+      - "我的心脏跳得好快 我的天"
+      - {line: "居然活下来了 别问我怎么活的", emote: 7}
+      - "我在电脑前手都是抖的 哈哈"
+      - {line: "记住: 下次别一次拉全图的怪", emote: 7}
+      - {line: "行 我得小心点了 刚才太悬了", emote: 6}
+      - "勉强活着 所以我才不一次拉那么多"
+      - "把手上所有药水都拍下去了 稍等"
+      - {line: "我真不该再这么干了 T_T", emote: 7}
+      - "行 我需要缓缓 顺便吃点东西"
+      - {line: "手心都冒汗了 哈哈 刚才有多险你懂吧", emote: 6}
+      - "刚才要是药水断了 经验就真没了 吓人"
+      - "行 深呼吸。我没事。问题不大。"
+      - {line: "记住: 一次拉一波", emote: 7}
+      - "这不对劲 重来重来"
+      - "差点用最惨的方式回城了"
+      - "血两秒从满到空 吓死个人"
+      - {line: "行 {MOB} 刚才那一下真把我吓到了", emote: 6}
+      - "上线来刷怪 差点直接永久下线"
+      - {line: "{MOB}差点把我送走。太丢人了。", emote: 7}
+      - "等等等等 我真的要死了"
+      - {line: "这也太悬了", emote: 7}
+      - "不行 立刻后撤"
+      - {line: "血量即将清零", emote: 6}
+      - {line: "现在疯狂嗑药中", emote: 6}
+      - {line: "刚才那一秒我是真慌了 哈哈", emote: 7}
+      - {line: "行 再也不这么干了", emote: 6}
+      - "这一下直接给我吓清醒了"
+      - {line: "差点一整级经验没了 我的天", emote: 6}
+      - "暂停 先回血"
+      - {line: "我天 好吓人", emote: 6}
+      - {{line: "嗑药嗑药 疯狂嗑药", emote: 6}}
+      - {{line: "ok 我先撤到安全区", emote: 0}}
+      - {{line: "刚才真的太险太险了", emote: 7}}
     emote:
       - 6
       - 7
@@ -506,119 +506,119 @@ TrainingBot:
 
   MapShare:
     text:
-      - {line: "this map taken {PLAYER_NAME}?", emote: 0}
-      - "wanna share? theres plenty of mobs"
-      - {line: "oh a {PLAYER_JOB} nice, ill take the left side", emote: 2}
-      - "this map taken? lmk if u wanna split"
-      - {line: "hey {PLAYER_NAME} :) want the right half?", emote: 2}
-      - "np theres room for two here"
-      - "u grinding too? we can share ^^"
-      - {line: "oh hi {PLAYER_NAME}, ill move to the next ch", emote: 0}
-      - "ill take top platform u take bottom, np"
-      - {line: "kinda my spot lol but ok we can share", emote: 5}
-      - "this map's pretty empty, plenty for both of us"
-      - {line: "welcome :) theres mobs on the left if u want", emote: 2}
-      - {line: "oh a {PLAYER_JOB}, wanna split the map?", emote: 0}
-      - "i can ch change if ur grinding, np"
-      - "wanna duo or u want ur own ch?"
-      - {line: "been here a while but i dont mind sharing", emote: 0}
-      - {line: "no ks i promise, just lmk where u wanna grind", emote: 2}
-      - "theres room, just dont ks pls lol"
-      - {line: "hey {PLAYER_NAME} u want this map? i can move", emote: 0}
-      - "ill yield the spawn to u, im almost done anyway"
-      - {line: "oh hi! plenty of mobs, go ahead {PLAYER_NAME}", emote: 2}
-      - {line: "this is kinda my grind spot but u can stay :)", emote: 5}
-      - "wanna take turns on the spawn?"
-      - "u looking to grind here too? we can share np"
-      - {line: "ill scoot over, all urs {PLAYER_NAME}", emote: 0}
-      - {line: "oh a {PLAYER_JOB}! u buff i grind? lol jk", emote: 2}
-      - "map's big enough, take whichever side u like"
-      - {line: "kinda was here first, but ill share half", emote: 5}
-      - "no worries ill just hop to another ch ^^"
-      - {line: "welcome to {MAP} :) theres room if u wanna stay", emote: 2}
-      - "ch change? i honestly dont mind"
-      - "all urs, i was bout to leave anyway"
-      - {line: "go ahead, gotta buy pots soon anyway", emote: 0}
-      - "this ledge is free if u want it"
-      - {line: "oh hey, didnt think anyone else came to this map lol", emote: 6}
-      - {line: "u after this spawn too? we can trade off ^^", emote: 2}
-      - "i usually camp here but ur welcome to the bottom mobs"
-      - {line: "if u stay just lemme keep the corner spawn ty", emote: 0}
-      - {line: "honestly grindings nicer with company, stick around :)", emote: 2}
-      - "been farming for my next lvl but theres more mobs than i can clear solo anyway"
-      - {line: "mobs respawn quick enough for both of us, no worries", emote: 0}
-      - {line: "ill give u the high platform, im comfy down here w my pots lol", emote: 2}
-      - "go ahead, im cycling channels anyway"
-      - "cool cool, we're good"
-      - "spawn's all urs"
-      - "yo {PLAYER_NAME}, plenty of room"
-      - "lmk if i'm ks-ing u"
-      - "grinding's way better when theres two of us"
-      - "omg hi! ive been here but dont worry bout me"
-      - "u can have the top, im grinding the bottom anyway"
-      - "np np, just trying to get some mobs in before dinner haha"
-      - "theres like, enough mobs for 5 people here lol"
-      - "honestly just need a few more kills, then all urs {PLAYER_NAME}"
-      - "i dont mind company at all, stick around if u want :)"
-      - "was just farming a bit before im gonna afk, u can stay"
-      - "this is my map. MY map. ...ok fine u can stay"
-      - {line: "oh great, company. wonderful.", emote: 5}
-      - {line: "HI HELLO YES HI new friend?? ^^", emote: 2}
-      - {line: "if u ks me im gonna write a very strongly worded megaphone about it", emote: 5}
-      - "hey."
-      - {line: "{PLAYER_NAME}, this map has the best spawn rate at our level range", emote: 0}
-      - "oh someone else, cool"
-      - {line: "yo {PLAYER_NAME}, just dont touch the left spawn and were good", emote: 0}
-      - {line: "a {PLAYER_JOB} huh, nice, the more the merrier i guess ^^", emote: 2}
-      - {line: "i was enjoying the silence but sure {PLAYER_NAME} u can stay", emote: 0}
-      - "been soloing this map for ages, ur welcome to join"
-      - {line: "oh {PLAYER_NAME}! wanna take the top platform?", emote: 2}
-      - {line: "{PLAYER_JOB}s are great grind partners, lets do this", emote: 2}
-      - "just dont ks pls, thats all i ask"
-      - {line: "ur lucky i just restocked on pots and im feeling generous lol", emote: 3}
-      - "take whatever side u want, im easy"
-      - "honestly was hoping someone would show up, gets lonely"
-      - "u can have the whole map, im about to afk"
-      - "sharing is caring n all that lol"
-      - "im on my way out anyway, great timing"
-      - {line: "just dont mess up my spawn route n we're cool", emote: 0}
-      - "two grinding is faster anyway trust me"
-      - "okay okay fair, stay"
-      - {line: "hey {PLAYER_NAME}, ill take right side u take left?", emote: 2}
-      - {line: "{PLAYER_JOB}? nice, u probably clear faster than me anyway", emote: 2}
-      - {line: "welcome to {MAP}, best kept secret at this level range", emote: 2}
-      - {line: "hey {PLAYER_NAME}, if ur staying please dont ks the top spawn", emote: 0}
-      - {line: "{PLAYER_JOB} huh, bet ur great in a party lol, wanna share?", emote: 2}
-      - {line: "{PLAYER_NAME} u want top or bottom of {MAP}? pick ur poison", emote: 0}
-      - {line: "sure {PLAYER_NAME}, plenty of mob for both of us at {MAP}", emote: 2}
-      - "plenty of room, no worries"
-      - {line: "yo {PLAYER_NAME} welcome, stay as long as u want", emote: 2}
-      - "map is big enough for multiple people grinding"
-      - {line: "hey {PLAYER_NAME}, just go ahead and grind, im cool", emote: 0}
-      - "just here for a bit, u can have the main spawns"
-      - {line: "no drama from me {PLAYER_NAME}, just grinding", emote: 0}
-      - "feel free to set up wherever u want"
-      - {{line: "{PLAYER_JOB}s and i can share this map ez", emote: 2}}
-      - "honestly prefer company over solo grinding"
-      - {{line: "u cool with sharing spawns {PLAYER_NAME}?", emote: 0}}
-      - "no ks here, just two grinders doing their thing"
-      - {{line: "{PLAYER_NAME} u were here first if u want it", emote: 0}}
-      - "sharing keeps it fresh, im down"
-      - {{line: "hey {PLAYER_NAME} lets just split the map fair", emote: 2}}
-      - "grinding together is better than competing anyway"
-      - {{line: "all good {PLAYER_NAME}, plenty for both", emote: 2}}
-      - "not gonna fight over mobs, we got enough"
-      - {{line: "{PLAYER_NAME} if u need the spot ill rotate out", emote: 0}}
-      - "honestly happy to have company out here"
-      - {{line: "{PLAYER_JOB}? nice we got synergy", emote: 2}}
-      - "just chill grinding, no tension"
-      - {{line: "hey {PLAYER_NAME}, all urs if u want the spot solo", emote: 0}}
-      - "two is better than one for grinding vibes"
-      - {{line: "{PLAYER_NAME} take what u need, im good", emote: 2}}
-      - "im not territorial about this map lol"
-      - {{line: "hey {PLAYER_JOB}! lets make this fun for both", emote: 2}}
-      - "coexisting peacefully over here ^^"
-      - {{line: "ok {PLAYER_NAME} we good? grinding buddies?", emote: 2}}
+      - {line: "这图有人吗 {PLAYER_NAME}?", emote: 0}
+      - "一起刷不? 怪多得很"
+      - {line: "哦 {PLAYER_JOB}啊 不错 我刷左边", emote: 2}
+      - "这图有人吗? 想分图就说一声"
+      - {line: "嘿 {PLAYER_NAME} :) 右边给你?", emote: 2}
+      - "没事 这图容得下两个人"
+      - "你也在练级? 咱可以分着刷 ^^"
+      - {line: "哦 你好 {PLAYER_NAME} 我换条线吧", emote: 0}
+      - "我刷上面平台 你刷下面 没毛病"
+      - {line: "这算我的老窝了 哈哈 不过行 可以一起", emote: 5}
+      - "这图挺空的 咱俩刷绰绰有余"
+      - {line: "欢迎 :) 左边的怪归你 想要就去", emote: 2}
+      - {line: "哦 {PLAYER_JOB}啊 想分图不?", emote: 0}
+      - "你要刷的话我可以换线 没事"
+      - "组队刷 还是你要单开一条线?"
+      - {line: "我在这刷挺久了 不过不介意拼图", emote: 0}
+      - {line: "我保证不抢怪 你告诉我想刷哪边", emote: 2}
+      - "有位置 就是别抢怪 哈哈"
+      - {line: "嘿 {PLAYER_NAME} 你想要这图吗? 我可以走", emote: 0}
+      - "这刷怪点让给你吧 反正我快刷完了"
+      - {line: "哦 你好! 怪管够 随便刷 {PLAYER_NAME}", emote: 2}
+      - {line: "这算我的刷怪点 不过你可以留下 :)", emote: 5}
+      - "轮流刷这个点不?"
+      - "你也来这练级? 一起刷 没事的"
+      - {line: "我挪挪 都给你 {PLAYER_NAME}", emote: 0}
+      - {line: "哦 {PLAYER_JOB}啊! 你给我加buff 我来刷? 哈哈 开玩笑", emote: 2}
+      - "这图够大 哪边都行"
+      - {line: "算我先来的 不过分你一半", emote: 5}
+      - "没事 我换条线 ^^"
+      - {line: "欢迎来{MAP} :) 想留下的话有位置", emote: 2}
+      - "换线? 我其实无所谓"
+      - "都归你了 我本来也准备走了"
+      - {line: "请吧 反正我也得去买药了", emote: 0}
+      - "这块平台空着 想要就拿去"
+      - {line: "哦 嘿 没想到还有别人来这图 哈哈", emote: 6}
+      - {line: "你也要刷这个点? 咱轮流来 ^^", emote: 2}
+      - "我一般蹲这 不过下面的怪让给你"
+      - {line: "你要留下的话 角落那个点留给我 谢谢", emote: 0}
+      - {line: "说实话 有人陪着刷怪更得劲 留下吧 :)", emote: 2}
+      - "我在刷下一级的经验 反正怪多 我一个人也清不完"
+      - {line: "怪刷得够快 咱俩都够刷 别担心", emote: 0}
+      - {line: "高台让给你 我在下面靠着药水蹲着 哈哈", emote: 2}
+      - "请便 反正我在轮着换线刷"
+      - "行行 咱俩没事"
+      - "这个点都归你了"
+      - "哟 {PLAYER_NAME} 位置多的是"
+      - "我要是抢你怪了说一声"
+      - "两个人一起刷效率高多了"
+      - "我的天 你好! 我在这待好久了 不过别管我"
+      - "上面归你 反正我刷下面"
+      - "没事没事 我就在晚饭前刷几只 哈哈"
+      - "这图怪多到五个人都刷不完 哈哈"
+      - "说实话我再刷几只就好 然后都给你 {PLAYER_NAME}"
+      - "我完全不介意有人 想待就待 :)"
+      - "我就随便刷会儿 待会要挂机 你可以留下"
+      - "这是我的图。我的。...行吧 你可以留下"
+      - {line: "哦 太好了。有伴了。真好。", emote: 5}
+      - {line: "嗨嗨嗨 你好呀 新朋友?? ^^", emote: 2}
+      - {line: "你要是抢我怪 我就发一条措辞激烈的喇叭", emote: 5}
+      - "嘿。"
+      - {line: "{PLAYER_NAME} 这图是咱这等级段刷怪率最高的", emote: 0}
+      - "哦 还有别人 挺好"
+      - {line: "哟 {PLAYER_NAME} 别碰左边那个点就行 咱就没事", emote: 0}
+      - {line: "{PLAYER_JOB}啊 不错 人越多越热闹 ^^", emote: 2}
+      - {line: "我本来正享受安静呢 不过行 {PLAYER_NAME} 你可以留下", emote: 0}
+      - "这张图我一个人刷了好久了 欢迎加入"
+      - {line: "哦 {PLAYER_NAME}! 想刷上面平台不?", emote: 2}
+      - {line: "{PLAYER_JOB}都是刷怪好搭子 开整吧", emote: 2}
+      - "就一条 别抢怪 行不"
+      - {line: "算你运气好 我刚补完药 心情好 哈哈", emote: 3}
+      - "随便挑哪边 我无所谓"
+      - "说实话我还盼着来个人呢 挺孤单的"
+      - "整张图都给你吧 我快挂机了"
+      - "分享是美德啥的 哈哈"
+      - "反正我也要走了 来得正好"
+      - {line: "别打乱我的刷怪路线 咱就没事", emote: 0}
+      - "相信我 两个人刷就是快"
+      - "行行 公平 留下吧"
+      - {line: "嘿 {PLAYER_NAME} 我刷右边你刷左边?", emote: 2}
+      - {line: "{PLAYER_JOB}? 不错 反正你清怪肯定比我快", emote: 2}
+      - {line: "欢迎来{MAP} 这等级段最被低估的宝地", emote: 2}
+      - {line: "嘿 {PLAYER_NAME} 你要留下的话别抢上面那个点", emote: 0}
+      - {line: "{PLAYER_JOB}啊 打组队任务肯定强 哈哈 一起刷不?", emote: 2}
+      - {line: "{PLAYER_NAME} {MAP}的上半还是下半? 选一个", emote: 0}
+      - {line: "行 {PLAYER_NAME} {MAP}的怪咱俩够刷的", emote: 2}
+      - "地方多的是 别担心"
+      - {line: "哟 {PLAYER_NAME} 欢迎 想待多久待多久", emote: 2}
+      - "这图够大 几个人同时刷都没问题"
+      - {line: "嘿 {PLAYER_NAME} 你刷你的 我没意见", emote: 0}
+      - "我就来待会儿 主刷怪点都给你"
+      - {line: "我这边不会有啥幺蛾子 {PLAYER_NAME} 就是刷", emote: 0}
+      - "随便找地方安顿就行"
+      - {{line: "{PLAYER_JOB}和我分这张图 轻轻松松", emote: 2}}
+      - "说实话 比起单刷我更想要有人陪"
+      - {{line: "一起分刷怪点 你ok吗 {PLAYER_NAME}?", emote: 0}}
+      - "这里没有抢怪 只有两个默默刷怪的人"
+      - {{line: "{PLAYER_NAME} 你要想先到先得 图给你", emote: 0}}
+      - "一起刷才有新鲜感 我加入"
+      - {{line: "嘿 {PLAYER_NAME} 咱把这图公平分了吧", emote: 2}}
+      - "一起刷总比抢来抢去强"
+      - {{line: "没事 {PLAYER_NAME} 怪管够", emote: 2}}
+      - "不为几只怪打架 怪多着呢"
+      - {{line: "{PLAYER_NAME} 你要这位置我就换", emote: 0}}
+      - "说实话 有人做伴挺好"
+      - {{line: "{PLAYER_JOB}? 不错 咱有配合", emote: 2}}
+      - "就安安静静刷怪 没火药味"
+      - {{line: "嘿 {PLAYER_NAME} 你想单刷的话 图都给你", emote: 0}}
+      - "两个人刷怪的氛围就是比一个人强"
+      - {{line: "{PLAYER_NAME} 想要啥拿啥 我没事", emote: 2}}
+      - "我对这张图没啥占有欲 哈哈"
+      - {{line: "嘿 {PLAYER_JOB}! 咱让两边都刷得开心", emote: 2}}
+      - "在这里和平共处 ^^"
+      - {{line: "行 {PLAYER_NAME} 咱俩没事吧? 刷怪搭子?", emote: 2}}
     emote:
       - 0
       - 2
@@ -627,113 +627,113 @@ TrainingBot:
 
   PlayerCompliment:
     text:
-      - {line: "yo nice {PLAYER_WEAPON}", emote: 2}
-      - {line: "aww {PLAYER_PET} is so cute", emote: 2}
-      - {line: "kinda jealous of that {PLAYER_GEAR}", emote: 4}
-      - {line: "omg where'd u get that {PLAYER_WEAPON} o_o", emote: 2}
-      - {line: "love that {PLAYER_GEAR} sooo clean ^^", emote: 2}
-      - {line: "wish i had a {PLAYER_GEAR} like that :(", emote: 4}
-      - {line: "{PLAYER_PET} following u around is the cutest thing <3", emote: 2}
-      - {line: "what guild is {PLAYER_GUILD}?? lookin to join one", emote: 0}
-      - {line: "ooo {PLAYER_GUILD} ppl always got the nicest gear", emote: 2}
-      - {line: "ur {PLAYER_WEAPON} prob took so many scrolls omg", emote: 0}
-      - {line: "ur whole look is so put together", emote: 2}
-      - {line: "ty for not ksing me btw, ur cool ^^", emote: 2}
-      - "that cape is sooo cute where from"
-      - {line: "ur fame must be crazy high", emote: 0}
-      - {line: "omg can i pet {PLAYER_PET} pls", emote: 2}
-      - "saving up for gear like urs one day :)"
-      - "u look like u been playing forever, so jealous"
-      - {line: "{PLAYER_NAME} ur so decked out omg", emote: 2}
-      - "is that NX? it looks amazing on u"
-      - "haha nice fit, u got good taste"
-      - {line: "ur {PLAYER_GEAR} matches everything perfectly, jealous", emote: 4}
-      - "been wanting that weapon for ages"
-      - {line: "{PLAYER_PET} is just chillin and i love it ^^", emote: 2}
-      - "u must have so many mesos to look like that lol"
-      - "honestly ur gear is goals"
-      - "oh hey nice ^^"
-      - "u look strong"
-      - "cool fit :)"
-      - {line: "whoa hi o_o", emote: 2}
-      - "lookin good today"
-      - {line: "u seem like u really know what ur doing haha", emote: 2}
-      - "always nice runnin into someone cool out here"
-      - {line: "u kinda make me wanna train harder lol", emote: 2}
-      - "i hope i look as good as u someday haha"
-      - {line: "seein ppl like u around makes this map way more fun ^^", emote: 2}
-      - "ur drip is insane"
-      - "u got veteran energy"
-      - {line: "ur {PLAYER_WEAPON} is goals", emote: 3}
-      - "that fit hits hard"
-      - "been grinding way too long"
-      - "ur just cool"
-      - "honestly the vibe here is way better now"
-      - {line: "is that {PLAYER_WEAPON} worth the grind tho", emote: 2}
-      - {line: "bet that {PLAYER_GEAR} took forever to get", emote: 4}
-      - {line: "how long did u farm for that {PLAYER_GEAR}", emote: 2}
-      - {line: "{PLAYER_GUILD} has like the best energy", emote: 2}
-      - {line: "{PLAYER_PET} knows ur the real one", emote: 2}
-      - "ur making this whole grind feel less lonely, ty for that"
-      - "the way ur just vibing here makes me feel way better"
-      - {line: "ur {PLAYER_WEAPON} is so clean it actually makes me wanna level faster", emote: 3}
-      - {line: "ok {PLAYER_NAME} ur kinda making the rest of us look bad with that gear", emote: 3}
-      - {line: "wow {PLAYER_WEAPON}, thats... actually really impressive", emote: 2}
-      - "nice."
-      - {line: "{PLAYER_GEAR} IS SO GOOD OMG", emote: 2}
-      - {line: "wish my gear looked half as good as urs", emote: 4}
-      - {line: "that {PLAYER_WEAPON} must have taken forever to scroll", emote: 0}
-      - {line: "{PLAYER_PET} and {PLAYER_NAME} are the cutest duo here ^^", emote: 2}
-      - {line: "ur {PLAYER_GEAR} is making me rethink my whole build honestly", emote: 6}
-      - "u just look like someone who knows what theyre doing"
-      - {line: "ok but {PLAYER_GUILD} members always have the cleanest gear", emote: 2}
-      - "seriously how do u afford all that"
-      - {line: "that {PLAYER_NX} looks really good on u ^^", emote: 2}
-      - {line: "oh a lvl {PLAYER_LEVEL} {PLAYER_JOB}, respect", emote: 2}
-      - "im gonna grind twice as hard to catch up to u lol"
-      - {line: "{PLAYER_NAME} out here looking like a boss", emote: 2}
-      - "ur just built different honestly"
-      - "respect the hustle, u look amazing"
-      - "hope i look that good someday, goals"
-      - "u been grinding hard huh, it shows"
-      - "ok ur vibe is immaculate"
-      - "veteran energy, i can feel it"
-      - "u make this map look cooler just by being here"
-      - {line: "ok ur clearly doing something right lol", emote: 2}
-      - {line: "that {PLAYER_GEAR} is so hard to get, how long did it take", emote: 2}
-      - {line: "not to be weird but ur {PLAYER_WEAPON} is literally perfect", emote: 2}
-      - {line: "the way {PLAYER_PET} just follows u everywhere is adorable lol", emote: 2}
-      - {line: "{PLAYER_NAME} flexing on all of us with that {PLAYER_GEAR}", emote: 3}
-      - {line: "every time i see {PLAYER_GUILD} members they look so geared omg", emote: 2}
-      - {line: "is {PLAYER_NX} hard to get? it looks amazing", emote: 0}
-      - {line: "if i had {PLAYER_WEAPON} id never stop grinding lol", emote: 2}
-      - "ur whole energy is immaculate"
-      - {line: "{PLAYER_NAME} u just look like u understand the game", emote: 2}
-      - "the way u move around looks so practiced"
-      - {{line: "ur {PLAYER_GEAR} coordination is actually perfect", emote: 2}}
-      - "u clearly know what ur doing"
-      - {{line: "{PLAYER_PET} looks like a pro setup", emote: 2}}
-      - "ur skills are obviously well honed"
-      - {{line: "{PLAYER_JOB} mains always have the best vibes", emote: 2}}
-      - "u look like someones who enjoys the game"
-      - {{line: "{PLAYER_NAME} the way u play is so smooth", emote: 2}}
-      - "ur clearly put thought into ur build"
-      - {{line: "respect to u for having {PLAYER_GEAR} like that", emote: 0}}
-      - "u got that veteran look"
-      - {{line: "the fact that u have {PLAYER_WEAPON} means u work hard", emote: 2}}
-      - "ur grinding style is inspiring honestly"
-      - {{line: "{PLAYER_NAME} u make it look so easy", emote: 2}}
-      - "u got swag and it shows"
-      - {{line: "{PLAYER_GEAR} choices show taste", emote: 0}}
-      - "u seem like someone id want to party with"
-      - {{line: "the {PLAYER_WEAPON} choice is *chef's kiss*", emote: 3}}
-      - "u got the grind down to a science"
-      - {{line: "{PLAYER_NAME} u intimidate me a little lol", emote: 2}}
-      - "ur just built different"
-      - {{line: "{PLAYER_JOB}s like u make me wanna level faster", emote: 2}}
-      - "u clearly love this game"
-      - {{line: "wow {PLAYER_GEAR} is goals honestly", emote: 4}}
-      - "u make grinding look like art"
+      - {line: "哟 你这{PLAYER_WEAPON}不错啊", emote: 2}
+      - {line: "哇 {PLAYER_PET}好可爱", emote: 2}
+      - {line: "有点酸你那件{PLAYER_GEAR}", emote: 4}
+      - {line: "我的天 你这{PLAYER_WEAPON}哪来的 o_o", emote: 2}
+      - {line: "爱了 你这{PLAYER_GEAR}也太干净了 ^^", emote: 2}
+      - {line: "我也想要你这样的{PLAYER_GEAR} :(", emote: 4}
+      - {line: "{PLAYER_PET}跟着你到处跑也太可爱了吧 <3", emote: 2}
+      - {line: "你们{PLAYER_GUILD}是啥公会?? 我也想进一个", emote: 0}
+      - {line: "哦哦 {PLAYER_GUILD}的人装备永远是顶配", emote: 2}
+      - {line: "你这{PLAYER_WEAPON}估计砸了不少卷吧 我的天", emote: 0}
+      - {line: "你这一身搭配得真好", emote: 2}
+      - {line: "顺便谢谢你不抢我怪 你人不错 ^^", emote: 2}
+      - "那披风好可爱 哪来的"
+      - {line: "你的人气肯定高得离谱", emote: 0}
+      - {line: "我的天 我能摸摸{PLAYER_PET}吗", emote: 2}
+      - "有朝一日我也要攒出你这样的装备 :)"
+      - "你看着就像玩了好久的老玩家 好羡慕"
+      - {line: "{PLAYER_NAME}你这一身也太豪华了 我的天", emote: 2}
+      - "那是NX点装吗? 穿你身上真好看"
+      - "哈哈 穿搭不错 有品位"
+      - {line: "你这{PLAYER_GEAR}跟全身都配得上 羡慕了", emote: 4}
+      - "那武器我想要好久了"
+      - {line: "{PLAYER_PET}就搁那待着 我好喜欢 ^^", emote: 2}
+      - "你看着就不缺金币 哈哈"
+      - "说实话 你这装备就是我的目标"
+      - "哦 嘿 不错嘛 ^^"
+      - "你看着好强"
+      - "穿搭可以 :)"
+      - {line: "哇哦 你好 o_o", emote: 2}
+      - "今天这身挺好看"
+      - {line: "你看起来是真的会玩 哈哈", emote: 2}
+      - "出来刷怪能碰上你这么厉害的人真好"
+      - {line: "你搞得我都想加倍努力练级了 哈哈", emote: 2}
+      - "希望有一天我也能像你这么帅 哈哈"
+      - {line: "看到你这样的人 这图都有意思多了 ^^", emote: 2}
+      - "你这身行头绝了"
+      - "你有一股老玩家气场"
+      - {line: "你这{PLAYER_WEAPON}就是我的梦想", emote: 3}
+      - "这身穿搭太顶了"
+      - "刷怪刷太久了"
+      - "你就是很酷"
+      - "说实话 这氛围现在好多了"
+      - {line: "话说 这{PLAYER_WEAPON}值得这么刷吗", emote: 2}
+      - {line: "赌你这{PLAYER_GEAR}刷了好久才出", emote: 4}
+      - {line: "那件{PLAYER_GEAR}你刷了多久啊", emote: 2}
+      - {line: "{PLAYER_GUILD}的氛围真的绝了", emote: 2}
+      - {line: "{PLAYER_PET}知道谁是真大佬", emote: 2}
+      - "有你在我这刷怪都不孤单了 谢谢啊"
+      - "你在这随便一站 我心情都好多了"
+      - {line: "你这{PLAYER_WEAPON}太干净了 搞得我想肝等级了", emote: 3}
+      - {line: "行 {PLAYER_NAME} 你这装备让我们这些路人都没面子了", emote: 3}
+      - {line: "哇 {PLAYER_WEAPON} 这... 属实厉害", emote: 2}
+      - "不错。"
+      - {line: "这{PLAYER_GEAR}也太强了吧 我的天", emote: 2}
+      - {line: "我的装备能有你一半好就知足了", emote: 4}
+      - {line: "你这{PLAYER_WEAPON}砸卷肯定砸了老久", emote: 0}
+      - {line: "{PLAYER_PET}和{PLAYER_NAME}是这图最萌的组合 ^^", emote: 2}
+      - {line: "你这{PLAYER_GEAR}搞得我都在反思我的加点了", emote: 6}
+      - "你一看就是懂行的人"
+      - {line: "行 {PLAYER_GUILD}的人装备永远这么干净", emote: 2}
+      - "说真的 你怎么买得起那一身"
+      - {line: "那件{PLAYER_NX}穿你身上真好看 ^^", emote: 2}
+      - {line: "哦 {PLAYER_LEVEL}级的{PLAYER_JOB} 佩服", emote: 2}
+      - "我要加倍肝 争取追上你 哈哈"
+      - {line: "{PLAYER_NAME}在这站得跟boss一样", emote: 2}
+      - "你就是天赋异禀"
+      - "respect 兄弟 你这一身绝了"
+      - "希望有一天我也能那样 加油"
+      - "你没少肝吧 看得出来"
+      - "行 你这气质绝了"
+      - "老玩家气场 我感受到了"
+      - "你往这一站 这图都显得高级了"
+      - {line: "行 你肯定有两把刷子 哈哈", emote: 2}
+      - {line: "那件{PLAYER_GEAR}可难刷了 你刷了多久啊", emote: 2}
+      - {line: "不是我说 你这{PLAYER_WEAPON}简直完美", emote: 2}
+      - {line: "{PLAYER_PET}寸步不离跟着你的样子太可爱了 哈哈", emote: 2}
+      - {line: "{PLAYER_NAME}用那件{PLAYER_GEAR}把我们全秀了", emote: 3}
+      - {line: "每次看到{PLAYER_GUILD}的人都是一身神装 我的天", emote: 2}
+      - {line: "{PLAYER_NX}难搞吗? 看着真不错", emote: 0}
+      - {line: "我要有{PLAYER_WEAPON} 我一天24小时刷怪都不带停的 哈哈", emote: 2}
+      - "你整个人的气质都绝了"
+      - {line: "{PLAYER_NAME} 你一看就懂这游戏", emote: 2}
+      - "你走位看着就很老练"
+      - {{line: "你这{PLAYER_GEAR}的搭配简直是完美", emote: 2}}
+      - "你一看就是专业的"
+      - {{line: "{PLAYER_PET}一看就是专业配置", emote: 2}}
+      - "你操作明显很熟练"
+      - {{line: "玩{PLAYER_JOB}的人气质就是不一样", emote: 2}}
+      - "你一看就是真心喜欢这游戏的人"
+      - {{line: "{PLAYER_NAME} 你玩得也太丝滑了", emote: 2}}
+      - "你明显用心研究过加点"
+      - {{line: "respect 能有{PLAYER_GEAR}这种装备", emote: 0}}
+      - "你有一副老玩家模样"
+      - {{line: "你有{PLAYER_WEAPON} 说明你是真肝", emote: 2}}
+      - "说实话 你的刷怪风格很励志"
+      - {{line: "{PLAYER_NAME} 你把这玩得跟喝水一样简单", emote: 2}}
+      - "你有范儿 看得出来"
+      - {{line: "选{PLAYER_GEAR}的眼光很好", emote: 0}}
+      - "你一看就是我想组队的那种人"
+      - {{line: "选{PLAYER_WEAPON}的眼光 *绝了*", emote: 3}}
+      - "你把刷怪玩成了一门科学"
+      - {{line: "{PLAYER_NAME} 你有点镇住我了 哈哈", emote: 2}}
+      - "你就是不一样"
+      - {{line: "你这样的{PLAYER_JOB}让我想肝得更快点", emote: 2}}
+      - "你显然很爱这游戏"
+      - {{line: "哇 {PLAYER_GEAR} 这就是我的梦想啊", emote: 4}}
+      - "你把刷怪玩成了艺术"
     emote:
       - 2
       - 0
@@ -741,92 +741,92 @@ TrainingBot:
 
   ShopRestock:
     text:
-      - "gotta restock pots before i head back"
-      - {line: "broke again from buying pots", emote: 4}
-      - {line: "stocking up in {REGION}, brb", emote: 0}
-      - {line: "back in {REGION} to restock, almost out of whites", emote: 0}
-      - {line: "pot prices r killing my mesos T_T", emote: 4}
-      - "lemme check the npc shop real quick"
-      - {line: "spent all my grind money on blue pots again lol", emote: 4}
-      - {line: "stacked up nice this time, ready to head out :)", emote: 2}
-      - "brb buying orange pots"
-      - {line: "every meso i make goes straight to pots smh", emote: 4}
-      - {line: "restocked in {REGION}, full pots full hp lets go", emote: 2}
-      - "need like 200 whites before i grind again"
-      - {line: "shop run before the next session", emote: 0}
-      - {line: "down to 3 pots, cutting it close lol", emote: 6}
-      - {line: "broke after this shop trip, gotta grind more", emote: 4}
-      - "popping back to {REGION} for a quick restock"
-      - {line: "return scrolled to town just to buy pots", emote: 0}
-      - {line: "got my pots, picked up a few extra return scrolls too :)", emote: 2}
-      - {line: "why r pots so expensive, broke again", emote: 4}
-      - {line: "all restocked, see u back at the grind spot", emote: 0}
-      - "mesos all gone again lol"
-      - "brb pots"
-      - "so many whites this time :)"
-      - "gotta hit the shop b4 i die out there lol"
-      - "honestly i spend more time restocking than grinding"
-      - {line: "checking how many blues i can afford T_T", emote: 4}
-      - {line: "town trip, back in a sec", emote: 0}
-      - {line: "wallet empty after this one", emote: 4}
-      - "npc shop run, the usual"
-      - {line: "loaded up on pots, feeling good", emote: 2}
-      - "kinda hate how fast i burn thru whites"
-      - {line: "one good grind session and its all gone to pots smh", emote: 6}
-      - "almost out again"
-      - "restocking at 2am, so tired lol"
-      - "oof prices are up again"
-      - "ouch, how many blues can i even get"
-      - "stocking up on oranges too"
-      - "restocking in {REGION}, not too bad"
-      - "been here so often the npc knows my order T_T"
-      - "all my grind money comes here, never lasts til the next session T_T"
-      - "same place, same time, same pots, different day"
-      - "out of whites?"
-      - "imagine being rich enough to not worry about pot costs"
-      - {line: "RESTOCKED AND READY LETS GO BACK OUT THERE", emote: 2}
-      - "pots."
-      - "i spend more on pots than i earn from grinding, this is a scam"
-      - "back to the npc, my favorite person in the game apparently"
-      - "bought so many whites the npc probably thinks im running a pharmacy"
-      - "the pot-to-meso ratio is criminal and i have opinions about it"
-      - "just grabbing supplies n heading back out"
-      - "honestly the npc should give me a bulk discount at this point"
-      - "ok stocked up, round two"
-      - "wish i could carry more pots"
-      - {line: "mesos in, pots out, thats the cycle T_T", emote: 4}
-      - "brb buying every white pot this npc has"
-      - "the walk of shame back to town for pots"
-      - "if i had a meso for every pot i bought id have enough to buy more pots"
-      - "the npc shop cashflow goes one way and it's not toward me"
-      - "wish pots were cheaper, my mesos are crying"
-      - "grabbed everything, ready to go back out"
-      - "always feel better after a restock"
-      - {line: "ok blues are getting expensive, switching to oranges for now", emote: 4}
-      - "why do i always wait til im completely out before i come here"
-      - "in n out, quick restock, back to the grind"
-      - "every single time, out of pots, same story"
-      - {line: "back in {REGION} for the fifth time today lol", emote: 6}
-      - {line: "stocking up on whites in {REGION}, this is my whole budget rip", emote: 4}
-      - {line: "{REGION} npc is basically my landlord at this point", emote: 4}
-      - {line: "popped back to {REGION} real quick, needed blues desperately", emote: 0}
-      - {line: "restocked everything in {REGION}, now back to the real work", emote: 2}
-      - {line: "all my mesos went to {REGION} pots again. again.", emote: 4}
-      - {line: "ok {REGION} stocked me up, round two bout to go hard", emote: 2}
-      - {line: "heading to {REGION} real quick for supplies", emote: 0}
-      - "time to refill the pot stash again"
-      - {line: "spent all my mesos in {REGION} again whoops", emote: 4}
-      - "restocking is just part of the grind cycle"
-      - {{line: "back from {REGION}, loaded up", emote: 2}}
-      - "the pot tax is brutal but necessary"
-      - {{line: "{REGION} shop is my second home lol", emote: 4}}
-      - "running low, gotta hit the npc"
-      - {{line: "popping into {REGION} for blues", emote: 0}}
-      - "broke again from pots, grind harder i guess"
-      - {{line: "everything ready in {REGION} for round two", emote: 2}}
-      - "pot shortage activated, heading back"
-      - {{line: "{REGION} vendor knows my order by heart", emote: 6}}
-      - "restocking ritual engaged"
+      - "回去之前得先补点药水"
+      - {line: "买药水又买穷了", emote: 4}
+      - {line: "去{REGION}补货 稍等", emote: 0}
+      - {line: "回{REGION}补货 白药快没了", emote: 0}
+      - {line: "药水价格快把我的金币榨干了 T_T", emote: 4}
+      - "我快速看一眼npc商店"
+      - {line: "刷怪钱又全砸蓝药上了 哈哈", emote: 4}
+      - {line: "这次囤得挺足 可以出发了 :)", emote: 2}
+      - "先去买点橙药"
+      - {line: "我赚的每一金币都进了药水的口袋 无语", emote: 4}
+      - {line: "在{REGION}补完货 药满血满 走起", emote: 2}
+      - "再刷之前得备上200瓶白药"
+      - {line: "下轮开刷前先去趟商店", emote: 0}
+      - {line: "只剩3瓶药了 玩的就是心跳 哈哈", emote: 6}
+      - {line: "这趟买完又穷了 得肝回来", emote: 4}
+      - "快速回{REGION}补个货"
+      - {line: "回城卷回镇 就为了买药", emote: 0}
+      - {line: "药水到手 还顺手多买了几个回城卷 :)", emote: 2}
+      - {line: "药水怎么这么贵 又穷了", emote: 4}
+      - {line: "补完了 刷怪点见", emote: 0}
+      - "金币又没了 哈哈"
+      - "先去买药"
+      - "这次白药买了好多 :)"
+      - "再不去商店我就要死在外头了 哈哈"
+      - "说实话 我补货的时间比刷怪还多"
+      - {line: "看看我的金币还买得起几瓶蓝药 T_T", emote: 4}
+      - {line: "回趟城 马上回来", emote: 0}
+      - {line: "这趟买完钱包空了", emote: 4}
+      - "跑npc商店 老流程"
+      - {line: "药水装满了 感觉良好", emote: 2}
+      - "白药烧得也太快了 烦"
+      - {line: "一场好端端的刷怪 钱全变成药水了 无语", emote: 6}
+      - "又快没了"
+      - "凌晨两点还在补货 困死了 哈哈"
+      - "哎 价格又涨了"
+      - "疼 蓝药都买不起几瓶了"
+      - "橙药也囤点"
+      - "在{REGION}补货 还行"
+      - "来得太勤 那npc都记住我要啥了 T_T"
+      - "我刷怪赚的钱全花这了 从来撑不到下一场 T_T"
+      - "老地方 老时间 老药水 新的一天"
+      - "白药没了?"
+      - "想象一下有钱到不心疼药水钱的日子"
+      - {line: "补货完毕 冲回刷怪点", emote: 2}
+      - "药水。"
+      - "我买药的钱比刷怪赚的还多 这就是个骗局"
+      - "回到npc身边 我在这游戏里最好的朋友"
+      - "白药买了一堆 那npc估计以为我在开药房"
+      - "药水和金币的汇率太离谱了 我有意见"
+      - "拿上补给就回"
+      - "说实话 这npc都该给我批发价了"
+      - "ok 补完了 第二回合"
+      - "真希望背包能多装点药"
+      - {line: "金币进 药水出 这就是循环 T_T", emote: 4}
+      - "把这npc的白药全包了"
+      - "回镇买药的羞耻之路"
+      - "要是我每买一瓶药就有一金币 那我就有钱买更多药了"
+      - "npc商店的钱流是单向的 而且不朝我这边流"
+      - "真希望药水便宜点 我的金币在哭"
+      - "东西都拿齐了 准备回"
+      - "每次补完货都感觉好多了"
+      - {line: "行 蓝药变贵了 先换橙药顶一阵", emote: 4}
+      - "我为什么总是等药水彻底空了才来买"
+      - "速去速回 补完就继续刷"
+      - "每次都这样 药水又没了 老剧本"
+      - {line: "今天第五次回{REGION}了 哈哈", emote: 6}
+      - {line: "在{REGION}囤白药 这就是我全部预算了 呜呜", emote: 4}
+      - {line: "{REGION}的npc现在简直就是我的房东", emote: 4}
+      - {line: "快速回{REGION}一趟 蓝药急缺", emote: 0}
+      - {line: "在{REGION}补满了 回去干正事", emote: 2}
+      - {line: "我的金币又全变成{REGION}的药水了。又。", emote: 4}
+      - {line: "行 {REGION}给我补给好了 第二回合狠狠冲", emote: 2}
+      - {line: "去{REGION}快速拿点补给", emote: 0}
+      - "又该补药水了"
+      - {line: "又在{REGION}把金币花光了 完蛋", emote: 4}
+      - "补货本来就是刷怪循环的一部分"
+      - {{line: "从{REGION}回来了 满载而归", emote: 2}}
+      - "药水税很残酷 但少不了"
+      - {{line: "{REGION}的商店就是我的第二个家 哈哈", emote: 4}}
+      - "快见底了 得去趟npc那"
+      - {{line: "去{REGION}买点蓝药", emote: 0}}
+      - "买药又买穷了 那就再肝吧"
+      - {{line: "{REGION}全都备齐了 第二回合走起", emote: 2}}
+      - "药水告急 回程"
+      - {{line: "{REGION}的商人已经背熟我的订单了", emote: 6}}
+      - "补货仪式启动"
     emote:
       - 0
       - 4
@@ -835,85 +835,85 @@ TrainingBot:
 
   MapTransition:
     text:
-      - "this spots dead, moving on"
-      - {line: "gonna go try {MAP} for a bit", emote: 0}
-      - "where to next hmm"
-      - "ok im done here, nothing left to kill"
-      - {line: "thinkin i'll head over to {MAP}", emote: 0}
-      - {line: "{MAP} sounds good actually, lets go ^^", emote: 2}
-      - "spawns kinda slow, gonna ch change or smth"
-      - {line: "rumor is {MAP} has better exp, worth a shot", emote: 0}
-      - "everyones grinding here lol, finding somewhere quieter"
-      - {line: "brb scrolling back, then off to {MAP}", emote: 0}
-      - "this map got boring fast"
-      - {line: "always wanted to grind {MAP}, finally goin", emote: 2}
-      - "alright shippin out, this place is overrun"
-      - {line: "kinda miss {MAP}, headin back there", emote: 0}
-      - "yawn... maybe somewhere with more mobs"
-      - {line: "packed it up, {MAP} next i think", emote: 0}
-      - "too many ppl camping here, im out"
-      - {line: "heard {MAP} is poppin today, otw", emote: 2}
-      - "kinda sleepy but one more map wont hurt"
-      - "anyway gonna wander a bit, find a new spot"
-      - "moving on"
-      - "next map it is"
-      - "off i go"
-      - "time to roam ^^"
-      - "drained this spot dry"
-      - "welp, nothin left here"
-      - "exp slowed way down, gonna find greener pastures"
-      - {line: "feels kinda empty now, lookin elsewhere", emote: 0}
-      - {line: "ok packing up, somewhere fresh sounds nice ^^", emote: 2}
-      - "respawns are crawlin, im wanderin off"
-      - {line: "gonna stretch my legs n hunt down some fresh mobs", emote: 2}
-      - "alright thats enough here, driftin along"
-      - "been parked here way too long, gonna go see whats out there"
-      - "comfy spot but the exp dried up, off to chase mobs somewhere new"
-      - {line: "tempted to just nap here, but theres better grindin waitin, lets go", emote: 6}
-      - "peace out, this map aint worthy"
-      - {line: "GONNA GO FIND EVEN BETTER MOBS LETS GO", emote: 2}
-      - "leaving."
-      - {line: "this map has BETRAYED me. zero drops. moving on.", emote: 5}
-      - "onward"
-      - {line: "heard {MAP} has better exp, gotta go verify", emote: 0}
-      - "ok this ch is dead, rotating"
-      - "time to see what else is out there"
-      - {line: "{MAP} is calling my name", emote: 2}
-      - "same grind different map"
-      - "need a change of scenery"
-      - "exp dried up, time to move"
-      - {line: "wonder if {MAP} is crowded today", emote: 6}
-      - "gonna go scout a new spot"
-      - "my feet are tired but the grind waits for no one"
-      - "gotta find somewhere fresh"
-      - "spawn's been bad all session, time to move"
-      - "done with this spot, on to better things"
-      - "exp per hour dropped, rotating out"
-      - {line: "gonna go find a quiet corner somewhere else", emote: 0}
-      - "not even sad to leave at this point"
-      - "peace, this map ran dry"
-      - "time to explore a bit"
-      - {line: "ok {MAP} i choose u, switching over", emote: 2}
-      - {line: "logging off this map, loading into {MAP}", emote: 0}
-      - {line: "checked {MAP} on my way here, looks less crowded", emote: 0}
-      - {line: "THIS MAP BETRAYED ME. {MAP} HERE I COME.", emote: 5}
-      - {line: "always said id try {MAP} eventually, today's the day i guess", emote: 2}
-      - {line: "heading out to {MAP}, mobs here weren't cooperating", emote: 0}
-      - {line: "done here. {MAP} next. simple.", emote: 0}
-      - {{line: "heading out from {MAP} now", emote: 0}}
-      - "time to try somewhere new"
-      - {{line: "leaving {MAP}, its been fun", emote: 0}}
-      - "onwards to fresh mobs"
-      - {{line: "{MAP} had its run, next adventure", emote: 2}}
-      - "gotta keep moving to stay ahead"
-      - {{line: "packing up, {MAP} later", emote: 0}}
-      - "new map new energy"
-      - {{line: "{MAP} was a solid grind spot but time to move", emote: 0}}
-      - "rotation time i guess"
-      - {{line: "ok {MAP} i bid u farewell", emote: 6}}
-      - "looking for better conditions elsewhere"
-      - {{line: "moving zones, {MAP} was chill but im restless", emote: 0}}
-      - "fresh legs fresh map fresh mobs"
+      - "这图没货了 撤"
+      - {line: "去{MAP}刷会儿试试", emote: 0}
+      - "接下来去哪呢 嗯"
+      - "ok 这刷完了 没怪可杀了"
+      - {line: "我想去{MAP}转转", emote: 0}
+      - {line: "{MAP}听起来不错 走起 ^^", emote: 2}
+      - "刷怪有点慢 换条线啥的"
+      - {line: "听说{MAP}经验更高 值得一试", emote: 0}
+      - "这图人挤人 哈哈 找个清净点的"
+      - {line: "先回城 然后去{MAP}", emote: 0}
+      - "这图很快就腻了"
+      - {line: "一直想去{MAP}刷 终于要去了", emote: 2}
+      - "行 撤了 这地方被占满了"
+      - {line: "有点想{MAP}了 回去那边", emote: 0}
+      - "哈欠... 找个怪多点的图吧"
+      - {line: "收工 下一站{MAP}吧", emote: 0}
+      - "这图蹲的人太多了 我溜了"
+      - {line: "听说{MAP}今天很热闹 在路上", emote: 2}
+      - "有点困 但再刷一张图也无妨"
+      - "反正也闲 逛逛找新点"
+      - "走了"
+      - "下一张图"
+      - "出发"
+      - "随便逛逛 ^^"
+      - "这图被我榨干了"
+      - "行 这没啥了"
+      - "经验掉得厉害 去别处找找"
+      - {line: "感觉有点空了 去别处看看", emote: 0}
+      - {line: "ok 收拾收拾 换个新鲜地方 ^^", emote: 2}
+      - "刷怪慢吞吞的 我溜达去了"
+      - {line: "伸伸腿 找点新怪刷刷", emote: 2}
+      - "行 这刷够了 漂移中"
+      - "在这蹲太久了 出去看看世界"
+      - "地方挺舒服 但经验干了 去新图追怪"
+      - {line: "真想就地睡一觉 不过更好的怪在等着 走起", emote: 6}
+      - "拜拜 这图不配"
+      - {line: "我要去找更肥的怪 冲鸭", emote: 2}
+      - "走了。"
+      - {line: "这图背叛了我。零掉落。撤了。", emote: 5}
+      - "前进"
+      - {line: "听说{MAP}经验更高 得去验证下", emote: 0}
+      - "ok 这条线没货 轮换"
+      - "去看看外面还有什么"
+      - {line: "{MAP}在呼唤我", emote: 2}
+      - "换图不换刷"
+      - "想换个风景看看"
+      - "经验干了 该走了"
+      - {line: "不知道{MAP}今天挤不挤", emote: 6}
+      - "去踩个新点"
+      - "脚酸了 但刷怪不等人"
+      - "得找个新地方"
+      - "这刷怪点一整天都拉胯 走人"
+      - "这地方刷完了 去更好的地方"
+      - "时经验掉了 轮换中"
+      - {line: "去别处找个安静的角落", emote: 0}
+      - "现在走人一点都不难过"
+      - "拜拜 这图没油水了"
+      - "去探索会儿"
+      - {line: "ok {MAP} 就决定是你了 换过去", emote: 2}
+      - {line: "退出这图 加载{MAP}", emote: 0}
+      - {line: "来的时候路过{MAP} 看着没那么挤", emote: 0}
+      - {line: "这图背叛了我。{MAP}我来了。", emote: 5}
+      - {line: "一直说迟早去{MAP}刷刷 就今天吧", emote: 2}
+      - {line: "出发去{MAP} 这的怪不配合", emote: 0}
+      - {line: "这刷完了。下一站{MAP}。简单。", emote: 0}
+      - {{line: "现在离开{MAP}", emote: 0}}
+      - "去个新地方试试"
+      - {{line: "离开{MAP}了 玩得挺开心", emote: 0}}
+      - "向新怪进发"
+      - {{line: "{MAP}风光过了 下一段冒险", emote: 2}}
+      - "得不停换图才能领先"
+      - {{line: "收拾东西 {MAP}回头见", emote: 0}}
+      - "新图新气象"
+      - {{line: "{MAP}是个好刷怪点 不过该走了", emote: 0}}
+      - "轮换时间到"
+      - {{line: "ok {MAP} 我跟你道个别", emote: 6}}
+      - "去别处找更好的条件"
+      - {{line: "换区了 {MAP}挺舒服 但我待不住", emote: 0}}
+      - "新腿脚 新图 新怪"
     emote:
       - 0
       - 6
@@ -922,85 +922,85 @@ TrainingBot:
 
   Fatigue:
     text:
-      - {line: "been farming {MOB} for hours... eyes hurt", emote: 4}
-      - "*yawn* how long have i been grinding"
-      - "just one more level then bed i swear"
-      - {line: "{MOB} is starting to blur together zzz", emote: 0}
-      - {line: "so tired but the exp is right there", emote: 4}
-      - "ugh my eyes -_- when did it get so late"
-      - {line: "{MOB} {MOB} {MOB}... thats all i see when i close my eyes now", emote: 4}
-      - "*yawn* one more pot then maybe i log off"
-      - {line: "how many {MOB} have i killed today lol i lost count", emote: 0}
-      - "soooo sleepy but i dont wanna lose my spot"
-      - {line: "been grinding {MOB} since forever... is it tomorrow already", emote: 4}
-      - "my back hurts from sitting here so long ugh"
-      - "almost there... almost... *yawn* zzz"
-      - {line: "i swear {MOB} respawn slower when ur this tired -_-", emote: 0}
-      - "maybe ill just rest my eyes for a sec T_T"
-      - "*yawn*"
-      - "so sleepy zzz"
-      - "my eyes -_-"
-      - "is it really that late already"
-      - "wow the sun is kinda coming up huh... oops"
-      - "i could honestly nap right here zzz"
-      - "just gonna grind till my pots run out then sleep"
-      - {line: "this spot feels like home at this point honestly lol", emote: 2}
-      - "warm and cozy and so so tired ueee"
-      - {line: "been so long my chair has a permanent dent in it now lol but the exp keeps tickin so im not movin", emote: 0}
-      - "fingers on autopilot zzz"
-      - "head drooping -_-"
-      - "blinking slowly"
-      - "running on caffeine and spite at this point"
-      - "cant tell if im playing or dreaming at this point"
-      - "the screen is so bright at 3am T_T"
-      - {line: "should really log off but {MOB} are dropping steady right now", emote: 4}
-      - "my brain stopped working like an hour ago"
-      - "everything aches but the exp bar wont stop calling me"
-      - {line: "tired enough to cry but {MOB} just spawned again so... five more minutes lol", emote: 7}
-      - {line: "IF I SEE ONE MORE {MOB} IM GOING TO SCREAM. ok im fine. one more.", emote: 5}
-      - "been better."
-      - {line: "lost count of how many {MOB} ive killed, its gotta be thousands", emote: 0}
-      - "autopilot engaged, brain offline"
-      - {line: "THE FACT THAT IM STILL GRINDING AT THIS HOUR SAYS SOMETHING ABOUT ME", emote: 6}
-      - "do i even enjoy this or is it habit at this point"
-      - {line: "if {MOB} had feelings theyd feel bad for me by now", emote: 4}
-      - "keyboard imprint on my forehead probably"
-      - "one more level one more level one more level"
-      - "pretty sure my chair has a permanent me-shaped dent"
-      - {line: "{MAP} is starting to feel like a prison lol", emote: 4}
-      - "dunno what day it is anymore"
-      - "coffee ran out two hours ago, running on stubbornness"
-      - {line: "eyes closing... {MOB} still spawning... must... grind...", emote: 4}
-      - "honestly forgot what the sun looks like"
-      - "ok i physically cannot stop, the exp bar is RIGHT there"
-      - "someone remind me why im still awake"
-      - "chair is so uncomfortable but here i am"
-      - {line: "ok five more kills then i genuinely need to sleep", emote: 4}
-      - "typing on autopilot, brain checked out an hour ago"
-      - "yawning every 30 seconds, this is not sustainable"
-      - "dont think i can blink without dozing off"
-      - "running on nothing but grind instincts"
-      - {line: "too tired to even appreciate {MOB} drops... they drop and i just stare", emote: 4}
-      - {line: "ANOTHER {MOB}. ok. sure. fine. whatever.", emote: 5}
-      - {line: "{MAP} feels like a fever dream at this hour", emote: 4}
-      - {line: "if {MOB} gave out pillows id be set right now", emote: 4}
-      - {line: "the {MAP} bgm is playing in my sleep now im pretty sure", emote: 0}
-      - {line: "just {MOB} after {MOB} after {MOB}... yeah ok. yeah.", emote: 0}
-      - {line: "been at {MAP} so long ive started naming the mobs", emote: 4}
-      - {{line: "my eyes are barely staying open but {MOB} dont care", emote: 4}}
-      - "the grinding reflex overtook rational thought hours ago"
-      - {{line: "honestly cant remember the last time i took a real break farming {MOB}", emote: 4}}
-      - "the blur between maps and mobs is real"
-      - {{line: "still hitting {MOB} somehow despite being half asleep", emote: 4}}
-      - "numbness has set in, just going through motions"
-      - {{line: "{MOB} just keep coming and im just here", emote: 0}}
-      - "physical body is tired but exp bar says keep going"
-      - {{line: "pretty sure im leveling in my sleep grinding {MOB}", emote: 4}}
-      - "everything feels distant but the grinding continues"
-      - {{line: "{MAP} has become a fever dream at this point", emote: 4}}
-      - "the ache is everywhere but the focus is unbreakable"
-      - {{line: "if {MOB} could talk they'd judge how tired i look", emote: 4}}
-      - "just... keep... clicking..."
+      - {line: "刷{MOB}刷了好几个小时了... 眼睛好酸", emote: 4}
+      - "*哈欠* 我刷了多久了"
+      - "就再升一级 然后睡觉 我发誓"
+      - {line: "{MOB}都开始重影了 zzz", emote: 0}
+      - {line: "困死了 可经验就在眼前", emote: 4}
+      - "啊 我的眼睛 -_- 怎么都这么晚了"
+      - {line: "{MOB} {MOB} {MOB}... 现在闭眼全是它们", emote: 4}
+      - "*哈欠* 再嗑一瓶药 也许就下线了"
+      - {line: "我今天杀了多少{MOB}了 哈哈 数不清了", emote: 0}
+      - "好困好困 但不想让出这个点"
+      - {line: "刷{MOB}刷了不知道多久... 是不是已经明天了", emote: 4}
+      - "坐这么久 背好疼 哎"
+      - "快到了... 快了... *哈欠* zzz"
+      - {line: "我发誓 人一困 {MOB}刷新都变慢了 -_-", emote: 0}
+      - "要不我闭眼歇一秒吧 T_T"
+      - "*哈欠*"
+      - "好困 zzz"
+      - "我的眼睛 -_-"
+      - "都已经这么晚了吗"
+      - "我去 天都快亮了... 完蛋"
+      - "说实话 我现在就地就能睡着 zzz"
+      - "就刷到药水用完 然后睡觉"
+      - {line: "说实话 这地方已经跟家一样了 哈哈", emote: 2}
+      - "暖乎乎的 但困得要命 呜呜"
+      - {line: "坐得久了 椅子上都有我的形状了 哈哈 可经验还在涨 不能走", emote: 0}
+      - "手指自动托管中 zzz"
+      - "脑袋一点一点的 -_-"
+      - "眨眼都变慢了"
+      - "现在全靠咖啡因和一股劲撑着"
+      - "分不清我是在玩还是在做梦了"
+      - "凌晨三点的屏幕也太亮了吧 T_T"
+      - {line: "真该下线了 可{MOB}现在掉得正稳", emote: 4}
+      - "我的大脑一小时前就罢工了"
+      - "浑身都酸 可经验条一直在喊我"
+      - {line: "困得想哭 可{MOB}又刷了... 那就再刷五分钟 哈哈", emote: 7}
+      - {line: "再让我看到一只{MOB}我就要尖叫了。行 我没事。再来一只。", emote: 5}
+      - "还行吧。"
+      - {line: "数不清杀了多少{MOB}了 肯定上千了", emote: 0}
+      - "托管启动 大脑下线"
+      - {line: "都这个点了我还在刷怪 说明我这个人有点东西", emote: 6}
+      - "我是真喜欢这游戏 还是只是习惯了"
+      - {line: "要是{MOB}有感情 现在都该同情我了", emote: 4}
+      - "额头上估计都印出键盘印了"
+      - "再升一级再升一级再升一级"
+      - "我敢肯定椅子上有个我形状的坑"
+      - {line: "{MAP}开始像个牢房了 哈哈", emote: 4}
+      - "都不知道今天周几了"
+      - "咖啡两小时前就没了 现在全靠倔强撑着"
+      - {line: "眼皮在打架... {MOB}还在刷... 必须... 继续...", emote: 4}
+      - "说实话 都快忘了太阳长啥样"
+      - "ok 我物理上停不下来了 经验条就在眼前"
+      - "谁来提醒我一下 我为啥还醒着"
+      - "椅子硌得慌 可我还在这"
+      - {line: "ok 再杀五只 然后我真的得睡了", emote: 4}
+      - "打字全靠肌肉记忆 大脑一小时前就下班了"
+      - "每三十秒一个哈欠 这可不持久"
+      - "感觉一眨眼就能睡过去"
+      - "全凭刷怪本能在撑着"
+      - {line: "困得连{MOB}的掉落都没心情看了... 掉了我就盯着发呆", emote: 4}
+      - {line: "又来一只{MOB}。行。可以。随便。无所谓。", emote: 5}
+      - {line: "这个点的{MAP}跟做梦一样不真实", emote: 4}
+      - {line: "要是{MOB}能掉枕头 我现在就幸福了", emote: 4}
+      - {line: "我敢肯定 {MAP}的bgm已经钻进我梦里了", emote: 0}
+      - {line: "就是{MOB} 接着{MOB} 接着{MOB}... 行。行。", emote: 0}
+      - {line: "在{MAP}待太久 我都开始给怪起名字了", emote: 4}
+      - {{line: "眼皮都快睁不开了 可{MOB}才不管", emote: 4}}
+      - "刷怪的肌肉记忆早在一小时前就接管了理智"
+      - {{line: "说实话 都记不清上一次正儿八经休息是啥时候了 一直在刷{MOB}", emote: 4}}
+      - "图和怪之间的界限已经模糊了"
+      - {{line: "半梦半醒居然还在打{MOB}", emote: 4}}
+      - "麻木了 只是机械地重复"
+      - {{line: "{MOB}不停来 而我就这么待着", emote: 0}}
+      - "身体很累 但经验条说 继续"
+      - {{line: "我寻思我做梦都在刷{MOB}升级", emote: 4}}
+      - "一切都变得遥远 但刷怪还在继续"
+      - {{line: "{MAP}现在就像一个幻觉", emote: 4}}
+      - "浑身酸痛 但专注无法击破"
+      - {{line: "要是{MOB}会说话 它们肯定吐槽我一脸困相", emote: 4}}
+      - "就... 继续... 点击..."
     emote:
       - 0
       - 4
@@ -1008,53 +1008,53 @@ TrainingBot:
 
   Rare:
     text:
-      - "why do i even keep leveling sometimes"
-      - "the grind feels different when no ones online to share it"
-      - {line: "i wonder if anyone i used to train with still plays", emote: 4}
-      - "same mobs, same map, just a higher number now..."
-      - {line: "remember when leveling actually felt like it meant something", emote: 4}
-      - "everyone i started with logged off years ago"
-      - {line: "sometimes i forget what i was even grinding toward", emote: 4}
-      - "the maps feel quieter than they used to"
-      - {line: "guess ill keep going... not really sure why anymore", emote: 4}
-      - "used to rush home just to log in and grind with friends"
-      - {line: "another level. wish someone was here to see it T_T", emote: 4}
-      - "funny how the numbers go up but it feels emptier"
-      - "logging in alone at 3am just feels different now"
-      - "i still hear the old grind music in my head sometimes..."
-      - "we used to race to see who'd hit the next level first"
-      - "anyway. one more pull."
-      - "the bgm hasnt changed but everything else kinda has"
-      - {line: "i miss the days when a level up meant someone would cheer for you", emote: 4}
-      - "...used to be more of us out here"
-      - {line: "every map still feels a little like a place i had to leave behind", emote: 4}
-      - "wonder if anyone would notice if i stopped logging in"
-      - "the exp bar goes up but nothing really changes"
-      - "used to make plans to play together, now i just grind alone"
-      - "funny how the game stays the same but everyone around it moves on"
-      - "i keep coming back to the same spots hoping theyll feel like they used to"
-      - "the maps are all still here. just... quieter."
-      - "sometimes i level up and just sit there for a minute"
-      - "the music still hits the same way it always did"
-      - "i used to screenshot every level up to share with friends"
-      - "hard to explain why i still play to people who never did"
-      - "the server feels different than it used to..."
-      - "sometimes i wonder who else is still out here, grinding away like me"
-      - "used to know what every level felt like. now they just tick by."
-      - "this game never really leaves you, even when you leave it for a while"
-      - {line: "funny that a map this empty still feels like somewhere", emote: 4}
-      - "the game remembers you, even when everyone else moved on"
-      - "sometimes the grind is just something to do while missing people"
-      - {line: "i keep playing like one day things will be like they were", emote: 4}
-      - "the exp goes up. everything else stays the same."
-      - "sat in this map for ten minutes just listening to the bgm once"
-      - {line: "sometimes i wonder if anyone else feels this way", emote: 4}
-      - {line: "the map hasnt changed but everything around it has", emote: 4}
-      - {line: "grinding alone is different when ur used to company", emote: 4}
-      - {line: "the levels still matter but theyre hollow somehow", emote: 4}
-      - {line: "i miss the laughter during the boring kills lol", emote: 4}
-      - {line: "the game goes on but not the same way it used to", emote: 4}
-      - {line: "sometimes levels feel like im chasing something i already lost", emote: 4}
+      - "有时候真不知道我还在升什么级"
+      - "没人在线一起刷的时候 刷怪的感觉都不一样了"
+      - {line: "不知道以前一起练级的人还有没有在玩", emote: 4}
+      - "同样的怪 同样的图 只是数字变大了..."
+      - {line: "还记得升级曾经是一件有分量的事吗", emote: 4}
+      - "和我一起入坑的人 几年前就都下线了"
+      - {line: "有时候我都忘了我到底在刷什么了", emote: 4}
+      - "这些图比以前安静多了"
+      - {line: "那就继续刷吧... 也不太清楚为什么了", emote: 4}
+      - "以前放学冲回家 就为了上线和朋友刷怪"
+      - {line: "又升一级。真希望有人能看到 T_T", emote: 4}
+      - "奇怪 数字在涨 心里却越来越空"
+      - "凌晨三点独自上线 感觉不一样了"
+      - "有时候脑子里还会响起以前的刷怪bgm..."
+      - "我们以前还比赛谁先升到下一级呢"
+      - "算了。再拉一波。"
+      - "bgm没变 可别的都变了"
+      - {line: "怀念以前升级的时候有人为你欢呼的日子", emote: 4}
+      - "...以前这里的人比现在多"
+      - {line: "每张图都像是某个我必须离开的地方", emote: 4}
+      - "不知道我要是不上线了 会不会有人发现"
+      - "经验条在涨 但一切都没变"
+      - "以前约着一起玩 现在只剩我单刷"
+      - "奇怪 游戏还是那个游戏 身边的人却都走远了"
+      - "我总是回到老地方 盼着它们还和从前一样"
+      - "这些图都还在。只是... 更安静了。"
+      - "有时候升了级 我会在原地坐上一分钟"
+      - "音乐响起的感觉还和当年一样"
+      - "以前每次升级都要截图发给朋友"
+      - "没玩过的人 很难解释我为啥还在玩"
+      - "服务器跟以前不一样了..."
+      - "有时候我会想 还有谁也在这 跟我一样默默刷着"
+      - "以前每一级都有感觉。现在只是一级级划过。"
+      - "这游戏你就算离开 也离不干净"
+      - {line: "奇怪 这么空的图 却还是让人有归属感", emote: 4}
+      - "就算别人都走了 这游戏还记得你"
+      - "有时候刷怪只是为了在想人的时候有点事做"
+      - {line: "我一直在玩 好像某天一切都会回到从前", emote: 4}
+      - "经验在涨。其他一切照旧。"
+      - "曾经在这图里坐了十分钟 就为了听那首bgm"
+      - {line: "有时候会想 是不是只有我会这样", emote: 4}
+      - {line: "图没变 但它周围的一切都变了", emote: 4}
+      - {line: "习惯有人陪着之后 单刷就变得不一样了", emote: 4}
+      - {line: "等级还是有意义 但总觉得空落落的", emote: 4}
+      - {line: "怀念那些无聊刷怪时的笑声 哈哈", emote: 4}
+      - {line: "游戏还在继续 只是不像从前了", emote: 4}
+      - {line: "有时候升级像是在追一个早就丢了的东西", emote: 4}
     emote:
       - 0
       - 4
@@ -1062,108 +1062,108 @@ TrainingBot:
 
   Greeting:
     text:
-      - "oh hi :)"
-      - {line: "hey ^^", emote: 2}
-      - "oh, sup!"
-      - "heyyy :)"
-      - "well hey ^^"
-      - {line: "oh, hey!", emote: 2}
-      - "yo ^^"
-      - "kinda mid-grind but hey! :)"
-      - {line: "been here a while lol, hey ^^", emote: 2}
-      - "been zoning out, hi! ^^"
-      - {line: "yo, didn't see u there! hi :)", emote: 6}
-      - {line: "oh hey {PLAYER_NAME}! what's up? :)", emote: 2}
-      - {line: "a {PLAYER_JOB}! oh hi :)", emote: 2}
-      - "sup {PLAYER_NAME} ^^"
-      - {line: "kinda deep in a grind sesh but hi {PLAYER_NAME}! glad u stopped by ^^", emote: 2}
-      - "a {PLAYER_JOB}! nice, hey :) just here farming mesos lol"
-      - "been grinding here forever, hi! nice to see someone ^^"
-      - {line: "oh {PLAYER_NAME}! didn't expect to see anyone, hi ^^", emote: 6}
-      - "just farming"
-      - "mesos on my mind"
-      - "grind szn :)"
-      - "longest day ever lol"
-      - "hey {PLAYER_NAME}! whatchu grinding?"
-      - "this map's been rly generous"
-      - "man the internet cafe grind is real"
-      - "coffee's cold but the exp rewards are hot :)"
-      - "ugh finally someone! been solo forever, kinda losing it"
-      - "oh {PLAYER_NAME}, nice! u farming or leveling?"
-      - "oh hi, come to admire me grind? cant blame u"
-      - "hey"
-      - {line: "HI OMG HELLO ^^", emote: 2}
-      - "oh, ur here. ok."
-      - "oh hey :) just chilling between pulls"
-      - {line: "hey {PLAYER_NAME}! grinding buddy? ^^", emote: 2}
-      - "yo, welcome to my map lol"
-      - "sup, just killing stuff"
-      - {line: "oh hey {PLAYER_NAME}, nice to see someone else out here", emote: 2}
-      - "been here so long i forgot how to talk to people lol"
-      - {line: "A PERSON!! hi hi hi ^^", emote: 2}
-      - "...hi"
-      - "oh hey, didnt hear u walk up, was mid-grind"
-      - {line: "hey {PLAYER_NAME}! u here to grind too?", emote: 2}
-      - "oh nice, company ^^"
-      - "heya, just takin a pot break"
-      - {line: "oh a {PLAYER_JOB}, cool! sup ^^", emote: 2}
-      - "welcome to the grind zone lol"
-      - "hey hey ^^"
-      - "yo :)"
-      - {line: "oh {PLAYER_NAME}! nice timing, i was about to fall asleep grinding lol", emote: 6}
-      - "hi, sorry, spacing out as usual"
-      - "evening ^^"
-      - "oh hey there, just doing my thing"
-      - {line: "hey {PLAYER_NAME}, hope ur grind is going well ^^", emote: 2}
-      - "hiii :)"
-      - "oh. hi. sorry i look like a mess, been here since morning lol"
-      - "sup sup"
-      - {line: "oh a {PLAYER_JOB}! hello :)", emote: 2}
-      - "hey, im kinda deep in a grind but always happy to chat ^^"
-      - "heyy! nice to see someone else out here"
-      - "oh perfect timing, was getting lonely lol"
-      - "hi! sorry if i look clueless, been grinding for hours"
-      - "oh! hi, didn't expect anyone today"
-      - {line: "oh hi, come on in, theres room ^^", emote: 2}
-      - "heyyy, just taking five before i get back to it"
-      - "welcome welcome ^^"
-      - "ooh hi! u caught me between pulls"
-      - "heyy :) good timing"
-      - "oh you're here, nice"
-      - "what's good ^^"
-      - {line: "oh a visitor! hi!", emote: 2}
-      - "sup lol, just doing my thing over here"
-      - "hey there! u grind here too?"
-      - "hi :) just me and the mobs out here usually"
-      - {line: "hey {PLAYER_NAME}! fancy seeing u here lol", emote: 2}
-      - {line: "oh {PLAYER_NAME}! sit down, theres mobs to kill ^^", emote: 2}
-      - {line: "a {PLAYER_JOB}! been a while since ive seen one out here", emote: 2}
-      - {line: "hey {PLAYER_NAME} :) how long u been grinding today", emote: 2}
-      - {line: "oh ur a {PLAYER_JOB}? cool, lots of mobs here for ur build", emote: 0}
-      - {line: "hi {PLAYER_NAME}! welcome to the grind :)", emote: 2}
-      - {line: "oh {PLAYER_NAME}, u look like u know what ur doing, nice", emote: 2}
-      - {line: "a {PLAYER_JOB} out here? surprising, hi ^^", emote: 6}
-      - {line: "hey {PLAYER_NAME}, catch me between kills lol", emote: 2}
-      - {line: "oh hi, {PLAYER_NAME} right? think ive seen u around before ^^", emote: 2}
-      - {line: "hi! {PLAYER_JOB}s are good at this map from what ive seen", emote: 2}
-      - {line: "hey {PLAYER_NAME}! been here a while, how u finding it out there?", emote: 2}
-      - {line: "{PLAYER_NAME}! hi! ok i was NOT expecting company today", emote: 6}
-      - {line: "oh a {PLAYER_JOB}! what level u grinding at", emote: 0}
-      - {line: "hey {PLAYER_NAME}, just be warned: this grind spot is addictive lol", emote: 3}
-      - "its nice when someones around"
-      - {line: "oh, company, that changes the energy ^^", emote: 2}
-      - "wasnt expecting to see anyone today"
-      - {{line: "hey hey, welcome to my corner", emote: 2}}
-      - "the solo grind hit different when u show up"
-      - {{line: "oh nice timing, i was getting lonely", emote: 6}}
-      - "just vibing out here, good to see u"
-      - {{line: "hey {PLAYER_NAME}! always happy to meet another grinder", emote: 2}}
-      - "the vibe just got better"
-      - {{line: "oh! didnt expect anyone, nice surprise ^^", emote: 2}}
-      - "grind feels less lonely now"
-      - {{line: "hey hey! welcome to the grind with me", emote: 2}}
-      - "this map just got more fun"
-      - "alright alright, lets make this a vibe"
+      - "哦 你好 :)"
+      - {line: "嘿 ^^", emote: 2}
+      - "哦 哟!"
+      - "嗨嗨嗨 :)"
+      - "哎呀 你好 ^^"
+      - {line: "哦 嘿!", emote: 2}
+      - "哟 ^^"
+      - "正刷着呢 不过你好! :)"
+      - {line: "在这待挺久了 哈哈 你好 ^^", emote: 2}
+      - "刚在发呆 你好! ^^"
+      - {line: "哟 没看见你! 你好 :)", emote: 6}
+      - {line: "哦 嘿 {PLAYER_NAME}! 咋了? :)", emote: 2}
+      - {line: "{PLAYER_JOB}啊! 哦 你好 :)", emote: 2}
+      - "哟 {PLAYER_NAME} ^^"
+      - {line: "正刷得入迷呢 不过你好 {PLAYER_NAME}! 你路过真是太好了 ^^", emote: 2}
+      - "{PLAYER_JOB}啊! 不错 嘿 :) 我在这刷金币呢 哈哈"
+      - "在这刷好久了 你好! 见到人真好 ^^"
+      - {line: "哦 {PLAYER_NAME}! 没想到会有人 你好 ^^", emote: 6}
+      - "就刷怪呢"
+      - "满脑子金币"
+      - "刷怪季 :)"
+      - "今天真是漫长的一天 哈哈"
+      - "嘿 {PLAYER_NAME}! 你刷啥呢?"
+      - "这图今天掉率真不错"
+      - "天 网吧刷怪才是真刷怪"
+      - "咖啡凉了 但经验热乎 :)"
+      - "啊 终于来人了! 单刷老半天了 人都快疯了"
+      - "哦 {PLAYER_NAME} 不错啊! 你是刷金币还是练级?"
+      - "哦 你好 来欣赏我刷怪的英姿吗? 不怪你"
+      - "嘿"
+      - {line: "嗨 我的天 你好呀 ^^", emote: 2}
+      - "哦 你来了。行。"
+      - "哦 嘿 :) 在波与波之间歇会儿"
+      - {line: "嘿 {PLAYER_NAME}! 刷怪搭子? ^^", emote: 2}
+      - "哟 欢迎来到我的地盘 哈哈"
+      - "哟 就杀杀怪"
+      - {line: "哦 嘿 {PLAYER_NAME} 能在这见到别人真好", emote: 2}
+      - "在这待太久 都快忘了怎么跟人说话了 哈哈"
+      - {line: "有人!! 嗨嗨嗨 ^^", emote: 2}
+      - "...嗨"
+      - "哦 嘿 没听见你走过来 正刷着呢"
+      - {line: "嘿 {PLAYER_NAME}! 你也来这刷吗?", emote: 2}
+      - "哦 不错 有伴了 ^^"
+      - "嘿呀 正歇着嗑药呢"
+      - {line: "哦 {PLAYER_JOB}啊 可以! 哟 ^^", emote: 2}
+      - "欢迎来到刷怪区 哈哈"
+      - "嘿 嘿 ^^"
+      - "哟 :)"
+      - {line: "哦 {PLAYER_NAME}! 来得正好 我刷怪都快刷睡着了 哈哈", emote: 6}
+      - "嗨 抱歉 又走神了"
+      - "晚上好 ^^"
+      - "哦 嘿 我忙我的呢"
+      - {line: "嘿 {PLAYER_NAME} 祝你刷得顺利 ^^", emote: 2}
+      - "嗨嗨 :)"
+      - "哦。嗨。抱歉我看起来乱糟糟的 我从早上就待在这了 哈哈"
+      - "哟 哟"
+      - {line: "哦 {PLAYER_JOB}啊! 你好 :)", emote: 2}
+      - "嘿 我正刷得入迷 不过随时欢迎聊天 ^^"
+      - "嘿! 能在这见到别人真好"
+      - "哦 来得正好 正觉得孤单呢 哈哈"
+      - "嗨! 抱歉我一脸懵 刷了好几个小时了"
+      - "哦! 嗨 没想到今天会有人"
+      - {line: "哦 嗨 进来吧 有位置 ^^", emote: 2}
+      - "嗨嗨嗨 先歇五分钟再接着刷"
+      - "欢迎欢迎 ^^"
+      - "哦 嗨! 你正好赶上我刷完一波"
+      - "嘿 :) 时机不错"
+      - "哦 你来了 不错"
+      - "咋样 ^^"
+      - {line: "哦 有客人! 你好!", emote: 2}
+      - "哟 哈哈 我在这忙我的"
+      - "嘿! 你也来这刷?"
+      - "嗨 :) 平时这图就我和怪"
+      - {line: "嘿 {PLAYER_NAME}! 真巧啊 在这碰上你 哈哈", emote: 2}
+      - {line: "哦 {PLAYER_NAME}! 坐吧 怪有的是 ^^", emote: 2}
+      - {line: "{PLAYER_JOB}啊! 好久没在这见到这职业了", emote: 2}
+      - {line: "嘿 {PLAYER_NAME} :) 你今天刷了多久了", emote: 2}
+      - {line: "哦 你是{PLAYER_JOB}? 不错 这图的怪很适合你的加点", emote: 0}
+      - {line: "嗨 {PLAYER_NAME}! 欢迎来刷 :)", emote: 2}
+      - {line: "哦 {PLAYER_NAME} 你一看就是会玩的 不错", emote: 2}
+      - {line: "{PLAYER_JOB}会来这? 稀奇 你好 ^^", emote: 6}
+      - {line: "嘿 {PLAYER_NAME} 等我刷完这只再聊 哈哈", emote: 2}
+      - {line: "哦 嗨 你是{PLAYER_NAME}吧? 好像之前见过你 ^^", emote: 2}
+      - {line: "嗨! 据我观察 {PLAYER_JOB}在这图都很强", emote: 2}
+      - {line: "嘿 {PLAYER_NAME}! 我在这挺久了 你觉得外面咋样?", emote: 2}
+      - {line: "{PLAYER_NAME}! 嗨! ok 我是真没想到今天会来人", emote: 6}
+      - {line: "哦 {PLAYER_JOB}! 你在这练到多少级了", emote: 0}
+      - {line: "嘿 {PLAYER_NAME} 先提醒你: 这刷怪点上瘾 哈哈", emote: 3}
+      - "有人在这感觉真好"
+      - {line: "哦 有伴了 气氛都不一样了 ^^", emote: 2}
+      - "没想到今天能见到人"
+      - {{line: "嘿 嘿 欢迎来到我的角落", emote: 2}}
+      - "你一来 单刷的感觉都不一样了"
+      - {{line: "哦 来得正好 我正觉得孤单", emote: 6}}
+      - "在这随便晃 见到你真好"
+      - {{line: "嘿 {PLAYER_NAME}! 认识新刷怪搭子总是开心的", emote: 2}}
+      - "气氛变好了"
+      - {{line: "哦! 没想到会有人 意外的惊喜 ^^", emote: 2}}
+      - "刷怪不那么孤单了"
+      - {{line: "嘿 嘿! 欢迎跟我一起刷", emote: 2}}
+      - "这图变得更有意思了"
+      - "行 行 咱把气氛搞起来"
     emote:
       - 0
       - 2
@@ -1172,148 +1172,148 @@ TrainingBot:
 
   PlayerReaction:
     text:
-      - "oh hey"
+      - "哦 嘿"
       - {line: "o_o", emote: 6}
-      - "heya ^^"
-      - "lol hi"
-      - "hey o/"
-      - {line: "oh!", emote: 6}
-      - "hi ^^"
-      - "whoa hey"
-      - "didnt see u come in"
-      - "havent seen u around here before"
-      - "where u headed after this?"
-      - "this spot has decent mobs"
-      - {line: "been here a while, kinda zoning out lol", emote: 4}
-      - "good map huh, mobs respawn pretty fast"
-      - "careful of the respawns over on the left"
-      - "u need pots? i got extras"
-      - {line: "just restocked, feeling good ^^", emote: 2}
-      - "this map gets kinda lonely, good to see u"
-      - "were u waiting for this spot? my bad lol, lots of room tho ^^"
-      - "oh hey {PLAYER_NAME}"
-      - {line: "oh a {PLAYER_JOB}!", emote: 2}
-      - "hey {PLAYER_NAME} ^^"
-      - "oh ur a {PLAYER_JOB}, nice"
-      - "hey {PLAYER_NAME}, u farming here too?"
-      - {line: "oh a {PLAYER_JOB}, good timing", emote: 2}
-      - "{PLAYER_NAME}! hey, didnt see u"
-      - "oh a {PLAYER_JOB}, havent seen one out here in a while"
-      - "hey {PLAYER_NAME}, hows the grind treating u"
-      - "oh {PLAYER_NAME}, u passing thru or staying to grind?"
-      - {line: "oh a {PLAYER_JOB}, nice, u guys level so fast", emote: 2}
-      - "hey {PLAYER_NAME}, mobs are spawning good today, good spot to stop"
-      - "almost didnt notice u, hey {PLAYER_NAME}"
-      - "hey {PLAYER_NAME}, been grinding long?"
-      - "oh {PLAYER_NAME}, safe travels ^^"
-      - "hey {PLAYER_NAME}, this map treating u well?"
-      - "hope u found ur spot ^^"
-      - "out here too huh, nice"
-      - "been pretty quiet till u showed up ^^"
-      - "hmm, hey ^^"
-      - "always nice seein someone out this way"
-      - "{PLAYER_NAME}, just out here grinding"
-      - "losing track of time"
-      - "this map hits different"
-      - "nocturnal grind life"
-      - "mobs never sleep lol"
-      - "just chilling"
-      - "gotta say, quiet maps hit the spot"
-      - "hey {PLAYER_NAME}, u found the chill spot"
-      - {line: "hey {PLAYER_NAME}, mobs just keep respawning here xD", emote: 2}
-      - "always nice when someone else appreciates the grind"
-      - {line: "oh a {PLAYER_JOB}, good to see other people out here", emote: 2}
-      - "{PLAYER_NAME}, same energy; just vibing with the mobs"
-      - "late nights just hit different; no chaos, just grind"
-      - {line: "a {PLAYER_JOB}? means we can actually just coexist here", emote: 2}
-      - "try not to be too impressed by my grind, i know its amazing"
-      - {line: "OH SOMEONE o_o HI", emote: 6}
-      - "hm."
-      - "oh."
-      - {line: "{PLAYER_NAME}! yo!", emote: 2}
-      - "been so quiet, startled me lol"
-      - {line: "a {PLAYER_JOB} out here? rare sighting ^^", emote: 2}
-      - "just doing my rounds"
-      - {line: "oh {PLAYER_NAME}, careful of the spawn over there", emote: 0}
-      - "late night crew checking in"
-      - {line: "oh a lvl {PLAYER_LEVEL} {PLAYER_JOB}, nice", emote: 2}
-      - "what brings u out this way"
-      - {line: "hey {PLAYER_NAME}, u grinding or just passing thru?", emote: 0}
-      - "is it always this quiet or just today"
-      - {line: "another {PLAYER_JOB}, the more the merrier ^^", emote: 2}
-      - "killing time and mobs, u know how it is"
-      - "oh cool, hey"
-      - {line: "{PLAYER_NAME} right? think ive seen u around before", emote: 0}
-      - "grinding is better with people around, welcome ^^"
-      - "ur the first person ive seen in like an hour lol"
-      - {line: "oh hey {PLAYER_NAME}, nice to see a face after all this solo grinding", emote: 2}
-      - "sup, just here killing stuff as usual"
-      - {line: "wait is that {PLAYER_GUILD}? ive heard of u guys", emote: 2}
-      - "been pretty uneventful till u showed up"
-      - {line: "{PLAYER_NAME} out here too huh, respect", emote: 2}
-      - "hmm hey"
-      - "oh hey, map's all urs if u want it, im flexible"
-      - {line: "yo {PLAYER_NAME}, good to see u", emote: 2}
-      - "careful around here, mobs hit harder than they look"
-      - {line: "a {PLAYER_JOB}! always cool seeing different classes out here", emote: 2}
-      - "oh hey there"
-      - "oh a visitor :)"
-      - "nice to see another face"
-      - "been quiet until now"
-      - "hey, u doing okay?"
-      - "oh, cool, company"
-      - "hey lol, didn't hear u"
-      - "just me out here till now haha"
-      - {line: "oh hey ^^", emote: 2}
-      - "u passing thru or grinding?"
-      - "welcome to my little corner lol"
-      - "woah hey, didn't see u coming"
-      - "oh ur here"
-      - "hey, mobs are decent here if u wanna stay"
-      - "sup :)"
-      - {line: "oh hey {PLAYER_NAME}! didn't think anyone would be out here today", emote: 2}
-      - {line: "a lvl {PLAYER_LEVEL} {PLAYER_JOB}! nice, hey ^^", emote: 2}
-      - {line: "{PLAYER_NAME}! hey, how's the grind going", emote: 2}
-      - {line: "oh a {PLAYER_JOB}, rare to see one at this spot", emote: 6}
-      - {line: "yo {PLAYER_NAME}, been here long?", emote: 0}
-      - {line: "huh, a {PLAYER_JOB}, cool choice for this area ^^", emote: 2}
-      - {line: "{PLAYER_NAME}! u always show up when things are getting quiet", emote: 2}
-      - {line: "wait {PLAYER_GUILD}? ive heard of ur guild, hey!", emote: 2}
-      - {line: "oh a {PLAYER_JOB} out here, nice, this map suits ur build", emote: 0}
-      - {line: "{PLAYER_NAME}, u farming here or just passing thru?", emote: 0}
-      - {line: "oh hey {PLAYER_NAME}, didn't know u came to this area", emote: 2}
-      - {line: "a {PLAYER_JOB} huh, they always seem so focused when they grind", emote: 0}
-      - {line: "{PLAYER_NAME}! was wondering if anyone else was around", emote: 2}
-      - {line: "oh {PLAYER_NAME}, hey! lvl {PLAYER_LEVEL} already?", emote: 2}
-      - {line: "hey {PLAYER_NAME}, {PLAYER_JOB}s always make this map feel more lively", emote: 2}
-      - "just another soul on the grind"
-      - {{line: "oh {PLAYER_NAME}, nice to have u here", emote: 2}}
-      - "the map feels more alive now"
-      - {{line: "hey {PLAYER_JOB}, u look focused too ^^", emote: 2}}
-      - "solidarity in the grind"
-      - {{line: "{PLAYER_NAME} u doing ur thing i see", emote: 0}}
-      - "grinding together even if separately"
-      - {{line: "oh lvl {PLAYER_LEVEL}! thats solid", emote: 2}}
-      - "nice knowing someones else is out here"
-      - {{line: "{PLAYER_NAME} u look like u belong in this spot", emote: 2}}
-      - "good energy out here now"
-      - {{line: "oh a {PLAYER_JOB}! adds to the vibe", emote: 2}}
-      - "theyre in their zone and i respect that"
-      - {{line: "{PLAYER_NAME} seems like they know what theyre doing", emote: 0}}
-      - "not alone anymore and thats nice"
-      - {{line: "oh {PLAYER_JOB} paired with that level is perfect", emote: 2}}
-      - "the atmosphere just got better"
-      - {{line: "hey {PLAYER_NAME}, im vibing with ur energy", emote: 2}}
-      - "another grinder on the journey"
-      - {{line: "{PLAYER_JOB}s are always so cool to see", emote: 2}}
-      - "were just two people doing what we love"
-      - {{line: "{PLAYER_NAME} u got that grinder look", emote: 2}}
-      - "the solitude is comfortable now"
-      - {{line: "oh ur here too, {PLAYER_NAME}, nice", emote: 0}}
-      - "two is always better than one"
-      - {{line: "{PLAYER_JOB} at {PLAYER_LEVEL} is respectable", emote: 2}}
-      - "the map energy just leveled up"
-      - "ya were just here doing our thing ^^"
+      - "嘿呀 ^^"
+      - "哈哈 嗨"
+      - "嘿 o/"
+      - {line: "哦!", emote: 6}
+      - "嗨 ^^"
+      - "哇哦 嘿"
+      - "没看见你进来"
+      - "以前没在这见过你啊"
+      - "刷完这波你打算去哪?"
+      - "这图怪还不错"
+      - {line: "在这待挺久了 有点走神 哈哈", emote: 4}
+      - "好图吧 怪刷得挺快"
+      - "小心左边刷出来的怪"
+      - "要药水不? 我有多余的"
+      - {line: "刚补完货 感觉不错 ^^", emote: 2}
+      - "这图挺孤单的 见到你真好"
+      - "你在等这个点? 我的锅 哈哈 不过地方够大 ^^"
+      - "哦 嘿 {PLAYER_NAME}"
+      - {line: "哦 {PLAYER_JOB}啊!", emote: 2}
+      - "嘿 {PLAYER_NAME} ^^"
+      - "哦 你是{PLAYER_JOB} 不错"
+      - "嘿 {PLAYER_NAME} 你也来这刷?"
+      - {line: "哦 {PLAYER_JOB} 来得正好", emote: 2}
+      - "{PLAYER_NAME}! 嘿 没看见你"
+      - "哦 {PLAYER_JOB} 好久没在这见到这职业了"
+      - "嘿 {PLAYER_NAME} 刷得怎么样"
+      - "哦 {PLAYER_NAME} 你是路过还是留下刷?"
+      - {line: "哦 {PLAYER_JOB} 不错 你们练级是真快", emote: 2}
+      - "嘿 {PLAYER_NAME} 今天怪刷得不错 是个好地方"
+      - "差点没注意到你 嘿 {PLAYER_NAME}"
+      - "嘿 {PLAYER_NAME} 刷了很久吗?"
+      - "哦 {PLAYER_NAME} 一路平安 ^^"
+      - "嘿 {PLAYER_NAME} 这图对你胃口不?"
+      - "希望你已经找到位置了 ^^"
+      - "你也出来刷啊 不错"
+      - "你来之前都挺安静的 ^^"
+      - "嗯 嘿 ^^"
+      - "在这边见到人总是很开心"
+      - "{PLAYER_NAME} 我就在这刷着"
+      - "时间感都没了"
+      - "这图感觉不一样"
+      - "夜猫子刷怪人"
+      - "怪永不睡觉 哈哈"
+      - "就随便待着"
+      - "得说 安静的图最对味"
+      - "嘿 {PLAYER_NAME} 你找到了个清净地儿"
+      - {line: "嘿 {PLAYER_NAME} 这的怪一直刷不停 xD", emote: 2}
+      - "有人也懂刷怪的乐趣 真好"
+      - {line: "哦 {PLAYER_JOB} 在这见到同行真好", emote: 2}
+      - "{PLAYER_NAME} 同频 就是和怪一起晃悠"
+      - "深夜就是不一样 没喧闹 只有刷怪"
+      - {line: "{PLAYER_JOB}? 说明咱能在这和平共处", emote: 2}
+      - "别被我的刷怪英姿惊到 我知道我超强"
+      - {line: "哦 有人 o_o 嗨", emote: 6}
+      - "嗯。"
+      - "哦。"
+      - {line: "{PLAYER_NAME}! 哟!", emote: 2}
+      - "一直太安静 吓我一跳 哈哈"
+      - {line: "{PLAYER_JOB}会来这? 稀有物种 ^^", emote: 2}
+      - "就转悠我的圈"
+      - {line: "哦 {PLAYER_NAME} 小心那边的刷怪点", emote: 0}
+      - "深夜小队打卡"
+      - {line: "哦 {PLAYER_LEVEL}级的{PLAYER_JOB} 不错", emote: 2}
+      - "什么风把你吹来了"
+      - {line: "嘿 {PLAYER_NAME} 你是刷怪还是路过?", emote: 0}
+      - "是一直这么安静 还是就今天"
+      - {line: "又一个{PLAYER_JOB} 人越多越热闹 ^^", emote: 2}
+      - "消磨时间 顺便消磨怪 你懂的"
+      - "哦 不错 嘿"
+      - {line: "你是{PLAYER_NAME}吧? 好像之前见过你", emote: 0}
+      - "有人的刷怪才有意思 欢迎 ^^"
+      - "你是我这一个小时里见到的第一个人 哈哈"
+      - {line: "哦 嘿 {PLAYER_NAME} 单刷老半天了 见到人真好", emote: 2}
+      - "哟 就老样子 在这杀怪"
+      - {line: "等等 那是{PLAYER_GUILD}? 我听说过你们", emote: 2}
+      - "你来之前都挺平淡的"
+      - {line: "{PLAYER_NAME}也出来刷啊 佩服", emote: 2}
+      - "嗯 嘿"
+      - "哦 嘿 这图想要就拿去 我随便"
+      - {line: "哟 {PLAYER_NAME} 见到你真好", emote: 2}
+      - "这附近小心点 怪比看起来猛"
+      - {line: "{PLAYER_JOB}! 在这看到不同职业总是很酷", emote: 2}
+      - "哦 嘿 你好"
+      - "哦 有客人 :)"
+      - "见到新面孔真好"
+      - "之前一直挺安静的"
+      - "嘿 你还好吗?"
+      - "哦 可以 有伴了"
+      - "嘿 哈哈 没听见你"
+      - "之前这图就我一个人 哈哈"
+      - {line: "哦 嘿 ^^", emote: 2}
+      - "你是路过还是刷怪?"
+      - "欢迎来到我的小角落 哈哈"
+      - "哇哦 嘿 没看见你过来"
+      - "哦 你来了"
+      - "嘿 这图怪还行 想留下的话欢迎"
+      - "哟 :)"
+      - {line: "哦 嘿 {PLAYER_NAME}! 没想到今天会有人来这", emote: 2}
+      - {line: "{PLAYER_LEVEL}级的{PLAYER_JOB}! 不错 嘿 ^^", emote: 2}
+      - {line: "{PLAYER_NAME}! 嘿 刷得怎么样", emote: 2}
+      - {line: "哦 {PLAYER_JOB} 在这图可不多见", emote: 6}
+      - {line: "哟 {PLAYER_NAME} 来这多久了?", emote: 0}
+      - {line: "嗯 {PLAYER_JOB} 这职业选这图有眼光 ^^", emote: 2}
+      - {line: "{PLAYER_NAME}! 你总在快冷场的时候出现", emote: 2}
+      - {line: "等等 {PLAYER_GUILD}? 我听说过你们公会 嘿!", emote: 2}
+      - {line: "哦 {PLAYER_JOB}会来这 不错 这图适合你的加点", emote: 0}
+      - {line: "{PLAYER_NAME} 你是来刷怪还是路过?", emote: 0}
+      - {line: "哦 嘿 {PLAYER_NAME} 不知道你也会来这片", emote: 2}
+      - {line: "{PLAYER_JOB}啊 他们刷怪的时候总是一脸专注", emote: 0}
+      - {line: "{PLAYER_NAME}! 我正想会不会有别人在呢", emote: 2}
+      - {line: "哦 {PLAYER_NAME} 嘿! 都{PLAYER_LEVEL}级了?", emote: 2}
+      - {line: "嘿 {PLAYER_NAME} {PLAYER_JOB}一来 这图都热闹了", emote: 2}
+      - "又一个刷怪人"
+      - {{line: "哦 {PLAYER_NAME} 有你在真好", emote: 2}}
+      - "这图活起来了"
+      - {{line: "嘿 {PLAYER_JOB} 你看起来也很专注 ^^", emote: 2}}
+      - "刷怪人的团结"
+      - {{line: "{PLAYER_NAME} 你在忙你的 我看出来了", emote: 0}}
+      - "各刷各的 也算一起"
+      - {{line: "哦 {PLAYER_LEVEL}级! 可以啊", emote: 2}}
+      - "知道还有别人在这 真好"
+      - {{line: "{PLAYER_NAME} 你一看就属于这图", emote: 2}}
+      - "这气氛好起来了"
+      - {{line: "哦 {PLAYER_JOB}! 氛围加分", emote: 2}}
+      - "他们在自己的状态里 我respect"
+      - {{line: "{PLAYER_NAME}看起来挺会玩的", emote: 0}}
+      - "不再孤单了 真好"
+      - {{line: "哦 {PLAYER_JOB}配上这个等级 完美", emote: 2}}
+      - "气氛变好了"
+      - {{line: "嘿 {PLAYER_NAME} 我喜欢你的气场", emote: 2}}
+      - "又一个刷怪路上的人"
+      - {{line: "{PLAYER_JOB}看着总是那么帅", emote: 2}}
+      - "咱就是两个做着热爱之事的人"
+      - {{line: "{PLAYER_NAME} 你有一副刷怪人的模样", emote: 2}}
+      - "这种独处现在很舒服"
+      - {{line: "哦 你也在啊 {PLAYER_NAME} 不错", emote: 0}}
+      - "两个人总比一个人强"
+      - {{line: "{PLAYER_JOB}配上{PLAYER_LEVEL}这个等级 值得respect", emote: 2}}
+      - "这图的能量升级了"
+      - "对 咱就在这忙咱的 ^^"
     emote:
       - 0
       - 2
@@ -1322,149 +1322,149 @@ TrainingBot:
 
   WanderChat:
     text:
-      - "hmm..."
-      - "just wandering"
-      - "la la la"
+      - "嗯..."
+      - "就随便逛逛"
+      - "啦 啦 啦"
       - "..."
-      - "just vibing"
-      - "taking the scenic route lol"
-      - "hm. ok."
-      - {line: "no one around huh", emote: 4}
-      - "quiet today"
-      - "humming to myself"
-      - {line: "left or right tho", emote: 6}
-      - "tum tum tum"
-      - "drifting through {MAP}"
-      - "keep going i guess"
-      - "just passin thru"
-      - "breeze feels nice out here"
-      - "this town feels so quiet today"
-      - {line: "kinda tired but gonna keep going", emote: 4}
-      - {line: "this map is kinda cozy", emote: 2}
-      - "hope i ate enough today lol"
-      - "been walking for a while now lol"
-      - "nobody around, just me and the mobs"
-      - "just one more spot then ill take a break"
-      - "thinking about pots. should restock soon"
-      - {line: "no ks drama today at least ^^", emote: 2}
-      - "nowhere specific to be"
-      - {line: "not a bad day for grinding i guess", emote: 2}
-      - "the mobs werent giving great drops today"
-      - "could go back to {MAP} i guess"
-      - {line: "{MAP} is kinda nice when its empty like this", emote: 2}
-      - "been in {MAP} longer than i meant to"
-      - "something about {MAP} feels cozy"
-      - "half paying attention"
-      - {line: "probably should job advance soon... but later", emote: 7}
-      - "kinda lost track of where i was going"
-      - "sometimes u just gotta walk around for a bit u know"
-      - "the world feels really big when ur just walking around like this"
-      - {line: "not sure what to do after {MAP}", emote: 6}
-      - "wonder if anyones grinding {MAP} right now or if its empty"
-      - {line: "the mobs in {MAP} were kinda rough today", emote: 4}
-      - "scrolls running out"
-      - "keep grinding"
-      - "round and round"
-      - "next spot?"
-      - "old routine"
-      - "eyes hurt lol"
-      - "what level am i even at this point"
-      - "could use a snack or something"
-      - "the mobs here arent too bad i guess"
-      - "gotta make this run count"
-      - "the {MAP} night grind is kinda peaceful"
-      - "lost track of time like always"
-      - "my whole body hurts but like, gotta keep the grind alive"
-      - "sometimes i forget why i'm even here, then another mob drops something cool"
-      - "could keep going like this for hours, if i had the time"
-      - "i own every map i walk thru, just saying"
-      - {line: "THE MUSIC HERE IS SO GOOD i love this game", emote: 2}
-      - "where am i even going"
-      - "hm."
-      - {line: "{MAP} is such an underrated area honestly", emote: 0}
-      - "legs tired"
-      - {line: "love the vibe of {MAP}", emote: 2}
-      - "just one of those days"
-      - {line: "havent been to {MAP} in forever", emote: 0}
-      - "walking walking walking"
-      - "think im lost lol"
-      - {line: "the mobs in {MAP} are kinda annoying", emote: 5}
-      - "wonder what everyone else is doing"
-      - "feel like ive been walking in circles"
-      - {line: "should i go back to {MAP} or try somewhere new hmm", emote: 6}
-      - "just putting one foot in front of the other"
-      - "if i find a good spot ill camp it for hours"
-      - "kinda miss having someone to walk around with"
-      - {line: "{MAP} always feels different at night", emote: 0}
-      - "need to find my next grind spot"
-      - "footsteps and bgm, thats all i hear"
-      - {line: "people sleep on {MAP} but its actually decent", emote: 0}
-      - "still looking"
-      - "ok where was that portal again"
-      - {line: "been thru {MAP} like five times today lol", emote: 6}
-      - "just going wherever the portals take me"
-      - "drifting"
-      - "mobs here are chill at least"
-      - {line: "{MAP} in the afternoon hits different ^^", emote: 2}
-      - "zoning out and walking, my specialty"
-      - "my mind is completely blank, just walking"
-      - "where was i going again"
-      - "nothing but me and the bgm"
-      - "think ill just wander a lil longer"
-      - "portal? or no portal? hmm"
-      - "not in a hurry, nowhere to be"
-      - "it's kinda nice just existing out here"
-      - {line: "every map feels the same at 3am", emote: 0}
-      - "following my feet and seeing where they take me"
-      - "the game is so quiet at this hour"
-      - "just kind of... floating around"
-      - "another lap and ill decide something"
-      - "does it count as exploring if ive been here a hundred times"
-      - {line: "lost in thought more than in the map lol", emote: 6}
-      - "headphones in, world out"
-      - {line: "something about {MAP} makes me just wanna slow down", emote: 0}
-      - {line: "every time i walk thru {MAP} i notice something new", emote: 2}
-      - {line: "been circling {MAP} forever today, no plan, just walking", emote: 6}
-      - {line: "{MAP} is quieter than i expected today", emote: 0}
-      - {line: "think ive done this route thru {MAP} like ten times already lol", emote: 6}
-      - {line: "something peaceful about {MAP} even when there's nothing going on", emote: 0}
-      - {line: "{MAP} at this hour feels like the whole world belongs to me", emote: 2}
-      - {line: "still wandering {MAP}, no destination needed", emote: 0}
-      - {line: "do people even realize how nice {MAP} is? underrated", emote: 2}
-      - {line: "the corners of {MAP} where no one goes are kinda my favorite", emote: 0}
-      - {line: "{MAP} again. ok fine. i just keep coming back here", emote: 6}
-      - {line: "the {MAP} scenery never gets old honestly", emote: 2}
-      - {line: "keep meaning to leave {MAP} and then... dont", emote: 4}
-      - {line: "walking around {MAP} just kills time in the best way", emote: 2}
-      - {line: "wander mode: on. destination: {MAP} again apparently", emote: 6}
-      - "just thinking about where next"
-      - {{line: "{MAP} is calling me back again lol", emote: 6}}
-      - "exploring options for the next session"
-      - {{line: "the {MAP} scenery is never boring honestly", emote: 2}}
-      - "slow walk through familiar places"
-      - {{line: "{MAP} just has that feeling u know", emote: 0}}
-      - "wandering leads to discoveries sometimes"
-      - {{line: "thinking about whether to go back to {MAP}", emote: 6}}
-      - "the journey is as good as the destination"
-      - {{line: "{MAP} was good but maybe ill try {MAP}", emote: 0}}
-      - "letting my feet decide where to go"
-      - {{line: "the {MAP} vibes are good this time of day", emote: 2}}
-      - "just drifting and thinking"
-      - {{line: "{MAP} pulls me back every time no matter what", emote: 2}}
-      - "peaceful moment before the grind"
-      - {{line: "{MAP} still feels fresh somehow", emote: 0}}
-      - "contemplating next steps"
-      - {{line: "{MAP} is always an option but theres other places", emote: 6}}
-      - "enjoying the walk"
-      - {{line: "the {MAP} layout is so familiar now", emote: 0}}
-      - "taking time to enjoy the world"
-      - {{line: "{MAP} has become like home u know", emote: 2}}
-      - "wandering without destination"
-      - {{line: "{MAP} one more time or somewhere new", emote: 6}}
-      - "the adventure of finding ur next spot"
-      - {{line: "{MAP} waiting for me but im in no rush", emote: 0}}
-      - "just absorbing the world"
-      - "letting the path decide"
+      - "随便晃悠"
+      - "走走观光路线 哈哈"
+      - "嗯。行。"
+      - {line: "没人啊", emote: 4}
+      - "今天真安静"
+      - "自己哼着小曲"
+      - {line: "往左还是往右呢", emote: 6}
+      - "哒 哒 哒"
+      - "飘过{MAP}"
+      - "继续走吧"
+      - "就路过下"
+      - "外面的风吹着挺舒服"
+      - "这镇子今天好安静"
+      - {line: "有点累 但继续走", emote: 4}
+      - {line: "这图有点温馨", emote: 2}
+      - "希望我今天吃得够多 哈哈"
+      - "都走了好久了 哈哈"
+      - "周围没人 就我和怪"
+      - "再看一个点就歇会儿"
+      - "想着药水呢。该补货了"
+      - {line: "今天至少没有抢怪的破事 ^^", emote: 2}
+      - "没啥特别要去的地方"
+      - {line: "今天刷怪日子还行吧", emote: 2}
+      - "今天怪掉的东西不咋地"
+      - "要不回{MAP}吧"
+      - {line: "{MAP}空着的时候还挺不错的", emote: 2}
+      - "在{MAP}待得比预想久了"
+      - "{MAP}有种温馨的感觉"
+      - "有一搭没一搭地看着"
+      - {line: "也许该去转职了... 不过再等等", emote: 7}
+      - "有点忘了自己要去哪"
+      - "有时候就是想随便走走 你懂的"
+      - "就这样随便走的时候 世界显得特别大"
+      - {line: "刷完{MAP}不知道干啥", emote: 6}
+      - "不知道现在有没有人在刷{MAP} 还是空无一人"
+      - {line: "今天{MAP}的怪有点凶", emote: 4}
+      - "卷轴快用完了"
+      - "继续刷"
+      - "一圈又一圈"
+      - "下一个点?"
+      - "老套路"
+      - "眼睛好酸 哈哈"
+      - "我现在到底多少级了"
+      - "想吃点零食啥的"
+      - "这的怪还行吧"
+      - "这趟得刷出点名堂"
+      - "{MAP}的夜刷还挺安逸"
+      - "跟往常一样 忘了时间"
+      - "浑身都疼 但刷怪不能停"
+      - "有时候都忘了自己为啥在这 然后又有只怪掉了好东西"
+      - "要是有时间 我能这么刷上好几个小时"
+      - "我走过的每张图都是我的地盘 就说说"
+      - {line: "这的音乐也太好听了 我爱这游戏", emote: 2}
+      - "我到底要去哪"
+      - "嗯。"
+      - {line: "说实话 {MAP}被严重低估了", emote: 0}
+      - "腿酸"
+      - {line: "喜欢{MAP}的氛围", emote: 2}
+      - "就是那样的一天"
+      - {line: "好久没去{MAP}了", emote: 0}
+      - "走啊走啊走"
+      - "我好像迷路了 哈哈"
+      - {line: "{MAP}的怪有点烦人", emote: 5}
+      - "不知道别人都在干嘛"
+      - "感觉我一直在绕圈"
+      - {line: "是回{MAP}还是去个新地方呢 嗯", emote: 6}
+      - "就一步一步往前走"
+      - "要是找到好点 我能蹲上好几个小时"
+      - "有点怀念有人一起走路的日子"
+      - {line: "{MAP}的夜晚总是不一样", emote: 0}
+      - "得找找下一个刷怪点"
+      - "只有脚步声和bgm 就这些"
+      - {line: "大家都看不上{MAP} 其实还不错", emote: 0}
+      - "还在找"
+      - "ok 那个传送门又在哪来着"
+      - {line: "今天都穿过{MAP}五趟了 哈哈", emote: 6}
+      - "传送门带我去哪就去哪"
+      - "漂移"
+      - "至少这的怪挺温和"
+      - {line: "下午的{MAP}感觉不一样 ^^", emote: 2}
+      - "边走边放空 我的拿手好戏"
+      - "脑子一片空白 就走着"
+      - "我本来要去哪来着"
+      - "只有我和bgm"
+      - "再随便走会儿吧"
+      - "传送门? 还是不传? 嗯"
+      - "不急 哪也不去"
+      - "就这样在外面存在一会儿也挺好"
+      - {line: "凌晨三点 每张图都长一个样", emote: 0}
+      - "跟着脚走 看它带我去哪"
+      - "这个点的游戏好安静"
+      - "就有点... 飘着"
+      - "再绕一圈就做决定"
+      - "来过一百遍了 还算探索吗"
+      - {line: "与其说迷路 不如说在想事情 哈哈", emote: 6}
+      - "耳机戴上 世界隔离"
+      - {line: "{MAP}有种让人想慢下来的东西", emote: 0}
+      - {line: "每次走过{MAP}都能发现点新东西", emote: 2}
+      - {line: "今天在{MAP}转了一整天 没计划 就是走", emote: 6}
+      - {line: "{MAP}今天比想象中安静", emote: 0}
+      - {line: "这条{MAP}的路线我都走了不下十遍了 哈哈", emote: 6}
+      - {line: "哪怕无事发生 {MAP}也有种宁静的感觉", emote: 0}
+      - {line: "这个点的{MAP} 感觉整个世界都是我的", emote: 2}
+      - {line: "还在{MAP}晃悠 不需要目的地", emote: 0}
+      - {line: "大家知道{MAP}有多好吗? 被低估了", emote: 2}
+      - {line: "{MAP}那些没人去的角落 恰恰是我的最爱", emote: 0}
+      - {line: "又是{MAP}。行吧。我就是老往这跑", emote: 6}
+      - {line: "{MAP}的风景真是百看不腻", emote: 2}
+      - {line: "一直想离开{MAP} 结果... 没走成", emote: 4}
+      - {line: "在{MAP}闲逛 是消磨时间的最好方式", emote: 2}
+      - {line: "闲逛模式: 开。目的地: 又是{MAP}", emote: 6}
+      - "就想想接下来去哪"
+      - {{line: "{MAP}又在召唤我了 哈哈", emote: 6}}
+      - "为下一场探索各种选项"
+      - {{line: "说实话 {MAP}的风景永远不会腻", emote: 2}}
+      - "在熟悉的地方慢慢走"
+      - {{line: "{MAP}就是有种感觉 你懂的", emote: 0}}
+      - "闲逛有时会有新发现"
+      - {{line: "在想要不要回{MAP}", emote: 6}}
+      - "旅途本身和目的地一样重要"
+      - {{line: "{MAP}不错 不过也许该去{MAP}试试", emote: 0}}
+      - "让脚决定去哪"
+      - {{line: "这个点的{MAP}氛围不错", emote: 2}}
+      - "就漂着 想着"
+      - {{line: "不管怎样 {MAP}总能把我拉回来", emote: 2}}
+      - "刷怪前的宁静时刻"
+      - {{line: "{MAP}不知怎么还有新鲜感", emote: 0}}
+      - "想想下一步"
+      - {{line: "{MAP}永远是个选项 但别处也有别处的好", emote: 6}}
+      - "享受这段路"
+      - {{line: "{MAP}的布局现在熟得不行", emote: 0}}
+      - "花点时间享受这个世界"
+      - {{line: "{MAP}已经像家了 你懂的", emote: 2}}
+      - "漫无目的地游荡"
+      - {{line: "再去一次{MAP} 还是换个新地方", emote: 6}}
+      - "寻找下一个点的冒险"
+      - {{line: "{MAP}在等我 但我不急", emote: 0}}
+      - "就吸收着这个世界"
+      - "让路自己决定"
     emote:
       - 0
       - 6
@@ -1473,120 +1473,120 @@ TrainingBot:
 
   EmoteReaction:
     text:
-      - "lol"
+      - "哈哈"
       - "^^"
-      - "hehe"
-      - "omg"
-      - "haha ^^"
-      - "same"
+      - "嘿嘿"
+      - "我的天"
+      - "哈哈 ^^"
+      - "同感"
       - ":o"
-      - {line: "haha ok i see u", emote: 3}
-      - "lol that got me"
-      - {line: "haha stop it xD", emote: 7}
-      - "lol same energy"
-      - {line: "aw hehe <3", emote: 2}
-      - "u got me lol"
-      - "haha ok ^^"
-      - {line: "aw that actually made me smile", emote: 2}
-      - {line: "lol didn't expect that but ok ^^", emote: 6}
-      - "u and ur emotes lol"
-      - "that was kinda cute lol"
-      - "ty just vibing :)"
-      - "brb don't die T_T"
-      - "aw come on xD"
-      - "grinding hits different"
-      - "ur making my grind feel less lonely"
-      - "that was pretty funny lol"
-      - "im way too tired for this"
-      - "ur kinda making my day better"
-      - "mb was totally spacing; whats up"
-      - "fine fine im awake now"
-      - "lol yeah thats about right"
-      - "was i supposed to react to that"
-      - {line: "AHAHAHA ok ok ^^", emote: 2}
-      - "cool"
-      - "pfft, i can do better emotes than that"
-      - "hah"
-      - "nooo dont make me laugh im trying to focus xD"
+      - {line: "哈哈 行 我懂你", emote: 3}
+      - "哈哈 被你逗到了"
+      - {line: "哈哈 别闹了 xD", emote: 7}
+      - "哈哈 同款气场"
+      - {line: "哇 嘿嘿 <3", emote: 2}
+      - "被你拿捏了 哈哈"
+      - "哈哈 行 ^^"
+      - {line: "哇 这真把我逗笑了", emote: 2}
+      - {line: "哈哈 没想到这出 不过行 ^^", emote: 6}
+      - "你和你那表情包 哈哈"
+      - "那还挺可爱的 哈哈"
+      - "谢啦 就随便晃晃 :)"
+      - "我离开一下 别死 T_T"
+      - "哎 别啊 xD"
+      - "刷怪的感觉不一样了"
+      - "你让我的刷怪不那么孤单了"
+      - "那还挺好笑的 哈哈"
+      - "我太累了 来不了这个"
+      - "你有点让我心情变好了"
+      - "我的锅 刚走神了 咋了"
+      - "行行 我醒了"
+      - "哈哈 是 差不多就是这么回事"
+      - "我该对这个有反应吗"
+      - {line: "哈哈哈哈 行行 ^^", emote: 2}
+      - "酷"
+      - "切 我的表情包可比你的强"
+      - "哈"
+      - "别 别逗我笑 我要专注 xD"
       - ":)"
-      - {line: "omg stop lol", emote: 7}
-      - "u and me both lol"
-      - "ok that was good"
+      - {line: "我的天 别闹了 哈哈", emote: 7}
+      - "咱俩都一样 哈哈"
+      - "行 这个可以"
       - "xD"
-      - "nice one lol"
-      - "lmaoo"
-      - "ok ok i see u ^^"
-      - "wait do that again lol"
-      - {line: "ok that caught me off guard haha", emote: 6}
+      - "好活 哈哈"
+      - "笑死我了"
+      - "行行 我懂你 ^^"
+      - "等等 再来一次 哈哈"
+      - {line: "行 这打得我措手不及 哈哈", emote: 6}
       - "^^;;"
-      - "ahaha ok"
+      - "啊哈哈 行"
       - "T_T"
-      - "whyyy xD"
-      - "smooth"
-      - "that one got me, wont lie"
-      - "hehe ok"
-      - {line: "omg STOP im dying xD", emote: 2}
-      - "oh lol"
+      - "为啥啊 xD"
+      - "丝滑"
+      - "这个逗到我了 不骗你"
+      - "嘿嘿 行"
+      - {line: "我的天 停 我要笑死了 xD", emote: 2}
+      - "哦 哈哈"
       - ":D"
-      - "we vibin"
-      - "ok now im actually awake lol"
-      - "u win this round ^^"
-      - "lol wait what was that"
-      - "pfft what even was that lol"
-      - "stop it im trying to be focused out here"
-      - "pff ok"
-      - "ur energy is something else lol"
-      - "ok fair"
-      - "that made my day a lil better not gonna lie"
-      - {line: "SAME tho ^^", emote: 2}
-      - "oh wow ok"
-      - "lol im so tired this got me"
-      - "ok ur fun"
-      - {line: "ur doing this just to mess with me aren't u", emote: 3}
-      - "i was zoning out and now im not, good job"
-      - "heh ok"
-      - "u're alright ^^"
-      - {line: "oh i see what ur doing, clever", emote: 3}
-      - "nice"
-      - "ok but seriously tho, again"
-      - "ok i genuinely laughed at that"
-      - "ur making me forget im supposed to be grinding"
-      - "lol i cant"
-      - {line: "well played, i concede", emote: 2}
-      - "ok u win, i smiled"
-      - "we are really vibing today haha"
-      - "kinda love this interaction"
-      - {line: "lol ok ur officially my favorite person in this map", emote: 2}
-      - "not laughing... ok yes i am"
-      - {line: "i genuinely needed that, ty ^^", emote: 2}
-      - "ok good point"
-      - "ok i give, ur actually funny"
+      - "咱在同步"
+      - "行 现在我彻底清醒了 哈哈"
+      - "这回合算你赢 ^^"
+      - "哈哈 等等 刚才那是什么"
+      - "切 那到底是个啥 哈哈"
+      - "别闹 我在努力专注呢"
+      - "切 行"
+      - "你的气场真是一绝 哈哈"
+      - "行 公平"
+      - "不骗你 这让我今天心情好了一点点"
+      - {line: "我也一样 ^^", emote: 2}
+      - "哦 哇 行"
+      - "哈哈 我太困了 被这个逗到了"
+      - "行 你挺有意思"
+      - {line: "你干这些就是为了整蛊我吧", emote: 3}
+      - "我刚在走神 现在不了 干得漂亮"
+      - "嘿 行"
+      - "你人不错 ^^"
+      - {line: "哦 我看出你的套路了 聪明", emote: 3}
+      - "不错"
+      - "行 不过说真的 再来一个"
+      - "行 这个我是真笑了"
+      - "你让我都忘了自己是来刷怪的"
+      - "哈哈 我不行了"
+      - {line: "打得漂亮 我认输", emote: 2}
+      - "行 你赢了 我笑了"
+      - "咱今天真的挺合拍 哈哈"
+      - "有点喜欢这种互动"
+      - {line: "哈哈 行 你正式成为这张图里我最喜欢的人", emote: 2}
+      - "没笑... 好吧 我笑了"
+      - {line: "我真的需要这个 谢啦 ^^", emote: 2}
+      - "行 说得有道理"
+      - "行 我服 你是真有趣"
       - ":D"
-      - "word ^^"
-      - "lol ok ok"
-      - "haha fair"
-      - {line: "that got a genuine laugh", emote: 2}
-      - "ur hilarious lol"
-      - {{line: "ok ok u win this round", emote: 2}}
-      - "that was smooth ngl"
-      - "hehe fair enough"
-      - "ok that one made me smile"
-      - {{line: "omg ur funny like actually", emote: 2}}
-      - "lol u got me"
-      - "that was good"
-      - {{line: "wait thats actually a good point lol", emote: 2}}
-      - "u and ur jokes"
-      - "lmao ok fine"
-      - {{line: "nah ur right tho ^^", emote: 2}}
-      - "that cracked me up"
-      - "ok im convinced"
-      - {{line: "u almost made me forget im grinding lol", emote: 2}}
-      - "that was clever ngl"
-      - {{line: "ok u deserve a win for that one", emote: 2}}
+      - "没错 ^^"
+      - "哈哈 行行"
+      - "哈哈 公平"
+      - {line: "这个让我真心笑了", emote: 2}
+      - "你可真逗 哈哈"
+      - {{line: "行行 这回合你赢了", emote: 2}}
+      - "这波丝滑 实话"
+      - "嘿嘿 说得对"
+      - "行 这个让我笑了"
+      - {{line: "我的天 你是真的好笑", emote: 2}}
+      - "哈哈 被你拿捏了"
+      - "这个不错"
+      - {{line: "等等 这说得真有道理 哈哈", emote: 2}}
+      - "你和你那些段子"
+      - "笑死 行吧"
+      - {{line: "不 你说得对 ^^", emote: 2}}
+      - "这把我逗乐了"
+      - "行 我信了"
+      - {{line: "你差点让我忘了我在刷怪 哈哈", emote: 2}}
+      - "这波机灵 实话"
+      - {{line: "行 这一下该算你赢", emote: 2}}
       - ":P"
-      - "ur actually the best"
-      - "ok that was chef's kiss"
-      - {{line: "ur making my grind so much better rn", emote: 2}}
+      - "你是真的顶"
+      - "行 这波绝了"
+      - {{line: "你让我的刷怪体验好了不止一点", emote: 2}}
     emote:
       - 2
       - 6
@@ -1597,18 +1597,18 @@ TrainingBot:
 
   TrainingTalk:
     text:
-      - {line: "pretty good! {MOB} exp is steady, cant complain", emote: 2}
-      - "slow but steady, u know how it is"
-      - {line: "honestly? {MAP} is underrated, exp is solid here", emote: 2}
-      - {line: "been at it a while, {MOB} are basically free exp at this point", emote: 3}
-      - "grinding's grinding lol, one bar at a time"
-      - {line: "decent! drops have been stingy tho", emote: 4}
-      - "cant complain, spawns are quick n nobody's fighting me for them"
-      - {line: "just vibing with the {MOB} honestly", emote: 0}
-      - "the exp bar moves if u stare at it hard enough lol"
-      - {line: "solid session so far, {MAP} never lets me down", emote: 2}
-      - "u know, mobs die, exp goes up, life is simple"
-      - {line: "almost leveled actually! few more {MOB} should do it", emote: 2}
+      - {line: "挺不错的! {MOB}经验稳 没啥可抱怨的", emote: 2}
+      - "慢但稳 你懂的"
+      - {line: "说实话? {MAP}被低估了 这经验很扎实", emote: 2}
+      - {line: "刷了挺久了 {MOB}现在就是白给的经验", emote: 3}
+      - "刷怪嘛就是刷怪 哈哈 一格一格来"
+      - {line: "还行! 就是掉率有点抠", emote: 4}
+      - "没啥抱怨的 刷得快 也没人跟我抢"
+      - {line: "就纯粹和{MOB}一起晃悠", emote: 0}
+      - "盯着经验条看 它就会动 哈哈"
+      - {line: "这局很稳 {MAP}从没让我失望", emote: 2}
+      - "你懂的 怪死 经验涨 生活简单"
+      - {line: "其实快升级了! 再刷几只{MOB}就差不多了", emote: 2}
     emote:
       - 2
       - 0
@@ -1616,16 +1616,16 @@ TrainingBot:
 
   PartyAccept:
     text:
-      - "a party? sure!! send the invite, i keep grinding either way"
-      - {line: "yes pls, grinding with company beats solo. invite me {PLAYER_NAME}!", emote: 2}
-      - "ok deal, invite me. fair warning i dont stop swinging lol"
-      - {line: "sure {PLAYER_NAME}, shoot the invite, more the merrier", emote: 2}
-      - "finally someone asks!! yes, invite me"
-      - "im down. invite me n grab a spot, mobs are plenty"
-      - {line: "party exp bonus? say less. invite me ^^", emote: 3}
-      - "yeah ok! this map's better with two anyway, send it"
-      - {line: "sure thing {PLAYER_NAME}, invite me, ill hold this side down", emote: 2}
-      - "ok but i already claimed this ledge, u can have the rest lol. invite me!"
+      - "组队? 好呀!! 发邀请 反正我刷不停"
+      - {line: "好呀好呀 有人一起刷总比单刷强。拉我 {PLAYER_NAME}!", emote: 2}
+      - "ok 成交 拉我。先说明 我手停不下来 哈哈"
+      - {line: "行 {PLAYER_NAME} 发邀请吧 人越多越热闹", emote: 2}
+      - "终于有人问我了!! 好 拉我"
+      - "我加入。拉我 占个位置 怪管够"
+      - {line: "组队经验加成? 别说了。拉我 ^^", emote: 3}
+      - "行 ok! 这图两个人刷更好 发吧"
+      - {line: "行 {PLAYER_NAME} 拉我 这边我罩着", emote: 2}
+      - "ok 但这块平台我先占了 剩下的给你 哈哈。拉我!"
     emote:
       - 2
       - 3
@@ -1633,20 +1633,20 @@ TrainingBot:
 
   PartyDecline:
     text:
-      - "sry im in my solo grind era rn"
-      - {line: "nah, im racing a guildie to the next level, cant split exp", emote: 3}
-      - "mm pass, i ks people by accident, better for everyone if im solo lol"
-      - {line: "cant! almost at my level goal n im not sharing these {MOB}", emote: 5}
-      - "sry, im logging soon, wouldnt be a fair party member"
-      - {line: "nahh {PLAYER_NAME}, party exp math doesnt math for me today", emote: 0}
-      - "not today, this is my meditation time lol"
-      - "id just slow u down... is what im telling myself. no ty"
-      - {line: "cant, im doing a no-party challenge run. its going terribly", emote: 7}
-      - "hmm no ty, the mobs and i have an understanding"
-      - "sry, last party wiped n took my exp with them, still recovering T_T"
-      - {line: "pass! but ur welcome to half the map {PLAYER_NAME}", emote: 0}
-      - "solo grind hits different, sry"
-      - "gonna pass rn, im way too deep in the zone sry"
+      - "抱歉 我现在正处在单刷阶段"
+      - {line: "不了 我正跟公会的人比赛冲级呢 经验不能分", emote: 3}
+      - "嗯 算了 我容易不小心抢怪 为了大家好我还是单刷吧 哈哈"
+      - {line: "不行! 快到我的等级目标了 这些{MOB}我可不让", emote: 5}
+      - "抱歉 我快下线了 当不了合格的队友"
+      - {line: "不了 {PLAYER_NAME} 组队经验这笔账今天算不过来", emote: 0}
+      - "今天不行 这是我的冥想时间 哈哈"
+      - "我只会拖你后腿... 我是这么安慰自己的。不了 谢谢"
+      - {line: "不行 我在做无组队挑战。目前进行得很惨烈", emote: 7}
+      - "嗯 不了 谢谢 我和怪之间有默契"
+      - "抱歉 上一个队团灭了 还带走了我的经验 还没缓过来 T_T"
+      - {line: "不了! 不过另一半图欢迎你 {PLAYER_NAME}", emote: 0}
+      - "单刷有单刷的味道 抱歉"
+      - "现在算了 我已经刷得太投入了 抱歉"
     emote:
       - 0
       - 4
@@ -1655,40 +1655,40 @@ TrainingBot:
 
   PartyJoined:
     text:
-      - "in!! ok lets farm, party exp lets gooo"
-      - {line: "joined ^^ ok {PLAYER_NAME} pick a side, mobs for days", emote: 2}
-      - "accepted! back to swinging, enjoy the shared exp"
-      - {line: "party up! ur timing is good, spawns are hot rn", emote: 2}
-      - "ok we're official, dont steal my ledge tho lol"
-      - "invite accepted, lets make these mobs regret spawning"
-      - {line: "nice, a party! ok {PLAYER_NAME}, watch this", emote: 3}
-      - "joined! grinding together > grinding alone"
+      - "进了!! ok 开刷 组队经验走起"
+      - {line: "加入了 ^^ ok {PLAYER_NAME} 挑一边吧 怪多到刷不完", emote: 2}
+      - "接受了! 继续刷 共享经验请享用"
+      - {line: "组队了! 你时机不错 现在刷怪点正热", emote: 2}
+      - "ok 我们正式组队了 不过别抢我的平台 哈哈"
+      - "邀请已接受 让这些怪后悔自己刷出来"
+      - {line: "不错 组上队了! ok {PLAYER_NAME} 看好了", emote: 3}
+      - "进了! 一起刷 > 一个人刷"
     emote:
       - 2
     wait: 1
 
   FollowAccept:
     text:
-      - "ok ok packing up, lead the way!"
-      - {line: "field trip?? yes. right behind u {PLAYER_NAME}", emote: 2}
-      - "sure, this spot was drying up anyway, im with u"
-      - {line: "ok {PLAYER_NAME}, u navigate, i follow, deal", emote: 2}
-      - "aight im done here then, show me this better map of urs"
-      - "following! if this new spot is worse im blaming u lol"
-      - {line: "yep gimme a sec... ok lets move ^^", emote: 2}
-      - "deal, ive been curious whats past this map anyway"
+      - "ok ok 收拾收拾 带路吧!"
+      - {line: "出去郊游?? 好呀。跟紧你 {PLAYER_NAME}", emote: 2}
+      - "行 这图反正也没啥油水了 我跟你走"
+      - {line: "ok {PLAYER_NAME} 你带路 我跟着 成交", emote: 2}
+      - "行 我在这也刷完了 带我去你说的好图吧"
+      - "跟着呢! 要是新地方更差 我就怪你 哈哈"
+      - {line: "好 等我一下... ok 走吧 ^^", emote: 2}
+      - "成交 反正我也好奇这图后面是啥"
     emote:
       - 2
     wait: 1
 
   PartyFirst:
     text:
-      - "invite me to ur party first so i dont lose u!"
-      - {line: "party me first {PLAYER_NAME}, then ill follow u anywhere", emote: 0}
-      - "no party no follow, them's the rules lol"
-      - "gotta be party members first, send the invite!"
-      - {line: "im not following a stranger lol, party invite first ^^", emote: 3}
-      - "ask me to party first, THEN we talk field trips"
+      - "先拉我进队 不然我跟丢了!"
+      - {line: "先组我 {PLAYER_NAME} 然后你走哪我跟哪", emote: 0}
+      - "不组队不跟走 这就是规矩 哈哈"
+      - "得先成为队友 发邀请吧!"
+      - {line: "我可不会跟陌生人走 哈哈 先发组队邀请 ^^", emote: 3}
+      - "先问我要不要组队 然后再聊郊游的事"
     emote:
       - 0
       - 2
@@ -1696,12 +1696,12 @@ TrainingBot:
 
   AlreadyPartied:
     text:
-      - "we're literally already partied lol"
-      - {line: "{PLAYER_NAME}... check ur party tab hehe", emote: 3}
-      - "uh, look at ur party list ^^"
-      - "already in! short memory much? lol"
-      - {line: "we ARE a party, now get over here n grind", emote: 2}
-      - "cant join twice, thats not how parties work xD"
+      - "咱俩不是已经组队了吗 哈哈"
+      - {line: "{PLAYER_NAME}... 看看你的队伍列表 嘿嘿", emote: 3}
+      - "呃 看看你的队伍列表 ^^"
+      - "已经进队了! 记性这么差吗? 哈哈"
+      - {line: "咱已经是队友了 赶紧过来一起刷", emote: 2}
+      - "不能进两次 队伍不是这么玩的 xD"
     emote:
       - 3
       - 2
@@ -1709,12 +1709,12 @@ TrainingBot:
 
   Goodbye:
     text:
-      - "cya! back to the grind"
-      - {line: "later {PLAYER_NAME}, gl out there", emote: 2}
-      - "ok these mobs arent gonna kill themselves, cya"
-      - "peace! ill be here, as always lol"
-      - {line: "cya around {PLAYER_NAME} ^^", emote: 2}
-      - "later! swing by if u change ur mind about that party"
+      - "拜拜! 回去继续刷"
+      - {line: "回头见 {PLAYER_NAME} 祝你好运", emote: 2}
+      - "ok 这些怪可不会自己死掉 拜拜"
+      - "拜! 我还在这 跟往常一样 哈哈"
+      - {line: "回头见 {PLAYER_NAME} ^^", emote: 2}
+      - "回头见! 组队的事改主意了再来找我"
     emote:
       - 2
       - 0
@@ -1724,20 +1724,20 @@ TrainingBot:
 
   BreakStart:
     text:
-      - "brb bathroom"
-      - "grabbing a snack real quick, mobs dont move"
-      - {line: "thirsty, need a water refill, brb", emote: 0}
-      - "gonna stretch my legs for a min"
-      - {line: "afk a sec, dont touch my spot lol", emote: 3}
-      - "my eyes need a break from this screen"
-      - "brb, someone's at the door"
-      - "quick break, i earned it"
-      - {line: "food break!! back in a min", emote: 2}
-      - "gotta stand up, my legs are asleep"
-      - "1 min break, the mobs can wait"
-      - {line: "pausing real quick, hands need a rest", emote: 4}
-      - "brb refilling my drink"
-      - {line: "ok 5 min break... fine, 1 min break", emote: 6}
+      - "去趟厕所"
+      - "快速搞点零食 怪又不会动"
+      - {line: "渴了 去接杯水 马上回", emote: 0}
+      - "起来伸伸腿"
+      - {line: "离开一下 别碰我的位置 哈哈", emote: 3}
+      - "眼睛得离开屏幕歇歇了"
+      - "有人敲门 马上回"
+      - "快速休息下 我应得的"
+      - {line: "干饭时间!! 一分钟就回", emote: 2}
+      - "得站起来了 腿都麻了"
+      - "休息一分钟 怪可以等"
+      - {line: "暂停一下 手需要歇会儿", emote: 4}
+      - "去续杯饮料"
+      - {line: "ok 休息五分钟... 行吧 就一分钟", emote: 6}
     emote:
       - 0
       - 4
@@ -1746,16 +1746,16 @@ TrainingBot:
 
   BreakOver:
     text:
-      - "ok back to it"
-      - {line: "im back, did i miss anything", emote: 2}
-      - "break over, mobs beware"
-      - {line: "refreshed n ready, lets go", emote: 2}
-      - "ok that helped, round two"
-      - "back! ok where was i"
-      - {line: "water acquired, grind resumed", emote: 2}
-      - "alright, focus time again"
-      - {line: "im back babyyy", emote: 2}
-      - "ok break's over, these levels wont grind themselves"
+      - "ok 继续"
+      - {line: "我回来了 错过什么了吗", emote: 2}
+      - "休息结束 怪们小心了"
+      - {line: "回血回蓝 满状态 走起", emote: 2}
+      - "ok 歇好了 第二回合"
+      - "回来了! ok 我刷到哪了"
+      - {line: "水已到手 刷怪继续", emote: 2}
+      - "好 又该专注了"
+      - {line: "我回来了 宝贝们", emote: 2}
+      - "ok 休息结束 这些级可不会自己升"
     emote:
       - 2
       - 0
@@ -1764,16 +1764,16 @@ TrainingBot:
   # Chalkboard sign texts while resting - keep these SHORT (they render on a small board).
   BreakSign:
     text:
-      - "brb"
-      - "getting water"
-      - "afk 1 min"
-      - "bathroom brb"
-      - "snack break"
-      - "brb dont ks pls"
-      - "resting a sec"
-      - "back soon"
-      - "brb food"
-      - "stretching"
+      - "稍等"
+      - "接水去"
+      - "离开1分钟"
+      - "去厕所 马上回"
+      - "吃零食"
+      - "稍等 别抢怪"
+      - "歇一下"
+      - "马上回"
+      - "吃饭去"
+      - "伸懒腰"
     emote:
       - 0
     wait: 1
@@ -1783,45 +1783,45 @@ TrainingBot:
 TrainingBot_Warrior:
   Signature:
     text:
-      - {line: "just stand in the middle n swing, warrior life ez", emote: 3}
-      - "tanky enough to facetank these all day"
-      - {line: "rushing {MOB} into a pile then brandish, so satisfying", emote: 2}
-      - {line: "no pots needed lol i just out-hp the whole map", emote: 3}
-      - {line: "big sword go thwack, dont overthink it", emote: 0}
-      - {line: "did a lil hp washing earlier, tanky as a wall now :)", emote: 2}
-      - {line: "power strike still hits like a truck, love this job", emote: 3}
-      - {line: "wading into {MOB} n just slash blastin away", emote: 0}
-      - {line: "my arms tired from swingin all day but cant stop", emote: 4}
-      - {line: "crusader advance soon, then the real grind starts", emote: 0}
-      - "spinning slash just melts groups of {MOB}s lol"
-      - "my gear's gettin better n my damage keeps scaling up"
-      - "warrior job makes grinding feel less like work"
-      - "one day ill be paladin but for now im just enjoyin warrior dmg"
-      - {line: "if ur not a warrior ur just doing it wrong", emote: 3}
-      - {line: "SLASH BLAST THE WHOLE PACK YESSS", emote: 2}
-      - "swing."
-      - "these mobs couldnt scratch me if they tried"
-      - {line: "hp so high i forgot what red looks like lol", emote: 3}
-      - "combo attack into the whole room, so clean"
-      - {line: "warrior tax is real, gear costs so much T_T", emote: 4}
-      - "just me and my sword against the world"
-      - {line: "rushing into {MOB} and just cleaving everything feels amazing", emote: 2}
-      - "gonna be a hero someday, literally, the job advance"
-      - {line: "warriors never retreat, we just advance forward... backwards", emote: 3}
-      - "wrist hurts from swinging so much, worth it"
-      - "sword builds are the only honest way to play this game"
-      - {line: "slashing through packs and feeling absolutely unstoppable", emote: 3}
-      - "warrior players built different, fight me"
-      - "defensive stance and just tanking it. warrior way."
-      - "not the flashiest class but the most satisfying to play honestly"
-      - {line: "if i have to see my hp go red ONE more time...", emote: 5}
-      - {line: "standing in the middle of {MOB} like a statue and just swinging, peak warrior", emote: 3}
-      - {line: "slashing {MOB} in half while tanking the hit, that's just class", emote: 3}
-      - {line: "{MOB} are falling so fast today, warriors were built for this", emote: 2}
-      - {line: "rush into {MOB} pack, slash blast, done. warriors make it look easy", emote: 3}
-      - {line: "taking hits from {MOB} and not even caring, high hp builds rule", emote: 0}
-      - {line: "{MOB} can barely dent me. warrior tax is worth it for this.", emote: 3}
-      - {line: "watching {MOB} bounce off my hp like nothing, warrior life is good", emote: 2}
+      - {line: "往怪堆中间一站就是砍 战士生活就是这么简单", emote: 3}
+      - "肉到能硬扛这些怪一整天"
+      - {line: "一个突进把{MOB}撞成一堆 然后群攻 解压", emote: 2}
+      - {line: "不需要药水 哈哈 我血量直接压过全图", emote: 3}
+      - {line: "大剑抡就完事了 别想太多", emote: 0}
+      - {line: "之前洗了点血 现在硬得跟墙一样 :)", emote: 2}
+      - {line: "强力攻击还是那么顶 我爱这职业", emote: 3}
+      - {line: "冲进{MOB}堆 一阵乱砍", emote: 0}
+      - {line: "抡了一整天 胳膊酸了 但停不下来", emote: 4}
+      - {line: "快能转骑士了 那才是真正的开始", emote: 0}
+      - "旋风斩一刀融化一片{MOB} 哈哈"
+      - "装备越来越好 伤害一直在涨"
+      - "战士刷怪就是没那么累"
+      - "总有一天我会成为圣骑士 不过现在先享受战士的伤害"
+      - {line: "不玩战士的 都玩不明白", emote: 3}
+      - {line: "群攻劈爆整波怪 耶耶耶", emote: 2}
+      - "抡。"
+      - "这些怪想挠我? 想都别想"
+      - {line: "血厚得我都忘了红血长啥样 哈哈", emote: 3}
+      - "连击打进整片房 干净利落"
+      - {line: "战士税是真的 装备贵得离谱 T_T", emote: 4}
+      - "就我和我的剑 与世界为敌"
+      - {line: "突进冲进{MOB}堆 一刀一片 爽翻了", emote: 2}
+      - "以后要当英雄 字面意思 就是那个转职"
+      - {line: "战士从不撤退 我们只会前进... 后退着前进", emote: 3}
+      - "抡多了手腕疼 值了"
+      - "剑系加点才是这游戏唯一的正道"
+      - {line: "劈穿一波又一波 感觉自己无人能挡", emote: 3}
+      - "战士玩家就是不一样 不服来辩"
+      - "开防御姿态 硬扛。战士之道。"
+      - "不是最炫的职业 但玩起来最带感"
+      - {line: "再让我看到红血一次...", emote: 5}
+      - {line: "站在{MOB}堆中间跟座雕像一样就是砍 这就是巅峰战士", emote: 3}
+      - {line: "扛着伤害把{MOB}劈成两半 这就是格调", emote: 3}
+      - {line: "今天{MOB}倒得飞快 战士就是为这而生的", emote: 2}
+      - {line: "突进冲进{MOB}堆 群攻 收工。战士让一切变简单", emote: 3}
+      - {line: "挨着{MOB}的揍还满不在乎 高血量加点yyds", emote: 0}
+      - {line: "{MOB}连我血皮都蹭不掉。就冲这个 战士税值了。", emote: 3}
+      - {line: "看着{MOB}打我血条纹丝不动 战士生活真不错", emote: 2}
     emote:
       - 3
       - 0
@@ -1831,45 +1831,45 @@ TrainingBot_Warrior:
 TrainingBot_Mage:
   Signature:
     text:
-      - {line: "one cast and the whole pack of {MOB} is gone, mage life", emote: 3}
-      - "low on mp again, brb sipping blue pots"
-      - {line: "teleport spam makes grinding so smooth ^^", emote: 2}
-      - {line: "blizzard the whole room then watch the exp roll in lol", emote: 3}
-      - "honestly one good aoe clears faster than my warrior friend swings twice"
-      - {line: "got jumped by {MOB} and nearly died, we mages r so squishy :(", emote: 4}
-      - "just finished mp washing, hp pool feels a lil better now"
-      - {line: "poison brace ticking away while i sip pots, comfy grind", emote: 0}
-      - {line: "thunderbolt go brrr, cant believe how fast this map melts", emote: 3}
-      - "wish i had a cleric friend grinding with me, healing would be so nice"
-      - "ice spear locks {MOB} while i pump spells, ez control"
-      - "poison ticking while i spam spells, f/p builds slap"
-      - "pots going down so fast, mp tax is crazy"
-      - "spells syncing perfect, that's the smooth mage grind"
-      - {line: "i could explain my build but ur brain would freeze. get it. i/l joke.", emote: 3}
-      - {line: "MP POTS COST MORE THAN MY RENT IN THIS GAME", emote: 5}
-      - "cast."
-      - {line: "MAGIC CLAW GOES BRRRRR", emote: 2}
-      - "teleporting makes every other class feel so slow honestly"
-      - {line: "one aoe and the whole platform is cleared, mage things ^^", emote: 3}
-      - {line: "out of mp AGAIN how is this possible", emote: 5}
-      - "INT gear is so hard to scroll ugh"
-      - {line: "meditation buff then straight to blasting {MOB}", emote: 0}
-      - "squishy but powerful, thats the mage way"
-      - "mp pots are my whole personality at this point"
-      - {line: "i teleport so much my legs forgot how to walk normally", emote: 3}
-      - "AoE clears are so satisfying, no other way to say it"
-      - "being squishy means nothing when u can clear a room in one cast"
-      - {line: "mages age so badly until they don't, and then they don't", emote: 0}
-      - "sometimes i drink so many blue pots i forget what hp pots look like"
-      - "teleport spam is the closest this game has to flight and i love it"
-      - {line: "people say mage is squishy. people have never seen my cast speed.", emote: 3}
-      - {line: "whole pack of {MOB} gone in two casts, mage things ^^", emote: 3}
-      - {line: "cleared the whole {MOB} spawn before the first one could even move lol", emote: 3}
-      - {line: "watching {MOB} get frozen mid-charge is never not funny", emote: 3}
-      - {line: "AoE on {MOB} and they just... cease to exist. beautiful.", emote: 3}
-      - {line: "i am running low on mp from blasting {MOB} but do i stop? no", emote: 5}
-      - {line: "teleport past {MOB}, cast behind them, they don't even know what happened", emote: 3}
-      - {line: "{MOB} sees me and doesn't realize the cast is already going lol", emote: 3}
+      - {line: "一发技能 整片{MOB}全没了 这就是法师", emote: 3}
+      - "蓝又见底了 先去灌几瓶蓝药"
+      - {line: "瞬移连发让刷怪丝般顺滑 ^^", emote: 2}
+      - {line: "暴风雪清场 然后坐看经验进账 哈哈", emote: 3}
+      - "说实话 一个aoe清得比我战士朋友挥两下还快"
+      - {line: "被{MOB}围殴 差点人没了 我们法师是真的脆 :(", emote: 4}
+      - "刚洗完蓝 血池终于好点了"
+      - {line: "毒雾慢慢跳伤害 我喝着药 舒服刷怪", emote: 0}
+      - {line: "雷电术biu biu biu 这图融化得也太快了", emote: 3}
+      - "真希望有个牧师朋友陪我刷 加血不要太香"
+      - "冰冻术定住{MOB} 我狂丢技能 稳稳控场"
+      - "毒在跳 技能在甩 f/p加点太顶了"
+      - "药水烧得太快了 蓝药税吓人"
+      - "技能衔接完美 这就是丝滑法师刷法"
+      - {line: "我可以给你讲我的加点 但你脑子会冻住。懂了没。冰雷梗。", emote: 3}
+      - {line: "蓝药比我现实房租还贵", emote: 5}
+      - "施法。"
+      - {line: "魔法双击biu biu biu", emote: 2}
+      - "瞬移一用 其他职业都显得好慢"
+      - {line: "一个aoe清空整条平台 法师日常 ^^", emote: 3}
+      - {line: "蓝又空了 这怎么可能", emote: 5}
+      - "智力装备砸卷也太难了 哎"
+      - {line: "冥想buff一上 直接开轰{MOB}", emote: 0}
+      - "脆但强 这就是法师之道"
+      - "蓝药现在就是我的人设了"
+      - {line: "瞬移多了 我的腿都忘了怎么正常走路", emote: 3}
+      - "aoe清场有多爽 没法形容"
+      - "只要一发技能就能清房 脆点又怎样"
+      - {line: "法师前期坐牢 熬出头之后... 那就不是坐牢了", emote: 0}
+      - "有时候蓝药喝太多 我都忘了红药长啥样"
+      - "瞬移连发是这游戏里最接近飞行的东西 我爱死了"
+      - {line: "有人说法师脆。那是他们没见过我的施法速度。", emote: 3}
+      - {line: "两发技能清光整片{MOB} 法师日常 ^^", emote: 3}
+      - {line: "第一只{MOB}还没来得及动 整片刷怪点就没了 哈哈", emote: 3}
+      - {line: "看着{MOB}冲锋中被冻在半空 永远那么好笑", emote: 3}
+      - {line: "对{MOB}放个aoe 它们就... 直接蒸发了。漂亮。", emote: 3}
+      - {line: "轰{MOB}轰得蓝见底了 但我会停吗? 不会", emote: 5}
+      - {line: "瞬移越过{MOB} 背后施法 它们都不知道发生了什么", emote: 3}
+      - {line: "{MOB}看见了我 却不知道技能已经出手了 哈哈", emote: 3}
     emote:
       - 3
       - 0
@@ -1879,45 +1879,45 @@ TrainingBot_Mage:
 TrainingBot_Thief:
   Signature:
     text:
-      - {line: "crit after crit on {MOB}, lucky seven goes brr", emote: 3}
-      - "stars are so expensive, half my mesos gone"
-      - {line: "dodged every hit, avoid build is the way ^^", emote: 2}
-      - {line: "savage blow just shredded that {MOB}, claw life", emote: 3}
-      - "down to my last few stars again, gotta hit the shop soon :("
-      - {line: "haste on and im zoomin past everything lol", emote: 0}
-      - {line: "no crits this whole pull, my luck ran out", emote: 4}
-      - {line: "drain keeps me topped off, bandit grind is so chill", emote: 0}
-      - {line: "stars flyin everywhere, this {MOB} never stood a chance", emote: 3}
-      - "ilbis cost more than they kill some days, my wallet hurts"
-      - "back to back crits, feeling lucky"
-      - "evasion working overtime, {MOB} is whiffing hard"
-      - "throwing stars are eating my mesos"
-      - "claw attacks hit way harder than expected"
-      - {line: "every hit is a crit when ur this good", emote: 3}
-      - {line: "CRIT CRIT CRIT LETS GOOO", emote: 2}
+      - {line: "打{MOB}刀刀暴击 双飞斩biu biu biu", emote: 3}
+      - "飞镖也太贵了 一半金币没了"
+      - {line: "全闪避 闪避流才是正解 ^^", emote: 2}
+      - {line: "六连斩直接把那只{MOB}撕了 拳套流人生", emote: 3}
+      - "飞镖又快见底了 得去趟商店 :("
+      - {line: "加速一开 我嗖嗖地掠过一切 哈哈", emote: 0}
+      - {line: "这波一个暴击都没有 运气用完了", emote: 4}
+      - {line: "吸血保持满血 侠盗刷怪太安逸了", emote: 0}
+      - {line: "飞镖满天飞 这只{MOB}根本没机会", emote: 3}
+      - "金钱镖比它杀死的怪还贵 我钱包在哭"
+      - "暴击连连 感觉来了"
+      - "闪避疯狂工作 {MOB}全在打空气"
+      - "飞镖在啃我的金币"
+      - "拳套打人比想象中疼"
+      - {line: "技术到位 刀刀暴击", emote: 3}
+      - {line: "暴击暴击暴击 冲鸭", emote: 2}
       - "..."
-      - {line: "STAR PRICES ARE A CRIME AGAINST THIEVES EVERYWHERE", emote: 5}
-      - {line: "dodge dodge dodge, cant touch this ^^", emote: 3}
-      - "luk build pays off when u see those crit numbers"
-      - {line: "just restocked on steelys, wallet is crying T_T", emote: 4}
-      - "assassinate would be so nice, cant wait for 4th job"
-      - {line: "flash jumped right past that {MOB}, clean", emote: 2}
-      - "dark sight saved me again, best skill in the game"
-      - "if i crit i win, and i usually crit"
-      - {line: "dark sight is the best passive in the game and i will die on this hill", emote: 3}
-      - "every star thrown is a statement"
-      - "the dodge rate on this build is genuinely absurd, i love it"
-      - {line: "assassin life is just counting ur stars n hoping for crits lol", emote: 3}
-      - "thieves clear FAST when it all clicks"
-      - "luk is the real stat, convince me otherwise"
-      - {line: "my star pouch is empty again. already. every time.", emote: 4}
-      - {line: "flash jump over {MOB}, claw on the way down, ez clear", emote: 3}
-      - {line: "stars into {MOB} from across the platform, clean as always", emote: 3}
-      - {line: "every {MOB} i dodge makes the whole build feel worth it", emote: 2}
-      - {line: "crit on {MOB} and the number was HUGE, heart skipped lol", emote: 2}
-      - {line: "haste active, zoomed past {MOB} without taking a single hit", emote: 3}
-      - {line: "dark sight thru the {MOB} spawn, they dont even notice me lol", emote: 3}
-      - {line: "{MOB} aggros me and i just dodge the whole thing, thief builds are so fun", emote: 2}
+      - {line: "飞镖价格是对全体飞侠的犯罪", emote: 5}
+      - {line: "闪避闪避闪避 你打不着我 ^^", emote: 3}
+      - "看到暴击数字的那一刻 运气加点值了"
+      - {line: "刚补完雪花镖 钱包在哭 T_T", emote: 4}
+      - "好想学一击必杀 等不及四转了"
+      - {line: "二段跳直接越过那只{MOB} 干净", emote: 2}
+      - "隐身术又救了我 这游戏最强技能"
+      - "我只要暴击就赢 而我基本都暴击"
+      - {line: "隐身术是这游戏最强被动 我死磕这个观点", emote: 3}
+      - "每扔一枚飞镖都是一次宣言"
+      - "这加点的闪避率高得离谱 我爱了"
+      - {line: "刺客人生就是数飞镖和盼暴击 哈哈", emote: 3}
+      - "飞侠状态对的时候 清怪快得飞起"
+      - "运气才是真属性 不信来辩"
+      - {line: "我的飞镖袋又空了。这么快。每次都这样。", emote: 4}
+      - {line: "二段跳越过{MOB} 下落中甩拳套 轻松清掉", emote: 3}
+      - {line: "隔着平台对{MOB}甩飞镖 一如既往的干净", emote: 3}
+      - {line: "每躲开一只{MOB} 这加点就值回票价", emote: 2}
+      - {line: "打{MOB}出了个超大的暴击数字 心都跳快了 哈哈", emote: 2}
+      - {line: "加速开启 掠过{MOB}身边 一滴血没掉", emote: 3}
+      - {line: "隐身穿过{MOB}刷怪点 它们压根没发现我 哈哈", emote: 3}
+      - {line: "{MOB}盯上我 结果全程被我闪避 飞侠加点太好玩了", emote: 2}
     emote:
       - 3
       - 0
@@ -1927,45 +1927,45 @@ TrainingBot_Thief:
 TrainingBot_Bowman:
   Signature:
     text:
-      - {line: "pick em off before they even reach me, range gang", emote: 3}
-      - "outta arrows again ugh, gotta restock"
-      - {line: "kiting {MOB} around the platform, never even got touched ^^", emote: 2}
-      - {line: "soul arrow on so i dont even gotta buy arrows for a bit lol", emote: 3}
-      - "spacing is everything, just strafe and they never land a hit"
-      - {line: "arrow rain into the whole pack, cleared the ledge in one go", emote: 3}
-      - "watching the sun come up while i pick off {MOB}, comfy grind"
-      - {line: "ran dry on arrows mid {MOB} pack, ugh classic", emote: 5}
-      - "eye of amazon makes this whole map feel so small lol"
-      - "just me n my bow up here, real chill night"
-      - "bow up high on this platform, they're so far below me lol"
-      - "arrows hit so clean from up here ^^"
-      - "mana's full, soul arrow's ticking, just vibing :)"
-      - "standing still and strafing, {MOB} can't keep up lol"
-      - {line: "why get close when u can snipe from across the map lol", emote: 3}
-      - {line: "HURRICANE MODE ACTIVATED LETS GO", emote: 2}
-      - "aim."
-      - {line: "I RAN OUT OF ARROWS MID-PULL THIS IS THE WORST DAY", emote: 5}
-      - {line: "sniping {MOB} from the top platform, they never see it coming ^^", emote: 3}
-      - "strafe kiting is an art form and i am the artist"
-      - {line: "soul arrow ran out, back to buying arrows T_T", emote: 4}
-      - "bowman life is so peaceful, just me and my bow up high"
-      - {line: "arrow rain on the whole pack of {MOB}, beautiful ^^", emote: 2}
-      - "DEX builds scale so well, best stat dont @ me"
-      - "range is everything, close range is for people who like getting hit"
-      - {line: "soul arrow on, arrows infinite, this is the life ^^", emote: 3}
-      - "positioning is the unspoken core mechanic of bowman and i mastered it"
-      - "the platform up top is mine. has always been mine."
-      - {line: "every shot counts when ur a bowman, love the precision", emote: 2}
-      - "dex stat scaling is the cleanest curve in the game honestly"
-      - "running out of arrows mid-pull is a bowman rite of passage"
-      - {line: "i could stand here all day and never take a hit, range solves everything", emote: 3}
-      - {line: "kiting {MOB} along the ledge while they cant reach me, perfection", emote: 3}
-      - {line: "arrow rain on the {MOB} pack, watched the whole platform clear", emote: 3}
-      - {line: "sniping {MOB} before they even spawn fully, range advantage is real", emote: 3}
-      - {line: "{MOB} never even gets close enough to hit me, bowman moment", emote: 3}
-      - {line: "strafe kiting {MOB} around the whole platform, not a scratch taken", emote: 2}
-      - {line: "eye of amazon up, watching {MOB} from the other side of the map lol", emote: 3}
-      - {line: "hurricane into the {MOB} pack, they never stood a chance ^^", emote: 2}
+      - {line: "怪还没摸到我 就被我点没了 远程帮集合", emote: 3}
+      - "箭又用完了 哎 得补货"
+      - {line: "拉着{MOB}在平台上周旋 一下都没被摸到 ^^", emote: 2}
+      - {line: "无形箭一开 暂时不用买箭了 哈哈", emote: 3}
+      - "走位就是一切 平移射击 它们根本打不中"
+      - {line: "箭雨洒进整波怪 一下清空平台", emote: 3}
+      - "看着日出点射{MOB} 舒服的刷怪时光"
+      - {line: "刷{MOB}刷到一半没箭了 哎 经典", emote: 5}
+      - "亚马逊之眼一开 整张图都显得好小 哈哈"
+      - "就我和我的弓待在高处 安静的夜晚"
+      - "站在高台上拉弓 它们在下面好远 哈哈"
+      - "从上面射箭 命中干净利落 ^^"
+      - "蓝满着 无形箭在跳 就很惬意 :)"
+      - "站桩平移射击 {MOB}根本追不上 哈哈"
+      - {line: "能在图对面狙击 为啥要近身 哈哈", emote: 3}
+      - {line: "暴风箭雨模式启动 冲鸭", emote: 2}
+      - "瞄准。"
+      - {line: "刷到一半没箭了 这是最糟的一天", emote: 5}
+      - {line: "从顶层平台狙{MOB} 它们永远不知道谁开的火 ^^", emote: 3}
+      - "风筝走位是一门艺术 而我是艺术家"
+      - {line: "无形箭到点了 又得回去买箭 T_T", emote: 4}
+      - "弓箭手生活真安逸 就我和我的弓待在高处"
+      - {line: "箭雨洒满整片{MOB} 漂亮 ^^", emote: 2}
+      - "敏捷加点成长曲线太顶了 最强属性 别来杠我"
+      - "射程就是一切 近身是留给喜欢挨打的人的"
+      - {line: "无形箭一开 箭用不完 这就是生活 ^^", emote: 3}
+      - "站位是弓箭手隐藏的核心机制 我已精通"
+      - "上面的平台是我的。一直都是。"
+      - {line: "对弓箭手来说 每一箭都要算 我喜欢这种精准", emote: 2}
+      - "说实话 敏捷属性的成长曲线是这游戏最干净的"
+      - "刷到一半没箭 是每个弓箭手的成人礼"
+      - {line: "我能在这站一整天都不挨打 射程解决一切", emote: 3}
+      - {line: "拉着{MOB}沿着平台边跑 它们够不着我 完美", emote: 3}
+      - {line: "箭雨洒向{MOB}群 看着整条平台被清空", emote: 3}
+      - {line: "{MOB}还没刷完就被我狙掉了 射程优势是真的", emote: 3}
+      - {line: "{MOB}根本近不了我的身 弓箭手时刻", emote: 3}
+      - {line: "风筝着{MOB}绕平台一圈 毫发无伤", emote: 2}
+      - {line: "亚马逊之眼一开 从图这头看着{MOB} 哈哈", emote: 3}
+      - {line: "暴风箭雨轰进{MOB}群 它们根本没机会 ^^", emote: 2}
     emote:
       - 3
       - 0

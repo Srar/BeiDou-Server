@@ -7,16 +7,16 @@ FollowerBot:
 
   FollowStart:
     text:
-      - {line: "right behind u {PLAYER_NAME}!", emote: 2}
-      - "lead the way, ill keep up"
-      - {line: "ok {PLAYER_NAME} where we headed?", emote: 2}
-      - "party time, im with u"
-      - {line: "dont walk too fast lol, short legs", emote: 6}
-      - "lets go lets go ^^"
-      - {line: "im sticking with u {PLAYER_NAME}, dont lose me", emote: 2}
-      - "following! this is way better than standing around town"
-      - "ooh adventure time"
-      - {line: "u pick the map, ill bring the vibes", emote: 3}
+      - {line: "紧跟在你后面{PLAYER_NAME}！", emote: 2}
+      - "你带路，我跟得上"
+      - {line: "好嘞{PLAYER_NAME}，咱们去哪？", emote: 2}
+      - "组队时间到，我跟定你了"
+      - {line: "别走太快啊哈哈，我腿短", emote: 6}
+      - "走走走 ^^"
+      - {line: "我跟着你{PLAYER_NAME}，别把我弄丢了", emote: 2}
+      - "跟上！比在城里干站着强多了"
+      - "哦豁，冒险时间到"
+      - {line: "你选图，我负责气氛", emote: 3}
     emote:
       - 2
       - 0
@@ -24,14 +24,14 @@ FollowerBot:
 
   StationHere:
     text:
-      - {line: "this map? looks good {PLAYER_NAME}, ill set up here", emote: 2}
-      - "ok! grinding time, ill hold this spot down"
-      - {line: "nice pick {PLAYER_NAME}, mobs everywhere, lets farm", emote: 2}
-      - "alright im clocking in, lets get this exp"
-      - {line: "settling in here then, dont mind my ksing lol", emote: 3}
-      - "good spot. pots ready. lets grind ^^"
-      - {line: "here? perfect, i was getting tired of walking anyway", emote: 2}
-      - "deal, ill start clearing, u take whatever side u want"
+      - {line: "就这张图？不错啊{PLAYER_NAME}，我在这开刷", emote: 2}
+      - "好！开练，这位置我占着了"
+      - {line: "选得好{PLAYER_NAME}，怪到处都是，刷起来", emote: 2}
+      - "行了开工，经验我来了"
+      - {line: "那我就在这扎营了，别介意我抢怪啊哈哈", emote: 3}
+      - "好地方。药备好了。开刷 ^^"
+      - {line: "就这？完美，反正我也走累了", emote: 2}
+      - "成交，我开清怪，你随便挑一边"
     emote:
       - 2
       - 3
@@ -39,14 +39,14 @@ FollowerBot:
 
   LeaderLost:
     text:
-      - "uh... hello? where'd u go"
-      - {line: "wait- did i just lose them??", emote: 6}
-      - "hmm they were JUST here"
-      - "ill wait here a bit i guess..."
-      - {line: "great, separated. classic me.", emote: 7}
-      - "maybe they went to change channels or smth"
-      - "hellooo? anyone?"
-      - {line: "ok dont panic, they'll be back... right?", emote: 6}
+      - "呃...人呢？你跑哪去了"
+      - {line: "等等，我把人跟丢了？？", emote: 6}
+      - "嗯...他们刚刚明明还在这"
+      - "那我就在这等会儿吧..."
+      - {line: "好嘛，走散了。不愧是我。", emote: 7}
+      - "说不定是换频道了"
+      - "喂喂？有人吗？"
+      - {line: "别慌别慌，他们会回来的...吧？", emote: 6}
     emote:
       - 6
       - 0
@@ -54,14 +54,14 @@ FollowerBot:
 
   PartyFarewell:
     text:
-      - "guess the party's over, was fun tho"
-      - {line: "aw, solo life again", emote: 4}
-      - "ok! good runs everyone, cya around"
-      - "welp, back to my own grind i guess"
-      - {line: "party disbanded huh... it was nice while it lasted", emote: 4}
-      - "gl out there! ill manage on my own ^^"
-      - "no party no problem, ive got mobs to hit"
-      - {line: "and just like that im a free agent again", emote: 0}
+      - "看来队伍散伙了，不过玩得挺开心"
+      - {line: "唉，又要单刷了", emote: 4}
+      - "好！大家辛苦，回见"
+      - "算了，回去刷我自己的吧"
+      - {line: "队伍解散了呀...好歹开心过", emote: 4}
+      - "祝你好运！我自己能行 ^^"
+      - "没队伍就没队伍，反正有怪打"
+      - {line: "一转眼我又成自由人了", emote: 0}
     emote:
       - 4
       - 0
@@ -69,12 +69,12 @@ FollowerBot:
 
   LoyalToLeader:
     text:
-      - "sry, im already with someone"
-      - {line: "cant, im {PLAYER_NAME}... wait no, im someone else's party lol", emote: 7}
-      - "im spoken for! party rules"
-      - {line: "ask my party leader, i just follow orders ^^", emote: 2}
-      - "loyal to the party, sry"
-      - "cant leave my crew hanging"
+      - "抱歉，我已经跟别人了"
+      - {line: "不行，我是{PLAYER_NAME}的...哦不对，我是别人队里的哈哈", emote: 7}
+      - "我有主了！队伍规矩"
+      - {line: "问我队长，我只管听指挥 ^^", emote: 2}
+      - "对队伍要忠心，抱歉啦"
+      - "不能把自家兄弟晾着"
     emote:
       - 0
       - 2
@@ -82,12 +82,12 @@ FollowerBot:
 
   NoMobsHere:
     text:
-      - "train HERE? theres nothing to fight lol"
-      - {line: "uh... i dont see any mobs {PLAYER_NAME}", emote: 6}
-      - "id love to but the mobs said no (theres none)"
-      - "find us a map with actual monsters first ^^"
-      - {line: "swing at what exactly? the air?", emote: 3}
-      - "no mobs no grind, lead on"
+      - "在这练级？这连个怪都没有哈哈"
+      - {line: "呃...{PLAYER_NAME}，这没怪啊", emote: 6}
+      - "我倒是想刷，可怪不答应（压根没有）"
+      - "先找张真有怪的地图吧 ^^"
+      - {line: "打啥？打空气吗？", emote: 3}
+      - "没怪刷个啥，接着走吧"
     emote:
       - 6
       - 3
@@ -95,12 +95,12 @@ FollowerBot:
 
   Goodbye:
     text:
-      - "ok! ill keep following"
-      - {line: "cya, im right behind u anyway lol", emote: 2}
-      - "np, lead on"
-      - "alright, onward ^^"
-      - {line: "ok {PLAYER_NAME}, just say the word when u find a spot", emote: 2}
-      - "got it, still tagging along"
+      - "好！我继续跟着"
+      - {line: "回见，反正我就跟在你后面哈哈", emote: 2}
+      - "没事，你带路"
+      - "好嘞，继续走 ^^"
+      - {line: "好{PLAYER_NAME}，找到位置说一声", emote: 2}
+      - "收到，我还跟着呢"
     emote:
       - 2
       - 0
@@ -108,12 +108,12 @@ FollowerBot:
 
   PartyJoined:
     text:
-      - "party accepted! now we're official ^^"
-      - {line: "joined ur party {PLAYER_NAME}, now the exp flows", emote: 2}
-      - "in! ok now take me somewhere good"
-      - {line: "officially partied up with {PLAYER_NAME}, lets go", emote: 2}
-      - "accepted, we're a real party now hehe"
-      - "party get! lead on"
+      - "队伍进了！现在咱们是一伙的 ^^"
+      - {line: "进了你的队伍{PLAYER_NAME}，经验哗哗来", emote: 2}
+      - "进了！快带我去个好地方"
+      - {line: "正式和{PLAYER_NAME}组上队了，走起", emote: 2}
+      - "接受了，咱现在可是正经队伍了嘿嘿"
+      - "组上了！带路吧"
     emote:
       - 2
     wait: 1

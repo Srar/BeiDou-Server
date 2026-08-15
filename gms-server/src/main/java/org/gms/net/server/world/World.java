@@ -1752,7 +1752,13 @@ public class World {
     }
 
     public void runPlayerHpDecreaseSchedule() {
-        Map<Character, Integer> m = new HashMap<>(playerHpDec);
+        // playerHpDec 是 synchronizedMap(WeakHashMap)：拷贝构造器绕过包装器的互斥锁，
+        // 直接迭代底层 WeakHashMap——并发 putIfAbsent/remove（bot 批量上线下线）会抛
+        // ConcurrentModificationException。快照拷贝必须在同一互斥锁下完成。
+        Map<Character, Integer> m;
+        synchronized (playerHpDec) {
+            m = new HashMap<>(playerHpDec);
+        }
 
         for (Entry<Character, Integer> e : m.entrySet()) {
             Character chr = e.getKey();

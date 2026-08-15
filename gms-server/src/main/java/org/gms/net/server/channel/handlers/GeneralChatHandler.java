@@ -27,9 +27,12 @@ import org.gms.client.autoban.AutobanFactory;
 import org.gms.client.command.CommandsExecutor;
 import org.gms.net.AbstractPacketHandler;
 import org.gms.net.packet.InPacket;
+import org.gms.server.bot.BotHelpers;
 import org.gms.server.bot.buffrequest.BotBuffRequestHandler;
 import org.gms.server.bot.event.BotEventBus;
 import org.gms.server.bot.event.GameEvent;
+import org.gms.server.bot.messaging.ChatMessage;
+import org.gms.server.bot.messaging.MessageQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.gms.server.ChatLogger;
@@ -72,11 +75,21 @@ public final class GeneralChatHandler extends AbstractPacketHandler {
 
             chr.getAutoBanManager().spam(7);
 
-            // Bot 框架：非隐藏玩家的聊天发布 CHAT 事件，供同图 bot 在自身 tick 内应答。
+            // Bot 框架：非隐藏且非 bot 玩家的聊天发布 CHAT 事件，供同图 bot 在自身 tick 内应答。
             // 放在 spam(7) 之后：订阅者异常（理论上总线契约禁止）也不会跳过反刷屏计数。
             // 隐身 GM 的发言只对 GM 可见，不进 bot 事件流（否则 bot 公开应答会暴露 GM 隐身）。
             if (!chr.isHidden()) {
-                BotEventBus.getInstance().publish(GameEvent.chat(chr.getWorld(), chr.getClient().getChannel(), chr.getMapId(), chr.getId(), s));
+                // bot 聊天不回喂：CHAT 事件与 primary 队列都不接收 bot 自己的聊天
+                //（防 bot 互相点名循环；与下方 tryHandle 内部的 isBot 守卫一致）。
+                if (!BotHelpers.isBot(chr)) {
+                    BotEventBus.getInstance().publish(GameEvent.chat(chr.getWorld(), chr.getClient().getChannel(), chr.getMapId(), chr.getId(), s));
+                    // 聊天点名链路接线（修复）：Dispatcher 每 2s 轮询 primary 队列做「消息含 bot 名字」
+                    // 的点名匹配——SocialBot 对话菜单 / TrainingBot 菜单 / FollowerBot "train here" 转职
+                    // / 黑杰克 join 等全部依赖此队列。此前 primary 队列无任何生产者、CHAT 事件又无
+                    // 订阅者，聊天点名交互整体断线。CHAT 事件与 primary 队列双轨并存：事件供未来
+                    // 订阅者，队列驱动现有 Dispatcher 点名链路。
+                    MessageQueue.getInstance().addMessage("primary", new ChatMessage(chr, s));
+                }
                 // 求 buff 入口：对齐 SoloMapling 源（普通聊天分支，事件/队列处理之后再 tryHandle）。
                 // tryHandle 内部已有 isBot 守卫（bot 聊天永不回喂）；此处与 CHAT 事件同处 !isHidden 分支，
                 // 保证隐身 GM 发言不触发 bot 反应（bot 公开 emote/气泡会暴露 GM 隐身）。

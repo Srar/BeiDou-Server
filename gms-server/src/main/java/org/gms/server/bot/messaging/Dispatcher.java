@@ -4,10 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.gms.client.Character;
 import org.gms.server.TimerManager;
 import org.gms.server.bot.BotExecutors;
+import org.gms.server.bot.BotHelpers;
 import org.gms.server.bot.BotSM;
 import org.gms.server.bot.BotStorage;
 import org.gms.server.bot.types.SocialBot;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -42,31 +44,48 @@ public class Dispatcher implements Runnable {
         processMessages();
     }
 
+    // 单轮处理上限：drain 循环防止高峰点名消息积压后被 QueueCleaner（primary 10s 过期）误删，
+    // 但每 2s 轮询周期内不能无限取消息——过载会饿死 TimerManager 共享线程。
+    // 达到上限本轮停止，剩余消息下轮继续。
+    private static final int MAX_MESSAGES_PER_ROUND = 64;
+
     private void processMessages() {
-        try {
-            ChatMessage message = messageQueue.getMessageNonBlocking("primary");
-            if (message == null) {
-                return;
-            }
-            Collection<Character> chars_on_map = message.getMap().getCharacters();
-            final int[] botToCall = new int[1];  // Using an array to hold the bot ID
+        // drain 循环：原实现每轮只 poll 1 条，而 QueueCleaner 每 2s 也会清理过期消息，
+        // 高峰时 primary 队列消息积压速度超过消费速度 → 点名消息被 10s 过期误删。
+        int processed = 0;
+        while (processed++ < MAX_MESSAGES_PER_ROUND) {
+            try {
+                ChatMessage message = messageQueue.getMessageNonBlocking("primary");
+                if (message == null) {
+                    return;
+                }
+                // 快照拷贝：防遍历期间玩家进图/离图与 getCharacters 并发修改抛 CME
+                //（对齐 BotSM.checkMainPlayersOnMap 的既有做法）。
+                Collection<Character> chars_on_map = new ArrayList<>(message.getMap().getCharacters());
+                final int[] botToCall = new int[1];  // Using an array to hold the bot ID
 
-            boolean characterFound = checkIfCharacterOnMap(chars_on_map, message, botToCall);
+                boolean characterFound = checkIfCharacterOnMap(chars_on_map, message, botToCall);
 
-            // Determine if the message is for any registered bot
-            if (characterFound) {
-                handleBotRunning(botToCall, message);
-            } else {
-                handleMessageWithNoBotName(message);
+                // Determine if the message is for any registered bot
+                if (characterFound) {
+                    handleBotRunning(botToCall, message);
+                } else {
+                    handleMessageWithNoBotName(message);
+                }
+            } catch (Exception e) {
+                log.warn("Dispatcher.processMessages error", e);
             }
-        } catch (Exception e) {
-            log.warn("Dispatcher.processMessages error", e);
         }
     }
 
     private boolean checkIfCharacterOnMap(Collection<Character> chars_on_map, ChatMessage message, int[] botToCall) {
         boolean characterFound = false;
         for (Character character : chars_on_map) {
+            // 候选过滤：只匹配已注册 bot——真人名 contains 命中后 getBotById 查无此 bot，
+            // 走 logBotNotFound 噪音且浪费一轮 async。isBot 双判据（区段 id + 注册表）过滤。
+            if (!BotHelpers.isBot(character)) {
+                continue;
+            }
             if (message.getContent().contains(character.getName())) {
                 if (!checkIfInvisibleBot(character.getId())) {
                     botToCall[0] = character.getId();
@@ -95,12 +114,26 @@ public class Dispatcher implements Runnable {
     }
 
     private void startNewBotSession(BotSM bot, ChatMessage message) {
+        // FINISHED 态的 bot 正在拆卸（掉线/交易完成路径），此时启动新会话会与拆卸流程冲突。
+        if (bot.getState() == BotSM.BotState.FINISHED) {
+            log.debug("Dispatcher: bot {} is FINISHED, skipping new session",
+                    bot.getChr() != null ? bot.getChr().getName() : "?");
+            return;
+        }
         log.info("Bot not running. Start scheduledTask line");
         bot.setRunning(true);
         bot.getInteractors().setRespondant(message.getSender());
         bot.startScheduledTask();
         if (bot instanceof SocialBot socialBot) {
             socialBot.onFirstInteraction(message.getSender());
+        } else {
+            // 非 SocialBot（FollowerBot/TrainingBot/BlackjackDealerBot 等）无 onFirstInteraction：
+            // 此前只 setRunning + setRespondant + startScheduledTask，玩家收不到任何菜单反馈；
+            // 后续关键词走 secondary 而这些 bot 不读 secondary → 首点名死路。
+            // 对齐 handleExistingBotSession 非 Social 分支：setInquirer + listOptions 弹菜单
+            //（listOptions 内部走 displayCommands 弹菜单，玩家可见可点选项）。
+            bot.getInteractors().setInquirer(message.getSender());
+            bot.getDialogueHandler().listOptions(message.getSender(), bot);
         }
     }
 
@@ -118,6 +151,11 @@ public class Dispatcher implements Runnable {
         // follow-up would have arrived — BotOptionMenu.poll drains it on the bot's next tick with the same
         // trim/lowercase/contains matcher. The menu is already active (listOptions ran synchronously above),
         // and a non-matching remainder ("yo Tiger") falls through harmlessly like a junk follow-up would.
+        // bot.getChr() 可能为 null（拆卸过程中角色已销毁）：跳过 remainder 逻辑，防 NPE 中断本轮 poll。
+        if (bot.getChr() == null) {
+            log.debug("Dispatcher: bot chr is null, skipping remainder enqueue");
+            return;
+        }
         String remainder = message.getContent().replace(bot.getChr().getName(), "").trim();
         if (!remainder.isEmpty()) {
             messageQueue.addMessage("tertiary", new ChatMessage(message.getSender(), remainder));
@@ -127,7 +165,21 @@ public class Dispatcher implements Runnable {
 
     private void handleSocialBotSession(SocialBot socialBot, ChatMessage message) {
         if (socialBot.hasActiveRespondant()) {
-            log.info("[Dispatcher] SocialBot busy, ignoring second player");
+            // busy 不丢消息：strip bot 名后的非空 remainder 入 secondary 队列，由会话 bot 在其
+            // tick 内消费（SocialBot.processMessages 轮询 secondary，且 sender == respondant 才
+            // 处理，恰是当前会话玩家）。remainder 为空则维持原状直接 return。
+            Character botChr = socialBot.getChr();
+            if (botChr == null) {
+                log.info("[Dispatcher] SocialBot busy, bot chr gone, dropping");
+                return;
+            }
+            String remainder = message.getContent().replace(botChr.getName(), "").trim();
+            if (!remainder.isEmpty()) {
+                log.info("[Dispatcher] SocialBot busy, queuing remainder to secondary");
+                messageQueue.addMessage("secondary", new ChatMessage(message.getSender(), remainder));
+            } else {
+                log.info("[Dispatcher] SocialBot busy, ignoring second player");
+            }
             return;
         }
         log.info("[Dispatcher] SocialBot available, setting respondant");

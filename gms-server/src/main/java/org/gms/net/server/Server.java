@@ -62,6 +62,7 @@ import org.gms.server.TimerManager;
 import org.gms.server.bot.BotTickService;
 import org.gms.server.bot.BotTypeManager;
 import org.gms.server.bot.decorate.BotDecorationQueue;
+import org.gms.server.bot.environment.EnvironmentManager;
 import org.gms.server.bot.gcmove.GCMovement;
 import org.gms.server.bot.itempool.DesirableEquipList;
 import org.gms.server.bot.itempool.EquipMetadataCache;
@@ -1696,6 +1697,9 @@ public class Server {
         runShutdownHook("BotDecorationQueue.stop", BotDecorationQueue::stop);
         runShutdownHook("GCMovement.shutdown", GCMovement::shutdown);
         runShutdownHook("TrainingBot.resetCombatTicker", TrainingBot::resetCombatTicker);
+        // 审计修正（m2）：复位 loadenv 防重复 guard——in-place 重启（restart=true 走 getInstance().init()）
+        // 后 bot 全部销毁、世界重开，guard 不复位则重启后的 spawn_on_startup 环境模式会静默跳过 9 波。
+        runShutdownHook("EnvironmentManager.resetForShutdown", EnvironmentManager::resetForShutdown);
 
         TimerManager.getInstance().purge();
         TimerManager.getInstance().stop();

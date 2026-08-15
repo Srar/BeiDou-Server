@@ -2528,7 +2528,14 @@ final class BotPhysicsEngine {
         if (map == null) {
             return null;
         }
-        if (map.getFootholds() == null || collisionIndex(map) == UNINDEXABLE) {
+        if (map.getFootholds() == null) {
+            // 停机竞态：服务器关停时 MapleMap.dispose 把 footholds 置 null，而导航图 warm 线程池
+            // 的积压任务仍在对已销毁地图查询地面。原实现把它当「stubbed map」走
+            // map.getPointBelow 原始路径，反而在 calcPointBelow 里直接 NPE（footholds.findBelow）。
+            // 地图已无地面数据，正确语义就是「无地面点」。
+            return null;
+        }
+        if (collisionIndex(map) == UNINDEXABLE) {
             return map.getPointBelow(initial); // stubbed map/tree — original query path
         }
         Foothold fh = findBelowIndexed(map, initial);

@@ -4,11 +4,14 @@ import org.gms.client.Character;
 import org.gms.client.Client;
 import org.gms.client.command.Command;
 import org.gms.constants.id.NpcId;
+import org.gms.server.bot.BotDebugHandler;
 import org.gms.server.bot.BotExecutors;
+import org.gms.server.bot.BotGeneration;
 import org.gms.server.bot.BotHelpers;
 import org.gms.server.bot.BotSM;
 import org.gms.server.bot.BotSpotClaims;
 import org.gms.server.bot.BotStorage;
+import org.gms.server.bot.BotTickService;
 import org.gms.server.bot.DefaultBotServerAccess;
 import org.gms.server.bot.commands.SocialCommands;
 import org.gms.server.bot.dialogue.BotChatter;
@@ -217,10 +220,15 @@ public class EnvironmentCommand extends Command {
         switch (input.toLowerCase()) {
             case "help" -> printHelp(p);
             case "loadenv" -> {
-                p.yellowMessage("!env loadenv - 环境生成已启动（后台执行，日志可见进度）");
                 BotExecutors.runAsync(() -> {
                     try {
-                        EnvironmentManager.environmentLoadStartup();
+                        boolean started = EnvironmentManager.environmentLoadStartup();
+                        if (started) {
+                            p.yellowMessage("!env loadenv - 环境生成已启动（后台执行，日志可见进度）");
+                        } else {
+                            p.yellowMessage("!env loadenv - 环境已加载，本次跳过（累计已生成 " + BotGeneration.getBotsCreatedCount()
+                                    + " 个 bot；如需强制重跑用 !env loadenv force）");
+                        }
                     } catch (Throwable t) {
                         log.warn("[EnvironmentCommand] loadenv 后台生成失败", t);
                     }
@@ -332,6 +340,13 @@ public class EnvironmentCommand extends Command {
             case "grindprofile", "spotdump" -> dumpGrindProfile(p);
             case "perf" -> printPerfReport(p);
             case "navstatus" -> printNavStatus(p);
+            case "status" -> printStatus(p);
+            case "filelog" -> {
+                boolean next = !BotDebugHandler.isFileLoggingEnabled();
+                BotDebugHandler.setFileLoggingEnabled(next);
+                p.yellowMessage("botlog.txt file logging: " + (next ? "ON" : "OFF")
+                        + "（默认关闭以省磁盘 I/O；仅调试排障时开启）");
+            }
             default -> p.yellowMessage("Invalid command - Direct Command");
         }
     }
@@ -372,6 +387,22 @@ public class EnvironmentCommand extends Command {
             case "getallcharsonplatform", "getcharsonplatform" -> {
                 p.yellowMessage("getcharsonplatform: platform CSV system not ported; listing all bots on your map instead.");
                 listBotsOnMap(p);
+            }
+            case "loadenv" -> {
+                if (input2.equalsIgnoreCase("force")) {
+                    p.yellowMessage("!env loadenv force - 强制重跑环境生成（后台执行，日志可见进度）");
+                    // 审计修正（m1）：force 与普通 loadenv 一样后台执行——9 波生成耗时数十秒，
+                    // 不能在 GM 命令线程上同步阻塞。
+                    BotExecutors.runAsync(() -> {
+                        try {
+                            EnvironmentManager.forceEnvironmentLoad();
+                        } catch (Throwable t) {
+                            log.warn("[EnvironmentCommand] loadenv force 后台生成失败", t);
+                        }
+                    });
+                } else {
+                    p.yellowMessage("!env loadenv - 未知参数 '" + input2 + "'（仅支持 force）");
+                }
             }
             default -> p.yellowMessage("Invalid command - handleStringStringCommand");
         }
@@ -432,6 +463,17 @@ public class EnvironmentCommand extends Command {
                 LodCounts.fullMaps(), LodCounts.haloMaps(), LodCounts.activeMaps()));
     }
 
+    private static void printStatus(Character p) {
+        p.yellowMessage("---- !env status ----");
+        p.yellowMessage("environment loaded: " + EnvironmentManager.isEnvironmentLoaded());
+        p.yellowMessage("bots created (cumulative): " + BotGeneration.getBotsCreatedCount());
+        p.yellowMessage("active bots (BotStorage): " + BotStorage.getAllBots().size());
+        p.yellowMessage("tick service size: " + BotTickService.size());
+        p.yellowMessage("movement engine states: " + GCMovement.enabledCount());
+        int cores = Runtime.getRuntime().availableProcessors();
+        p.yellowMessage(String.format("cpu cores: %d   env scale: %.2f", cores, EnvironmentManager.environmentScale()));
+    }
+
     private static void printNavStatus(Character p) {
         // 世界图（可步行传送门连通图）就绪状态与已索引地图数；不触发构建。
         p.yellowMessage(String.format("world graph: ready=%s maps=%d",
@@ -476,8 +518,11 @@ public class EnvironmentCommand extends Command {
         p.yellowMessage("-- Diagnostics --");
         p.yellowMessage("!env perf                        - bot perf: counts, LOD, tiers");
         p.yellowMessage("!env navstatus                   - world/nav graph readiness + movement/observer/bot counts");
+        p.yellowMessage("!env status                      - env loaded flag, bot counts, tick/movement sizes, cores & scale");
+        p.yellowMessage("!env filelog                     - toggle botlog.txt file logging (off by default)");
         p.yellowMessage("-- World Startup --");
-        p.yellowMessage("!env loadenv                     - run full environment startup");
+        p.yellowMessage("!env loadenv                     - run full environment startup (skipped if already loaded)");
+        p.yellowMessage("!env loadenv force               - force full environment startup, ignoring the loaded guard");
         p.yellowMessage("-- FM Spawning --");
         p.yellowMessage("!env spawnfmbots                 - spawn FM entrance bots");
         p.yellowMessage("!env spawnmerchbots              - spawn merchant bots in FM entrance");

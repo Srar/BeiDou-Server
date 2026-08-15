@@ -3,6 +3,7 @@ package org.gms.server.bot.environment;
 import lombok.extern.slf4j.Slf4j;
 import org.gms.client.Character;
 import org.gms.client.Job;
+import org.gms.config.GameConfig;
 import org.gms.constants.id.MapId;
 import org.gms.constants.id.NpcId;
 import org.gms.server.bot.BotCustomization;
@@ -36,6 +37,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 /**
@@ -59,6 +61,10 @@ public final class EnvironmentManager {
 
     private static final Random random = new Random();
 
+    // gms 增强：防重复 loadenv guard。源实现（SoloMapling）无此 guard——在 spawn_on_startup=true
+    // 启动链已跑过一遍 9 波的情况下，手动 !env loadenv 会再跑一遍并把 bot 规模翻倍（2 核小机 CPU 全满）。
+    private static final AtomicBoolean ENV_LOADED = new AtomicBoolean(false);
+
     private static final int FM_ENTRANCE = 910000000;
     private static final int HENESYS = 100000000;
     private static final int HENESYS_MARKET = 100000100;
@@ -76,7 +82,57 @@ public final class EnvironmentManager {
 
     // ── 9 波环境启动 ────────────────────────────────────────────────────────
 
-    public static void environmentLoadStartup() {
+    /**
+     * @return true = 本次实际执行了 9 波生成；false = 已被防重复 guard 拦截（环境已加载过）
+     */
+    public static boolean environmentLoadStartup() {
+        // gms 增强：源（SoloMapling）无防重复 guard。spawn_on_startup=true 时启动链已跑过一遍，
+        // 手动 !env loadenv 再来一遍会把 bot 规模翻倍（2 核小机直接 CPU 全满），此处用一次性开关挡住。
+        if (!ENV_LOADED.compareAndSet(false, true)) {
+            log.info("gms 增强：环境已加载，跳过重复 environmentLoadStartup（累计已生成 {} 个 bot；如需强制重跑用 !env loadenv force）",
+                    BotGeneration.getBotsCreatedCount());
+            return false;
+        }
+        try {
+            doEnvironmentLoadStartup();
+        } catch (Throwable t) {
+            // 审计修正（m3）：guard 先置位后执行——生成中途失败时复位 flag，否则永久跳过、
+            // 且 force 恢复会重跑 1-7 波造成重复生成。复位后下次 loadenv 可完整重试。
+            ENV_LOADED.set(false);
+            throw t;
+        }
+        return true;
+    }
+
+    /**
+     * 强制重跑完整环境生成：先置位 guard 再直接执行加载逻辑（跳过防重复检查）。
+     * 供 !env loadenv force 使用。
+     */
+    public static void forceEnvironmentLoad() {
+        ENV_LOADED.set(true);
+        log.info("gms 增强：forceEnvironmentLoad - 忽略已加载 guard，强制重跑环境生成");
+        doEnvironmentLoadStartup();
+    }
+
+    public static boolean isEnvironmentLoaded() {
+        return ENV_LOADED.get();
+    }
+
+    /** 供测试在 @AfterEach 复位防重复 guard（当前 src/test 无引用，保留给未来测试）。 */
+    static void resetEnvironmentForTest() {
+        ENV_LOADED.set(false);
+    }
+
+    /**
+     * 停机复位钩子（审计修正 m2）：in-place 重启（Server.doShutdownInternal → getInstance().init()）
+     * 后 bot 全部销毁、世界重开，ENV_LOADED 若不复位则 restart 的 spawn_on_startup 环境模式会
+     * 静默跳过 9 波生成（世界空无 bot）。由 Server 停机钩子链调用。
+     */
+    public static void resetForShutdown() {
+        ENV_LOADED.set(false);
+    }
+
+    private static void doEnvironmentLoadStartup() {
         long startupStart = System.currentTimeMillis();
 
         // 真人在场时唤醒 bot（移动 + 宏脑），双向：玩家进入有人图，或 bot 回到玩家图。
@@ -140,6 +196,20 @@ public final class EnvironmentManager {
                 () -> spawnMerchBotsBatch("m5", 2, 2, 1)
         ));
 
+        // gms 增强：低核机器上训练波（波 8 大头 ~2390 bot）按 scaleForCores() 缩放；
+        // 缩放生效时打印核数、scale 与调整后训练 bot 总数。
+        double envScale = scaleForCores();
+        if (envScale < 1.0) {
+            int rawTotal = 0;
+            int scaledTotal = 0;
+            for (int c : WAVE8_TRAINING_COUNTS) {
+                rawTotal += c;
+                scaledTotal += Math.max(1, (int) Math.round(c * envScale));
+            }
+            log.info("gms 增强：env 缩放生效 cores={} scale={} 训练 bot {} -> {}",
+                    Runtime.getRuntime().availableProcessors(), envScale, rawTotal, scaledTotal);
+        }
+
         runWave(8, "Training bots", List.of(
                 () -> GCMovement.mapsWithinHops(MapId.HENESYS, 1), // 预热一次 portal 图
                 () -> spawnTrainingBotsAt(MapId.LITH_HARBOUR, 20, 1, 15),
@@ -173,7 +243,43 @@ public final class EnvironmentManager {
         log.info("=== All bots initialized: {} bots in {}s ===", BotGeneration.getBotsCreatedCount(), String.format("%.1f", totalSeconds));
     }
 
+    // gms 增强：波 8 各 spawnTrainingBotsAt 调用的原始数量，与上方 runWave(8) 一一对应，
+    // 仅用于缩放生效时的日志统计；实际缩放发生在 spawnTrainingBotsAt 内部。
+    private static final int[] WAVE8_TRAINING_COUNTS = {
+            20, 225, 225, 225, 225, 225, 180, 220, 200, 160, 200, 200, 25, 20, 20, 20
+    };
+
+    /**
+     * gms 增强：按 CPU 核数缩放 bot 环境规模（SoloMapling 运行于高核机器，无此缩放）。
+     * 8+ 核 → 1.0；&lt;=2 核 → 0.25；3-7 核线性插值 0.25 + (cores-2)/6*0.75，结果钳制 [0.25, 1.0]。
+     * GameConfig 键 bot.env_scale（double，默认 -1 = 自动；键缺失时 getServerDouble 返回 0，等效自动；
+     * 显式 &gt;0 时直接用作缩放因子并钳制 [0.1, 1.0]）。
+     */
+    private static double scaleForCores() {
+        double configured = GameConfig.getServerDouble("bot.env_scale");
+        if (configured > 0) {
+            return Math.max(0.1, Math.min(1.0, configured));
+        }
+        int cores = Runtime.getRuntime().availableProcessors();
+        double scale;
+        if (cores >= 8) {
+            scale = 1.0;
+        } else if (cores <= 2) {
+            scale = 0.25;
+        } else {
+            scale = 0.25 + (cores - 2) / 6.0 * 0.75;
+        }
+        return Math.max(0.25, Math.min(1.0, scale));
+    }
+
+    /** public 访问器：当前生效的环境缩放因子（供 !env status 诊断）。 */
+    public static double environmentScale() {
+        return scaleForCores();
+    }
+
     private static int spawnTrainingBotsAt(int townMapId, int n, int loLevel, int hiLevel) {
+        // gms 增强：训练波按核数缩放（SoloMapling 无此缩放，其运行于高核机器）。
+        n = Math.max(1, (int) Math.round(n * scaleForCores()));
         MapleMap map = getMapleMapById(townMapId);
         Point sp = spawnPortal(map);
         if (map == null || sp == null) {
@@ -213,14 +319,19 @@ public final class EnvironmentManager {
     }
 
     public static void spawnTown(TownPresenceConfig.TownEntry town) {
+        // gms 增强：城镇人口同属大规模 spawn（波 9），入口统一计算 local scale 后缩放
+        // share.count() 与 wanderers（SoloMapling 无此缩放）。
+        double scale = scaleForCores();
         for (TownPresenceConfig.MapShare share : town.maps()) {
-            int n = spawnSocialCohort(share.mapId(), share.count(), town.levelLo(), town.levelHi());
+            int scaled = share.count() > 0 ? Math.max(1, (int) Math.round(share.count() * scale)) : 0;
+            int n = spawnSocialCohort(share.mapId(), scaled, town.levelLo(), town.levelHi());
             debugprint(fmt("TownPresence: {} social bots on map {} ({}, lv {}..{})",
                     n, share.mapId(), town.name(), town.levelLo(), town.levelHi()));
         }
         if (town.wanderers() > 0) {
-            int w = spawnTownWanderers(town.mainMapId(), town.wanderers(), town.levelLo(), town.levelHi());
-            debugprint(fmt("TownPresence: {} wanderers on map {} ({})", w, town.mainMapId(), town.name()));
+            int w = Math.max(1, (int) Math.round(town.wanderers() * scale));
+            int spawned = spawnTownWanderers(town.mainMapId(), w, town.levelLo(), town.levelHi());
+            debugprint(fmt("TownPresence: {} wanderers on map {} ({})", spawned, town.mainMapId(), town.name()));
         }
     }
 

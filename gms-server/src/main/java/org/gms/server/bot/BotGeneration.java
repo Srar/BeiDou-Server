@@ -15,7 +15,9 @@ import org.gms.util.Randomizer;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
@@ -45,6 +47,22 @@ public final class BotGeneration {
      * 初值 100 → 首个 bot = BOT_BASE_ID + 100。
      */
     private static final AtomicInteger currentBotCount = new AtomicInteger(100);
+
+    /**
+     * 本次运行已分配（曾用）的 bot IGN 集合，小写存储（F8 gms 增强）。
+     * <p>
+     * SoloMapling 源直接 {@code getRandomCharacterIGN()} 随机取名、不查重；
+     * gms 版为防 PlayerStorage 静默覆盖做了查重，但原实现每次查重都全量遍历
+     * 活跃 bot 注册表 + 存储查重，生成 N 个 bot 总代价 O(N²)——5000 bot 生成期
+     * CPU 尖峰来源之一。本集合把「已分配名字」判断降到 O(1)，遍历兜底仅在
+     * 集合未命中时执行（正常路径被短路）。
+     * <p>
+     * 释放路径：createBot 失败回滚（rollbackRegistration）与 removeBotFromServer 销毁。
+     * 若 bot 经其他路径被移除（直接调 BotStorage.removeActiveBot），名字条目会滞留；
+     * 名字空间为 i18n 随机池的组合，空间足够大且 nameInUse 的注册表兜底仍会拦截
+     * 真实冲突，少量滞留不影响唯一性，可接受。
+     */
+    private static final Set<String> ASSIGNED_BOT_NAMES = ConcurrentHashMap.newKeySet();
 
     private static volatile BotServerAccess serverAccess = DefaultBotServerAccess.INSTANCE;
 
@@ -154,7 +172,9 @@ public final class BotGeneration {
 
         bot.setClient(BotClientHolder.getBotClient(world, channel));
         bot.setId(botId);
-        bot.setName(randomUniqueBotName());
+        String botName = randomUniqueBotName();
+        bot.setName(botName);
+        ASSIGNED_BOT_NAMES.add(botName.toLowerCase(Locale.ROOT)); // F8 gms 增强：生成期 O(1) 查重
         bot.setFame(botId); // 调试标记：fame 值 == botId
         bot.setWorld(world);
         // 标记已进入频道世界：awayFromWorld 默认 true，不置 false 的话
@@ -167,7 +187,7 @@ public final class BotGeneration {
         } catch (RuntimeException e) {
             // 先把根因打进日志再回滚重抛——否则线上只会看到回滚警告而无从定位
             log.error(I18nUtil.getLogMessage("BotGeneration.bot.create.failed", botId), e);
-            rollbackRegistration(bot);
+            rollbackRegistration(bot, botName);
             throw e;
         }
 
@@ -186,8 +206,13 @@ public final class BotGeneration {
         return botId;
     }
 
-    /** createBot 失败补偿：清理已完成的注册（地图 → channel/world 存储）。 */
-    private static void rollbackRegistration(Character bot) {
+    /** createBot 失败补偿：清理已完成的注册（地图 → channel/world 存储）+ 释放已分配名字。 */
+    private static void rollbackRegistration(Character bot, String assignedName) {
+        // F8 gms 增强：回滚时释放本次分配的名字（名字在注册前已入集合，失败不得滞留）。
+        // 用传入的 assignedName 而非 bot.getName()：mock/半初始化角色可能读不回名字。
+        if (assignedName != null) {
+            ASSIGNED_BOT_NAMES.remove(assignedName.toLowerCase(Locale.ROOT));
+        }
         try {
             MapleMap current = bot.getMap();
             if (current != null) {
@@ -266,6 +291,11 @@ public final class BotGeneration {
         }
         serverAccess.removeBotFromServer(bot);
         BotStorage.removeActiveBot(bot.getId());
+        // F8 gms 增强：销毁即释放名字（判空容忍 mock/未命名角色）。
+        String botName = bot.getName();
+        if (botName != null) {
+            ASSIGNED_BOT_NAMES.remove(botName.toLowerCase(Locale.ROOT));
+        }
         log.info(I18nUtil.getLogMessage("BotGeneration.bot.removed", bot.getId()));
     }
 
@@ -294,8 +324,18 @@ public final class BotGeneration {
     }
 
     private static boolean nameInUse(String name) {
+        // F8 gms 增强：已分配名字集合 O(1) 短路。生成 N 个 bot 的查重总代价由此从
+        // O(N²)（每次遍历全部活跃 bot + 存储查重）降为 O(N)；源实现（SoloMapling）
+        // 不查重，本查重即 gms 增强，此处集合为 gms 侧进一步优化。
+        if (ASSIGNED_BOT_NAMES.contains(name.toLowerCase(Locale.ROOT))) {
+            return true;
+        }
+        // 兜底：注册表遍历 + 存储查重，覆盖集合遗漏窗口（外部直接注册的 bot、
+        // 真实玩家同名、集合滞留条目的最终裁决）。正常路径已被上方集合短路，
+        // 此分支仅偶发执行，成本可忽略。
         for (BotSM bot : BotStorage.getAllBots().values()) {
-            if (name.equalsIgnoreCase(bot.getChr().getName())) {
+            Character chr = bot.getChr();
+            if (chr != null && name.equalsIgnoreCase(chr.getName())) {
                 return true;
             }
         }

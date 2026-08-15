@@ -5557,6 +5557,12 @@ public class Character extends AbstractCharacterObject {
     }
 
     private void guildUpdate() {
+        // bot（内存构造、从不加载公会数据）与从未进过公会的角色 mgc 为 null：
+        // 解引用会 NPE 并中断 levelUp/怪物经验分发整条链（掉落、复活、广播全部丢失）。
+        // 无公会成员对象即无公会数据可更新，直接跳过。
+        if (mgc == null) {
+            return;
+        }
         mgc.setLevel(level);
         mgc.setJobId(job.getId());
 

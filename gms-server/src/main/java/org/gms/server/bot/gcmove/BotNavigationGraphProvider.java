@@ -414,8 +414,8 @@ final class BotNavigationGraphProvider {
     }
 
     static void warmGraphAsync(MapleMap map, BotMovementProfile movementProfile) {
-        if (map == null) {
-            return;
+        if (map == null || map.getFootholds() == null) {
+            return; // 停机窗口：地图已 dispose，无可 warm 的地面数据
         }
         movementProfile = canonicalProfile(map, movementProfile);
         GraphCacheKey key = GraphCacheKey.from(map.getId(), movementProfile);
@@ -451,6 +451,9 @@ final class BotNavigationGraphProvider {
     static BotNavigationGraph rebuildGraph(MapleMap map, BotMovementProfile movementProfile) {
         GraphCacheKey key = GraphCacheKey.from(map.getId(), movementProfile);
         BotNavigationGraph rebuilt = buildGraph(map, movementProfile);
+        if (rebuilt == null) {
+            return null; // 地图已 dispose（停机窗口）：不 put null 进 GRAPHS、不 saveGraph
+        }
         GRAPHS.put(key, rebuilt);
         CompletableFuture<BotNavigationGraph> pending = PENDING_GRAPHS.remove(key);
         if (pending != null) {
@@ -483,12 +486,21 @@ final class BotNavigationGraphProvider {
         Runnable task = () -> {
             try {
                 BotNavigationGraph graph = loadOrBuildGraph(map, movementProfile, key);
-                GRAPHS.put(key, graph);
+                if (graph != null) {
+                    GRAPHS.put(key, graph);
+                }
                 future.complete(graph);
             } catch (Throwable t) {
                 future.completeExceptionally(t);
-                log.warn("Failed to warm bot nav graph for map {} speed={} jump={}",
-                        key.mapId(), key.totalSpeedStat(), key.totalJumpStat(), t);
+                if (map == null || map.getFootholds() == null) {
+                    // 停机竞态：服务器关停时地图被 dispose（footholds 置 null），积压的 warm
+                    // 任务对已销毁地图必然失败——这是预期事件，debug 级静默，绝不刷屏。
+                    log.debug("Bot nav graph warm skipped for disposed map {} speed={} jump={}",
+                            key.mapId(), key.totalSpeedStat(), key.totalJumpStat());
+                } else {
+                    log.warn("Failed to warm bot nav graph for map {} speed={} jump={}",
+                            key.mapId(), key.totalSpeedStat(), key.totalJumpStat(), t);
+                }
             } finally {
                 PENDING_GRAPHS.remove(key, future);
             }
@@ -504,6 +516,22 @@ final class BotNavigationGraphProvider {
 
     private static ExecutorService selectWarmupExecutor(MapleMap map) {
         return isFastWarmupCandidate(map) ? FAST_GRAPH_WARMUP_EXECUTOR : GRAPH_WARMUP_EXECUTOR;
+    }
+
+    /**
+     * 停机钩子（gms 增强）：取消全部 pending 图构建。
+     * 服务器关停时地图被逐个 dispose（footholds 置 null），pending/排队中的 warm 任务对
+     * 已销毁地图执行会刷屏 NPE（见 pointBelowIndexed 防御注释）。此处把 pending 全部
+     * 取消（completeExceptionally），并依赖 buildGraph/pointBelowIndexed 的 null 防御 +
+     * 任务侧 debug 降噪消化已排队的残余任务——warm 池保持 static final 不被 shutdownNow，
+     * 避免 in-place 重启后池无法复用的 RejectedExecutionException（GCMovementDriver.POOL
+     * 同款既有遗留）。由 Server.doShutdownInternal 的 bot 钩子链调用。
+     */
+    public static void shutdown() {
+        PENDING_GRAPHS.forEach((key, future) ->
+                future.completeExceptionally(new java.util.concurrent.CancellationException(
+                        "server shutdown: nav graph warm canceled for map " + key.mapId())));
+        PENDING_GRAPHS.clear();
     }
 
     private static boolean isFastWarmupCandidate(MapleMap map) {
@@ -522,6 +550,11 @@ final class BotNavigationGraphProvider {
         }
 
         BotNavigationGraph built = buildGraph(map, movementProfile);
+        if (built == null) {
+            // 停机竞态：地图已 dispose（footholds 置 null），建图无意义——返回 null 让任务
+            // 静默跳过，不 saveGraph（其内部会解引用 graph.mapId）。
+            return null;
+        }
         saveGraph(built);
         return built;
     }
@@ -568,6 +601,11 @@ final class BotNavigationGraphProvider {
     }
 
     private static BotNavigationGraph buildGraph(MapleMap map, BotMovementProfile movementProfile) {
+        // 停机竞态防御：服务器关停时 MapleMap.dispose 把 footholds 置 null，warm 线程池积压任务
+        // 可能对已销毁地图进入构建。空列表硬构建既产出垃圾图又会在 rope 边阶段 NPE——直接放弃。
+        if (map == null || map.getFootholds() == null) {
+            return null;
+        }
         movementProfile = movementProfile == null ? BotMovementProfile.base() : movementProfile;
         BuildProfileBuilder buildProfile = new BuildProfileBuilder(map.getId(), movementProfile);
         ACTIVE_BUILD_PROFILE.set(buildProfile);

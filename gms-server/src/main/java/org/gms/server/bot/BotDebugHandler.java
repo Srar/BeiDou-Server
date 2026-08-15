@@ -24,6 +24,26 @@ public class BotDebugHandler {
 
     private static final String BOT_LOG_FILE = "botlog.txt";
 
+    /**
+     * 文件日志总开关（gms 增强 F4）：默认关闭。
+     * 源（SoloMapling BotLogger）每 tick 无条件写 BotLog.txt；gms 侧全服 bot 争
+     * logToFile 的全局 synchronized 锁做打开/追加/关闭磁盘 I/O（TrainingBot 每 tick
+     * 两次），2核4G 数千 bot 时为固定浪费。默认不写文件，测试/GM 调试经
+     * {@link #setFileLoggingEnabled(boolean)} 显式开启。volatile：tick 线程读、
+     * 调试命令线程写。useChalkDebug/chalkboard 粉笔黑板逻辑不受此开关影响。
+     */
+    private static volatile boolean FILE_LOGGING_ENABLED = false;
+
+    /** 开启/关闭 botlog.txt 文件日志（供测试或 GM 调试使用；默认关闭）。 */
+    public static void setFileLoggingEnabled(boolean enabled) {
+        FILE_LOGGING_ENABLED = enabled;
+    }
+
+    /** 查询文件日志开关状态（测试断言用）。 */
+    public static boolean isFileLoggingEnabled() {
+        return FILE_LOGGING_ENABLED;
+    }
+
     boolean useChalkDebug;
     boolean logInteractors;
     Character chr;
@@ -68,8 +88,12 @@ public class BotDebugHandler {
     }
 
     public void debugLoggingFull(String botLogMessage, String chalkboardMessage) {
-        // 1) 文件日志：源 BotLogger 写 BotLog.txt，gms 等价写 botlog.txt
-        logToFile(botLogMessage);
+        // 1) 文件日志：源 BotLogger 写 BotLog.txt，gms 等价写 botlog.txt。
+        //    gms 增强（F4）：开关未开时跳过（防御绕过 handleDebugPrints 的直接调用者，
+        //    如 TrainingBot.updateState 每 tick 的直接调用，省去字符串拼接后的写盘）。
+        if (FILE_LOGGING_ENABLED) {
+            logToFile(botLogMessage);
+        }
 
         // 2) MMC 转发：gms 无 MapleMessengerConsole，原调用保留为 TODO（待 MMC 落地后回填）
         // TODO(移植): MapleMessengerConsole.isLoggingBot(chr.getId()) -> sendMMCLogToConnected(botLogMessage)
@@ -85,6 +109,11 @@ public class BotDebugHandler {
 
     public void logCurrentRespondantsAndInquirers(BotSM botSM) {
         if (!isLogInteractors()) {
+            return;
+        }
+        // gms 增强（F4）：文件日志开关未开时直接返回，省去两次 StringBuilder 拼接与写盘
+        //（防御绕过 handleDebugPrints 的直接调用者）。
+        if (!FILE_LOGGING_ENABLED) {
             return;
         }
         StringBuilder respondantLine = new StringBuilder("Respondants: ");
@@ -111,6 +140,12 @@ public class BotDebugHandler {
     }
 
     void handleDebugPrints(BotSM botSM) {
+        // gms 增强（F4）：该方法只做日志（每 tick 无条件调用），文件日志关闭时整条短路
+        //（源无条件 debugLoggingFull + logCurrentRespondantsAndInquirers）。粉笔黑板等
+        // 非文件日志逻辑在 debugLoggingFull 内部，不受此开关影响。
+        if (!FILE_LOGGING_ENABLED) {
+            return;
+        }
         debugLoggingFull("\n\n" + botSM.getChr().getName() + " State: " + botSM.state);
         logCurrentRespondantsAndInquirers(botSM);
     }

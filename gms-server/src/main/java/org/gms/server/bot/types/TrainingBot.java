@@ -157,7 +157,12 @@ public class TrainingBot extends BotSM {
     @Override
     protected long lowPriorityDelayMs() {
         if (phase == Phase.GRIND) {
-            return 60_000 + rng.nextInt(60_000);
+            // gms 增强（F6）：源每次返回 60_000 + rng.nextInt(60_000) 新随机数，
+            // 使 BotSM.updateScheduleDelay 的「周期不变则短路」永远失效——每个未观察
+            // 宏 tick 都触发 synchronized reschedule（轮盘写 + 重排）。改为按 bot id
+            // 的确定性稳定值：60-120s 范围语义不变、bot 间按 id 错峰、不引入新状态，
+            // 相位不变时后续 tick 的相等短路恢复生效。
+            return 60_000 + (getChr().getId() % 60_000);
         }
         return super.lowPriorityDelayMs();
     }

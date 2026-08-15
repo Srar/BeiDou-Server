@@ -86,6 +86,21 @@ public abstract class BotSM implements EventSubscriber {
     private volatile long currentDelay;
     private volatile boolean cadenceObserved = true; // startScheduledTask 以正常 2-6s 节奏起步
 
+    /**
+     * 空闲站立广播去重（gms 增强 F3）：上次已广播的 stance，初始哨兵值保证首拍必广播。
+     * 对应 SoloMapling MovementCommands.BotIdleStandingUpdate 的每 tick 站立刷新；
+     * 源每个宏 tick 无条件构造并广播刷新包，gms 增强为「未观察图跳过 + stance 去重」——
+     * 同帧重复广播无观感收益只烧 CPU，观察图观感不变（stance 变化或首拍仍广播）。
+     */
+    private int lastIdleStance = Integer.MIN_VALUE;
+
+    /**
+     * F9 gms 增强：上次已写入 BotStorage 地图索引的 mapId（初始 -1 表示尚未刷新过）。
+     * tick 轮里与当前 mapId 比对，仅换图时动索引，避免每拍空转。
+     */
+    private int lastIndexedMapId = -1;
+
+
     private final BotEventBuffer eventBuffer;
 
     public BotSM(Character chr) {
@@ -114,11 +129,25 @@ public abstract class BotSM implements EventSubscriber {
             if (isWaiting()) {
                 return;
             }
+            refreshMapIndexIfNeeded();
             updateState();
         } catch (Exception e) {
             log.warn(I18nUtil.getLogMessage("BotSM.tick.error", getChr().getName()), e);
         }
     };
+
+    /**
+     * F9 gms 增强：mapId 索引刷新。仅当当前图与上次索引不同才动集合（首拍必刷一次，
+     * 把 addActiveBot 时点与首拍之间可能发生的换图同步进索引）。索引残留无害——
+     * 消费方 {@link BotMapEntryResponder} 经 getBotById 判空跳过。
+     */
+    private void refreshMapIndexIfNeeded() {
+        int currentMapId = getChr().getMapId();
+        if (currentMapId != lastIndexedMapId) {
+            lastIndexedMapId = currentMapId;
+            BotStorage.refreshBotMapIndex(getChr().getId(), currentMapId);
+        }
+    }
 
     // ── 无睡眠等待（waitFor 门控） ──────────────────────────────────────────
     // FSM 需要停顿就 waitFor(ms) 然后从 tick 里 return；tick 轮在等待期间整拍跳过，
@@ -220,8 +249,19 @@ public abstract class BotSM implements EventSubscriber {
                 // 空闲站立刷新（等价 SoloMapling MovementCommands.BotIdleStandingUpdate）：
                 // gms 未移植录制引擎，用 Character.broadcastStance() 广播一次站立包，
                 // 让同图玩家看到的 bot 保持站立帧不僵死。
-                if (getChr().getMap() != null) {
-                    getChr().broadcastStance();
+                // gms 增强（F3）：
+                //   1) 观察门控——源 BotIdleStandingUpdate 同样带 LOD 观察门控
+                //      （trackerRunning && !isMapActive 直接 return）；此处复用本类
+                //      checkMainPlayersOnMap()（观察轮运行时走 LodCounts O(1)），
+                //      无人观察的图省去每 tick 构造 packet + 遍历同图角色的广播开销。
+                //   2) stance 去重——stance 与上次已广播值相同时跳过（源每 tick 都构造
+                //      刷新包；连续 tick 间站立帧不变，同帧重播无观感收益）。
+                if (getChr().getMap() != null && checkMainPlayersOnMap()) {
+                    int stance = getChr().getStance();
+                    if (stance != lastIdleStance) {
+                        lastIdleStance = stance;
+                        getChr().broadcastStance();
+                    }
                 }
                 if (verifyTradePartner()) {
                     tradeInitialized(getTradeMode());

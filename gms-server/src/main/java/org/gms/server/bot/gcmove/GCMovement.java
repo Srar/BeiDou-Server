@@ -93,6 +93,8 @@ public final class GCMovement {
      * 停机钩子：逐个停止动态移动 tick，清空状态与到达回调，再关 driver 线程池与观察器轮询，
      * 避免停机后残留调度器（in-place 重启后旧 driver 被 shutdownNow、但状态与观察轮未复位）。
      * 由 Server.doShutdownInternal 在停 TimerManager 之前调用。
+     * 停机竞态修复：一并取消导航图 pending 构建——地图 dispose（footholds 置 null）后
+     * warm 线程池的积压任务会对已销毁地图 NPE 刷屏（BotNavigationGraphProvider.shutdown）。
      */
     public static void shutdown() {
         for (BotMovementState st : STATES.values()) {
@@ -102,11 +104,17 @@ public final class GCMovement {
         ARRIVAL_CALLBACKS.clear();
         GCMovementDriver.shutdownPool();
         ObserverTracker.stop();
+        BotNavigationGraphProvider.shutdown();
     }
 
     /* Package-private snapshot of the enabled dynamic states (for LodMetrics reporting). */
     static java.util.Collection<BotMovementState> enabledStates() {
         return new java.util.ArrayList<>(STATES.values());
+    }
+
+    /** Public bridge: count of enabled movement states (for !env status diagnostics). */
+    public static int enabledCount() {
+        return enabledStates().size();
     }
 
     // ── Commands ────────────────────────────────────────────────────────────

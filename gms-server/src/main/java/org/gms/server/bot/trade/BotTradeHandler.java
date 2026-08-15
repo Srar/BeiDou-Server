@@ -2,6 +2,7 @@ package org.gms.server.bot.trade;
 
 import lombok.extern.slf4j.Slf4j;
 import org.gms.client.Character;
+import org.gms.server.Trade;
 
 @Slf4j
 public class BotTradeHandler {
@@ -22,52 +23,34 @@ public class BotTradeHandler {
     }
 
     protected Character getTradePartnerConfirmed() {
-        try {
-            return this.tradePartner;
-        } catch (Exception e) {
-            // expected no-partner path guarded via try/catch; log at debug (per-tick null guard)
-            log.debug("BotTradeHandler.getTradePartnerConfirmed for bot {}", chr != null ? chr.getId() : "null", e);
-            return null;
-        }
+        // gms 增强（F7）：源的 try/catch 包住一个纯字段访问（从不抛异常），属多余
+        // 异常表字节码；直接返回，语义不变（null = 无已确认伙伴）。
+        return this.tradePartner;
     }
 
     public Character getTradePartnerRaw() {
-        try {
-            return chr.getTrade().getPartner().getChr();
-        } catch (Exception e) {
-            // expected no-trade path guarded via try/catch; log at debug (per-tick null guard)
-            log.debug("BotTradeHandler.getTradePartnerRaw for bot {}", chr != null ? chr.getId() : "null", e);
+        // gms 增强（F7）：源用 try/catch 吞掉无交易路径的 NPE——每个宏 tick 构造
+        // 约 2 个异常（栈填充）是 2核4G 数千 bot 的固定浪费。改为显式判空短路：
+        // 无交易（getTrade()==null）或对方未确认（getPartner()==null）时直接返回
+        // null，返回语义与源一致（null = 无交易伙伴），但不抛异常。
+        Trade trade = chr.getTrade();
+        if (trade == null) {
             return null;
         }
+        Trade partner = trade.getPartner();
+        if (partner == null) {
+            return null;
+        }
+        return partner.getChr();
     }
 
-//    protected boolean checkTradeRequests() {
-//        if (getTradePartnerRaw() == null || !verifyPlayerOnSameMap(getTradePartnerRaw())) {
-//            resetTradePartner();
-//            return false;
-//        }
-//        setTradePartner(getTradePartnerRaw());
-//        return true;
-//    }
-
     public boolean verifyTradePartner() {
-
-        boolean haveTradePartner = getTradePartnerRaw() == null;
-        Character tradePartner = getTradePartnerConfirmed();
-        boolean haveTradePartnerConfirmed = tradePartner == null;
-        boolean tradePartnerOnSameMap;
-        if (tradePartner != null) {
-            tradePartnerOnSameMap = verifyPlayerOnSameMap(tradePartner);
-        } else {
-            tradePartnerOnSameMap = false;
-        }
-//        debugprint("tradePartner, tradePartnerConfirmed, tradePartnerSameMap: ",
-//                haveTradePartner, haveTradePartnerConfirmed, tradePartnerOnSameMap);
-
-        if (getTradePartnerRaw() == null ||
-                getTradePartnerConfirmed() == null ||
-                !verifyPlayerOnSameMap(getTradePartnerConfirmed())) {
-//            debugprint("verify trade partner false. ");
+        // gms 增强（F7）：源对 getTradePartnerRaw()/getTradePartnerConfirmed() 各调用
+        // 3 次（每次构造 try/catch 异常表），改为局部变量单次求值 + 显式判空短路；
+        // 返回语义与源完全一致（无交易伙伴 = false），且不再依赖 try/catch NPE。
+        Character raw = getTradePartnerRaw();
+        Character confirmed = getTradePartnerConfirmed();
+        if (raw == null || confirmed == null || !verifyPlayerOnSameMap(confirmed)) {
             return false;
         }
         return true;

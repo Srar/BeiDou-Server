@@ -26,6 +26,7 @@ import org.gms.net.netty.LoginServer;
 import org.gms.net.opcodes.Opcode;
 import org.gms.net.opcodes.RecvOpcode;
 import org.gms.net.server.channel.handlers.*;
+import org.gms.net.server.handlers.ClientErrorHandler;
 import org.gms.net.server.handlers.CustomPacketHandler;
 import org.gms.net.server.handlers.KeepAliveHandler;
 import org.gms.net.server.handlers.LoginRequiringNoOpHandler;
@@ -138,6 +139,10 @@ public final class PacketProcessor {
     private void registerCommonHandlers() {
         registerHandler(RecvOpcode.PONG, new KeepAliveHandler());
         registerHandler(RecvOpcode.CUSTOM_PACKET, new CustomPacketHandler());
+        // gms 增强：客户端启动错误 / 崩溃上报（Nexon crash report 机制）。原实现未注册，
+        // 客户端崩溃报告被静默丢弃——此处打 WARN 留痕供服务端与客户端对时排查（无堆栈信息）。
+        registerHandler(RecvOpcode.CLIENT_START_ERROR, new ClientErrorHandler("CLIENT_START_ERROR"));
+        registerHandler(RecvOpcode.CLIENT_ERROR, new ClientErrorHandler("CLIENT_ERROR"));
     }
 
     private void registerLoginHandlers() {

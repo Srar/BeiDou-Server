@@ -59,7 +59,12 @@ public class BotPartyCommands {
         fakechar.setParty(null);
     }
 
-    public static boolean botAcceptPartyInvite(Character fakechar) {
+    /**
+     * 同步接受（gms 侧消费点）。synchronized 串行化 accept/reject：answerInvite 的
+     * check-then-act 在同一把锁内完成，并发的第二次消费（poll 与同步路径竞态）只会
+     * 拿到 NOT_FOUND 而不会双 join。
+     */
+    public static synchronized boolean botAcceptPartyInvite(Character fakechar) {
         BotPartyQueue.PartyInviteEntry entry = BotPartyQueue.getInstance().getPartyInvite(fakechar);
         if (entry == null) {
             log.debug("botAcceptPartyInvite: no pending invite for {}", fakechar.getName());
@@ -88,7 +93,9 @@ public class BotPartyCommands {
         return false;
     }
 
-    public static boolean botRejectPartyInvite(Character fakechar) {
+    // synchronized 与 botAcceptPartyInvite 共用 BotPartyCommands.class 锁：
+    // 串行化队列消费，杜绝 accept/reject 并发下的 check-then-act 双消费竞态。
+    public static synchronized boolean botRejectPartyInvite(Character fakechar) {
         BotPartyQueue.PartyInviteEntry entry = BotPartyQueue.getInstance().getPartyInvite(fakechar);
         if (entry == null) {
             log.debug("botRejectPartyInvite: no pending invite, no-op.");

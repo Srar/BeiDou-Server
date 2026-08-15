@@ -35,7 +35,11 @@ import org.gms.net.server.world.PartyCharacter;
 import org.gms.net.server.world.PartyOperation;
 import org.gms.net.server.world.World;
 import org.gms.server.bot.BotHelpers;
+import org.gms.server.bot.BotSM;
+import org.gms.server.bot.BotStorage;
+import org.gms.server.bot.party.BotPartyCommands;
 import org.gms.server.bot.party.BotPartyQueue;
+import org.gms.server.bot.party.BotRecruitManager;
 import org.gms.util.PacketCreator;
 
 import java.util.List;
@@ -97,12 +101,39 @@ public final class PartyOperationHandler extends AbstractPacketHandler {
                             party = player.getParty();
                         }
                         if (party.getMembers().size() < 6) {
+                            // 直接右键邀请 bot：邀请即掷骰（无冷却）。未命中不创建邀请、
+                            // 不弹邀请窗，黄字提示拒绝；命中才走正常邀请流程。
+                            if (BotHelpers.isBot(invited) && !BotRecruitManager.rollDirectPartyInvite(invited, player)) {
+                                player.sendPacket(PacketCreator.serverNotice(5, invited.getName() + " has declined your party request."));
+                                return;
+                            }
                             if (InviteCoordinator.createInvite(InviteType.PARTY, player, party.getId(), invited.getId())) {
                                 invited.sendPacket(PacketCreator.partyInvite(player));
                                 if (BotHelpers.isBot(invited)) {
                                     BotPartyQueue.getInstance().addPartyInvite(invited, player, party.getId());
+                                    BotSM bot = BotStorage.getBotById(invited.getId());
+                                    String botType = bot == null ? null : bot.getBotType();
+                                    // SocialBot/TrainingBot：ARMED 已写入，下一拍 pollInvites 按
+                                    // inviter id 匹配接受（完整保留转 Follower / 台词 / PartyJoined 语义）。
+                                    // FollowerBot：不写 ARMED，下一拍 pollLeaderInvite（750ms tick）
+                                    // 按 leader 裁决（leader 邀请接受、非 leader 礼貌拒绝），不同步接受。
+                                    // 其他类型（含 OPQBot 等无 poll 消费点的）：同步立即接受。
+                                    if (!"SocialBot".equals(botType) && !"TrainingBot".equals(botType)
+                                            && !"FollowerBot".equals(botType)) {
+                                        if (BotPartyCommands.botAcceptPartyInvite(invited)) {
+                                            // 同步接受成功即消费武装窗口，防止 ARMED 泄漏拒掉后续合法邀请。
+                                            BotRecruitManager.clearArmed(invited.getId());
+                                        }
+                                    }
                                 }
                             } else {
+                                // createInvite 失败（通常对方已有待处理邀请）：
+                                // 若本轮掷骰刚命中（武装者就是本玩家），立即回滚 ARMED，
+                                // 防止幻影武装窗口在邀请从未生效的情况下拒掉他人的合法邀请。
+                                if (BotHelpers.isBot(invited)
+                                        && BotRecruitManager.armedInviterId(invited.getId()) == player.getId()) {
+                                    BotRecruitManager.clearArmed(invited.getId());
+                                }
                                 c.sendPacket(PacketCreator.partyStatusMessage(22, invited.getName()));
                             }
                         } else {

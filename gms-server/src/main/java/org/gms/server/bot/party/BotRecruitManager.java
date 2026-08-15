@@ -24,6 +24,9 @@ public class BotRecruitManager {
     public static final int FOLLOWER_CAP = 30;
     public static final double SOCIAL_ACCEPT_CHANCE = 0.70;
     public static final double TRAINING_ACCEPT_CHANCE = 0.80;
+    // Fallback accept chance for direct (non-dialogue) right-click invites to bot types that have
+    // no recruit brain of their own (e.g. IdleBot / merchant bots).
+    public static final double DIRECT_INVITE_DEFAULT_CHANCE = 0.30;
     // Kept comfortably above the InviteCoordinator's ~3-min silent timeout so the accept window no
     // longer races it - the coordinator now backstops staleness (a late accept just NOT_FOUNDs
     // harmlessly). This also keeps isArmed() true across the whole realistic invite window, which
@@ -73,6 +76,68 @@ public class BotRecruitManager {
         log.debug("rollPartyAsk: {} DECLINED {} (rolled no, {}min cooldown)",
                 botChr.getName(), player.getName(), DECLINE_COOLDOWN_MS / 60000);
         return RecruitAnswer.DECLINED;
+    }
+
+    /**
+     * 直接右键邀请（非对话）的掷骰入口（gms 增强，用户拍板）：无冷却每次重掷；
+     * 命中写入 ARMED（200s 武装窗口），未命中不写 DECLINED_UNTIL。
+     * 对话流程 rollPartyAsk 的冷却 gate 保持不变（两条路径互不影响）。
+     * <p>
+     * 武装短路（对话承诺兑现，兑现率 100%）：若 bot 正处于 rollPartyAsk 写入的
+     * 有效武装窗口内，直接邀请不再二次掷骰——同玩家（inviterId 匹配）直接返回 true
+     * 兑现对话承诺（不覆盖窗口），其他玩家返回 false（保护已武装窗口，不被后来者
+     * 覆盖/偷走，也不会被本轮掷骰重写）。
+     * <p>
+     * 冷却旁路（有意行为）：对话被拒后走右键直接邀请可绕过对话 180s 冷却——直接
+     * 邀请路径不读 DECLINED_UNTIL，未命中也不写冷却。用户拍板的有意设计。
+     */
+    public static boolean rollDirectPartyInvite(Character botChr, Character player) {
+        Armed armed = ARMED.get(botChr.getId());
+        if (armed != null && System.currentTimeMillis() <= armed.expiresAtMs()) {
+            // 对话承诺兑现：同玩家不二次掷骰、不覆盖窗口；他人不覆盖、不偷走。
+            return armed.inviterId() == player.getId();
+        }
+        if (botChr.getLevel() < 10) {
+            // 防御：PartyOperationHandler 已挡 sub-10 邀请，这里双保险，避免武装一个用不了的窗口。
+            return false;
+        }
+        BotSM bot = BotStorage.getBotById(botChr.getId());
+        String type = bot == null ? null : bot.getBotType();
+        if ("FollowerBot".equals(type)) {
+            // 放行入队（true）但不写 ARMED：接受与否交 FollowerBot.pollLeaderInvite
+            // （750ms tick）按 leader 裁决——leader 邀请接受、非 leader 被 poll 礼貌拒绝。
+            return true;
+        }
+        if ("OPQBot".equals(type)) {
+            // 无条件接受，与 BotPartyLogic.checkPartyQueue 语义一致。
+            return true;
+        }
+        final double chance;
+        final boolean willFollow;
+        if ("SocialBot".equals(type)) {
+            chance = SOCIAL_ACCEPT_CHANCE;
+            willFollow = true;
+        } else if ("TrainingBot".equals(type)) {
+            chance = TRAINING_ACCEPT_CHANCE;
+            willFollow = false;
+        } else {
+            chance = DIRECT_INVITE_DEFAULT_CHANCE;
+            willFollow = false;
+        }
+        if (willFollow && activeFollowerCount() >= FOLLOWER_CAP) {
+            log.debug("rollDirectPartyInvite: follower cap reached ({}), declining", FOLLOWER_CAP);
+            return false;
+        }
+        if (Randomizer.nextDouble() < chance) {
+            ARMED.put(botChr.getId(), new Armed(player.getId(), System.currentTimeMillis() + INVITE_WINDOW_MS));
+            log.debug("rollDirectPartyInvite: {} ACCEPTED {} (no cooldown, invite window {}s)",
+                    botChr.getName(), player.getName(), INVITE_WINDOW_MS / 1000);
+            return true;
+        }
+        // 无冷却：未命中不写 DECLINED_UNTIL，玩家被拒后立刻再邀仍有完整机会。
+        log.debug("rollDirectPartyInvite: {} DECLINED {} (rolled no, no cooldown)",
+                botChr.getName(), player.getName());
+        return false;
     }
 
     // Per-tick invite drain for recruit-enabled bots. BotPartyQueue is last-wins per bot, so a

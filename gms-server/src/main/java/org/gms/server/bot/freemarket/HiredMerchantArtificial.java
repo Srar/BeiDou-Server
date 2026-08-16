@@ -11,10 +11,13 @@ import java.awt.*;
  * <p>移植说明（gms 底座差异）：
  * <ul>
  *   <li>源中 HiredMerchant 的 {@code ownerId}/{@code ownerName} 为 {@code protected}，
- *       子类可直接赋值；gms 中 {@code ownerId} 为 {@code private final}、{@code ownerName} 为
- *       {@code private}，无法写入。故本类声明同名字段遮蔽父类字段，并覆盖
- *       {@link #getOwnerId()} / {@link #getOwner()}，使外部可见语义与源完全一致
- *       （父类内部持久化等路径仍使用构造时传入 owner 的 id，属于不可避免的差异）。</li>
+ *       子类可直接赋值；gms 中两者为 {@code private}，无法写入。故本类声明同名字段遮蔽
+ *       父类字段，并覆盖 {@link #getOwnerId()} / {@link #getOwner()}，使外部可见语义与源
+ *       完全一致。父类内部路径（如 {@link HiredMerchant#buy} 的卖家结算）读的是父类私有
+ *       字段，因此调用方必须保证构造入参 owner 的 id/name 与传入的 id/name 一致——
+ *       {@code ArtificialFreeMarket.spawnHiredMerchantStore} 在构造前已
+ *       {@code owner.setId(id)} + {@code owner.setName(name)}（漏设 name 会使父类 ownerName
+ *       为 null，真实玩家购买时 getCharacterByName(null) NPE）。</li>
  *   <li>gms 构造器签名与源相同：{@code HiredMerchant(Character owner, String desc, int itemId)}。</li>
  * </ul>
  *

@@ -342,6 +342,54 @@ public class PlayerShop extends AbstractMapObject {
         }
     }
 
+    /**
+     * Bot 专用购买（逐行移植自 SoloMapling PlayerShop.botBuy）：bot 共用 headless client
+     * （getPlayer() 恒为 null），无法走 buy(Client, ...) 的买家校验；虚拟买家免检
+     * meso/库存，商品直接结算给卖家。
+     */
+    public boolean botBuy(Character fakechar, PlayerShopItem pItem, int itemPosition, short quantity) {
+        synchronized (items) {
+            if (!open.get() || quantity < 1 || !pItem.isExist() || pItem.getBundles() < quantity) {
+                return false;
+            }
+            Item newItem = pItem.getItem().copy();
+            newItem.setQuantity((short) ((pItem.getItem().getQuantity() * quantity)));
+            visitorLock.lock();
+            try {
+                int price = (int) Math.min((float) pItem.getPrice() * quantity, Integer.MAX_VALUE);
+
+                if (!owner.canHoldMeso(price)) {    // thanks Rohenn for noticing owner hold check misplaced
+                    fakechar.dropMessage(1, "Transaction failed since the shop owner can't hold any more mesos.");
+                    return false;
+                }
+
+                price -= Trade.getFee(price);  // thanks BHB for pointing out trade fees not applying here
+                owner.gainMeso(price, true);
+
+                SoldItem soldItem = new SoldItem(fakechar.getName(), pItem.getItem().getItemId(), quantity, price);
+                owner.sendPacket(PacketCreator.getPlayerShopOwnerUpdate(soldItem, itemPosition));
+
+                synchronized (sold) {
+                    sold.add(soldItem);
+                }
+
+                pItem.setBundles((short) (pItem.getBundles() - quantity));
+                if (pItem.getBundles() < 1) {
+                    pItem.setDoesExist(false);
+                    if (++boughtnumber == items.size()) {
+                        owner.setPlayerShop(null);
+                        this.setOpen(false);
+                        this.closeShop();
+                        owner.dropMessage(1, "Your items are sold out, and therefore your shop is closed.");
+                    }
+                }
+                return true;
+            } finally {
+                visitorLock.unlock();
+            }
+        }
+    }
+
     public void broadcastToVisitors(Packet packet) {
         visitorLock.lock();
         try {
@@ -428,17 +476,31 @@ public class PlayerShop extends AbstractMapObject {
     }
 
     public void chat(Client c, String chat) {
-        byte s = getVisitorSlot(c.getPlayer());
+        if (c == null || c.getPlayer() == null) {
+            return;
+        }
+        chat(c.getPlayer(), chat);
+    }
+
+    /**
+     * Bot 专用重载：bot 共用 headless client（从未绑定 player，getPlayer() 恒为 null），
+     * 故直接以 Character 为入参（对齐 SoloMapling 的 chat(Character, String) 重载）。
+     */
+    public void chat(Character player, String chat) {
+        if (player == null) {
+            return;
+        }
+        byte s = getVisitorSlot(player);
 
         synchronized (chatLog) {
-            chatLog.add(new Pair<>(c.getPlayer(), chat));
+            chatLog.add(new Pair<>(player, chat));
             if (chatLog.size() > 25) {
                 chatLog.remove(0);
             }
-            chatSlot.put(c.getPlayer().getId(), s);
+            chatSlot.put(player.getId(), s);
         }
 
-        broadcast(PacketCreator.getPlayerShopChat(c.getPlayer(), chat, s));
+        broadcast(PacketCreator.getPlayerShopChat(player, chat, s));
     }
 
     private void recoverChatLog() {

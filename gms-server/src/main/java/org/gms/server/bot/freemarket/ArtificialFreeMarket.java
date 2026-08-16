@@ -152,6 +152,9 @@ public class ArtificialFreeMarket {
         Character newchar = Character.getDefault(cm);
         newchar.setWorld(world);
         newchar.setId(ownerId); // Channel.addHiredMerchant 以角色 id 为 key，必须唯一
+        // 必须与 setId 对称：HiredMerchant 构造将 owner.getName() 写进父类私有 ownerName，
+        // 漏设会导致真实玩家购买时 getCharacterByName(null) NPE。
+        newchar.setName(ownerName);
         newchar.setPosition(position);
         newchar.setMap(Server.getInstance().getChannel(world, channel).getMapFactory().getMap(mapId));
 

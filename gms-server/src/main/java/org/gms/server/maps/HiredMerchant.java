@@ -380,6 +380,68 @@ public class HiredMerchant extends AbstractMapObject {
         }
     }
 
+    /**
+     * Bot 专用购买（逐行移植自 SoloMapling HiredMerchant.botBuy）：bot 共用 headless client
+     * （getPlayer() 恒为 null），无法走 buy(Client, ...) 的买家校验；虚拟买家免检
+     * meso/库存，商品直接结算给卖家（在线走 addMerchantMesos，离线落 MerchantMesos 库）。
+     */
+    public void botBuy(Character fakechar, PlayerShopItem pItem, short quantity) {
+        synchronized (items) {
+            if (!open.get() || quantity < 1 || !pItem.isExist() || pItem.getBundles() < quantity) {
+                return;
+            }
+            Item newItem = pItem.getItem().copy();
+            newItem.setQuantity((short) ((pItem.getItem().getQuantity() * quantity)));
+
+            int price = (int) Math.min((float) pItem.getPrice() * quantity, Integer.MAX_VALUE);
+            price -= Trade.getFee(price);  // thanks BHB for pointing out trade fees not applying here
+
+            synchronized (sold) {
+                sold.add(new SoldItem(fakechar.getName(), pItem.getItem().getItemId(), newItem.getQuantity(), price));
+            }
+
+            pItem.setBundles((short) (pItem.getBundles() - quantity));
+            if (pItem.getBundles() < 1) {
+                pItem.setDoesExist(false);
+            }
+
+            if (GameConfig.getServerBoolean("use_announce_shop_item_sold")) {   // idea thanks to Vcoc
+                announceItemSold(newItem, price, getQuantityLeft(pItem.getItem().getItemId()));
+            }
+
+            Character owner = Server.getInstance().getWorld(world).getPlayerStorage().getCharacterByName(ownerName);
+            if (owner != null) {
+                owner.addMerchantMesos(price);
+            } else {
+                try (Connection con = DatabaseConnection.getConnection()) {
+                    long merchantMesos = 0;
+                    try (PreparedStatement ps = con.prepareStatement("SELECT MerchantMesos FROM characters WHERE id = ?")) {
+                        ps.setInt(1, ownerId);
+                        try (ResultSet rs = ps.executeQuery()) {
+                            if (rs.next()) {
+                                merchantMesos = rs.getInt(1);
+                            }
+                        }
+                    }
+                    merchantMesos += price;
+
+                    try (PreparedStatement ps = con.prepareStatement("UPDATE characters SET MerchantMesos = ? WHERE id = ?", PreparedStatement.RETURN_GENERATED_KEYS)) {
+                        ps.setInt(1, (int) Math.min(merchantMesos, Integer.MAX_VALUE));
+                        ps.setInt(2, ownerId);
+                        ps.executeUpdate();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            try {
+                this.saveItems(false);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     private void announceItemSold(Item item, int mesos, int inStore) {
         String qtyStr = (item.getQuantity() > 1) ? " x " + item.getQuantity() : "";
 

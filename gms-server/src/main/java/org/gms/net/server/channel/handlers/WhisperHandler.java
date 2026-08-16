@@ -74,7 +74,8 @@ public final class WhisperHandler extends AbstractPacketHandler {
 
     private void handleFind(Character user, Character target, byte flag) {
         if (user.gmLevel() >= target.gmLevel()) {
-            if (target.getCashShop().isOpened()) {
+            // bot 类角色未初始化 CashShop（见 PacketCreator.charInfo 同类防御），判空再探商城状态
+            if (target.getCashShop() != null && target.getCashShop().isOpened()) {
                 user.sendPacket(PacketCreator.getFindResult(target, RT_CASH_SHOP, -1, flag));
             } else if (target.getClient().getChannel() == user.getClient().getChannel()) {
                 user.sendPacket(PacketCreator.getFindResult(target, RT_SAME_CHANNEL, target.getMapId(), flag));

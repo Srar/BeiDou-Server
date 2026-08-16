@@ -70,6 +70,9 @@ public class PlayerStorage {
     }
 
     public Character getCharacterByName(String name) {
+        if (name == null) {
+            return null;    // 防御：bot 摊位等合成对象可能带 null 名字（如 HiredMerchant 的 ownerName）
+        }
         rlock.lock();
         try {
             return nameStorage.get(name.toLowerCase());

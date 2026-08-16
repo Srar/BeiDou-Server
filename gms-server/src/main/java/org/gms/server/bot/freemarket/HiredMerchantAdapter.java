@@ -9,7 +9,8 @@ import java.awt.Point;
 
 /**
  * HiredMerchant 适配器（逐行移植自 SoloMapling FreeMarket.HiredMerchantAdapter）。
- * gms 底座差异：原生 buy(Client, int item, short) 以列表下标定位，故先 indexOf 再买。
+ * gms 底座差异：bot 共用 headless client（getPlayer() 恒为 null），购买走
+ * HiredMerchant.botBuy(Character, ...) 虚拟买家结算（对齐 SoloMapling 同名方法）。
  */
 public class HiredMerchantAdapter implements ShopKeeper {
     private final HiredMerchant merchant;
@@ -45,11 +46,8 @@ public class HiredMerchantAdapter implements ShopKeeper {
 
     @Override
     public void botBuyItem(Character fakechar, PlayerShopItem pItem, short quantity) {
-        int idx = getMerchant().getItems().indexOf(pItem);
-        if (idx >= 0) {
-            getMerchant().buy(fakechar.getClient(), idx, quantity);
-            getMerchant().broadcastToVisitorsThreadsafe(PacketCreator.updateHiredMerchant(getMerchant(), fakechar));
-        }
+        getMerchant().botBuy(fakechar, pItem, quantity);
+        getMerchant().broadcastToVisitorsThreadsafe(PacketCreator.updateHiredMerchant(getMerchant(), fakechar));
     }
 
     @Override

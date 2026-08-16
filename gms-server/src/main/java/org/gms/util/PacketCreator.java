@@ -2762,16 +2762,29 @@ public class PacketCreator {
         } else {
             p.writeByte(0);
         }
-        p.writeByte(chr.getCashShop().getWishList().size());
-        for (int sn : chr.getCashShop().getWishList()) {
-            p.writeInt(sn);
+        CashShop cashShop = chr.getCashShop();
+        if (cashShop != null) {
+            p.writeByte(cashShop.getWishList().size());
+            for (int sn : cashShop.getWishList()) {
+                p.writeInt(sn);
+            }
+        } else {
+            p.writeByte(0); // bot 类角色无 CashShop（从未进过商城），愿望单按 0 条写出
         }
 
         MonsterBook book = chr.getMonsterBook();
-        p.writeInt(book.getBookLevel());
-        p.writeInt(book.getNormalCard());
-        p.writeInt(book.getSpecialCard());
-        p.writeInt(book.getTotalCards());
+        if (book != null) {
+            p.writeInt(book.getBookLevel());
+            p.writeInt(book.getNormalCard());
+            p.writeInt(book.getSpecialCard());
+            p.writeInt(book.getTotalCards());
+        } else {
+            // bot 类角色无怪物图鉴，按全 0 写出（真实空图鉴的 bookLevel 默认值为 1，此差异仅展示级）
+            p.writeInt(0);
+            p.writeInt(0);
+            p.writeInt(0);
+            p.writeInt(0);
+        }
         p.writeInt(chr.getMonsterBookCover() > 0 ? ItemInformationProvider.getInstance().getCardMobId(chr.getMonsterBookCover()) : 0);
         Item medal = chr.getInventory(InventoryType.EQUIPPED).getItem((short) -49);
         if (medal != null) {

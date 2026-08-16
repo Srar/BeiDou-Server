@@ -9,7 +9,8 @@ import java.awt.Point;
 
 /**
  * PlayerShop 适配器（逐行移植自 SoloMapling FreeMarket.PlayerShopAdapter）。
- * gms 底座差异：chat 与 buy 均以 Client 为入参。
+ * gms 底座差异：buy 以 Client 为入参；chat 已补 Character 重载（bot 的 headless
+ * client 未绑定 player），直传 fakechar。
  */
 public class PlayerShopAdapter implements ShopKeeper {
     private final PlayerShop shop;
@@ -35,7 +36,7 @@ public class PlayerShopAdapter implements ShopKeeper {
 
     @Override
     public void chat(Character fakechar, String msg) {
-        getShop().chat(fakechar.getClient(), msg);
+        getShop().chat(fakechar, msg);
     }
 
     @Override
@@ -50,7 +51,7 @@ public class PlayerShopAdapter implements ShopKeeper {
 
     @Override
     public void botBuyItemPlayerShop(Character fakechar, PlayerShopItem pItem, int itemPosition, short quantity) {
-        getShop().buy(fakechar.getClient(), itemPosition, quantity);
+        getShop().botBuy(fakechar, pItem, itemPosition, quantity);
         getShop().broadcast(PacketCreator.getPlayerShopItemUpdate(getShop()));
     }
 

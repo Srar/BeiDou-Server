@@ -269,6 +269,10 @@ public final class BotGeneration {
         bot.setId(botId);
         String botName = randomUniqueBotName();
         bot.setName(botName);
+        // T1-MEDIUM-1：把已发放的 bot 名登记进 FMShopDescGen 的 assignedCharacterNames，
+        // 恢复 getRandomShopOwnerIGN 的 35%「复用在线 bot 名」分支活性（gms bot 名由
+        // BotHelpers 大池发放，不再经 FMShopDescGen.getRandomCharacterIGN 自动登记）。
+        org.gms.server.bot.freemarket.FMShopDescGen.registerAssignedCharacterName(botName);
         ASSIGNED_BOT_NAMES.add(botName.toLowerCase(Locale.ROOT)); // F8 gms 增强：生成期 O(1) 查重
         bot.setFame(botId); // 调试标记：fame 值 == botId
         bot.setWorld(world);

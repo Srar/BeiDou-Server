@@ -19,6 +19,7 @@ import org.gms.server.bot.decorate.BotDecorate;
 import org.gms.server.bot.decorate.BotDecorationQueue;
 import org.gms.server.bot.decorate.BotEquipChecker;
 import org.gms.server.bot.dialogue.ConversationManager;
+import org.gms.server.bot.freemarket.ArtificialFreeMarket;
 import org.gms.server.bot.environment.platform.Platform;
 import org.gms.server.bot.environment.platform.PlatformParser;
 import org.gms.server.bot.environment.platform.PlatformSpawner;
@@ -468,11 +469,17 @@ public final class EnvironmentManager {
     );
 
     // 对应源 ArtificialFreeMarket.populateFreeMarketRegion（并行点燃区域内每个房间的商店生成）。
-    // gms 增强：源有完整商店经济（ArtificialShopGenerator 等未移植），此处只恢复
-    // 「商人在 FM 房间分布」语义——每房间小规模试点商人防拥挤，不做摊位商店经济。
-    // gms 简化：region 内顺序执行（region 级已由 wave task 并行）。
+    // gms 增强（波 2）：摊位商店经济已完整移植（org.gms.server.bot.freemarket.ArtificialFreeMarket：
+    // 雇佣商人箱 + bot 个人商店 + 定价/招牌），本方法现在两层并存——
+    //   1) spawnFMRoomBots：商人 bot 试点的既有行为（每房间小规模 FSM 商人，按核数缩放）；
+    //   2) ArtificialFreeMarket.populateFreeMarketRegion：完整摊位生成管线。
+    // 摊位数对齐源原值（源每房 24-28 点、全量约 577 摊），不按 scaleForCores() 缩放；
+    // 2 核小机如遇性能问题，可后续在此接线处加按 scale 的子集逻辑。
+    // gms 简化：商人 bot 试点 region 内顺序执行（region 级已由 wave task 并行）。
     // 审计修正（LOW）：region 名做 toLowerCase 容错（源实现同款容错，调用方可能传 "HENESYS"），
     // region 为 null 先判再查表。
+    // 审计修正（P2）：第 2 层摊位生成已并入 wave 时序（同步等待完成）——不再 runAsync 包裹，
+    // 否则外层 wave 任务立即返回、latch 提前放行，摊位生成与后续 wave 训练 bot 并发叠加峰值。
     private static void populateFreeMarketRegion(String region) {
         int[] roomMapIds = region == null ? null : FM_ROOM_MAP_IDS.get(region.toLowerCase(Locale.ROOT));
         if (roomMapIds == null) {
@@ -481,8 +488,19 @@ public final class EnvironmentManager {
             log.warn("populateFreeMarketRegion: unknown region '{}' (expected henesys/ludi/perion/elnath)", region);
             return;
         }
+        // 第 1 层：商人 bot 试点（既有行为，保留）。
         for (int roomMapId : roomMapIds) {
             spawnFMRoomBots(roomMapId);
+        }
+        // 第 2 层：完整摊位生成管线（波 2 接线）。审计修正（P2）：当前线程同步执行——
+        // 旧实现 runAsync 包裹使本 wave 任务立即返回、latch 提前放行，摊位生成与后续
+        // wave（波 8 训练 bot）生成并发叠加（2 核 CPU 峰值）。gms 对齐源 wave 时序（源语义
+        // 即 wave 内完成）；摊位数 577 在 2 核上生成较慢，但错峰 200ms/摊已内置。
+        // 审计修正（LOW-6）：catch(Throwable) 对齐 fmshop 命令写法（Error 同样可见可记）。
+        try {
+            ArtificialFreeMarket.populateFreeMarketRegion(region);
+        } catch (Throwable t) {
+            log.warn("populateFreeMarketRegion: ArtificialFreeMarket pipeline failed for region '{}'", region, t);
         }
     }
 
@@ -491,8 +509,9 @@ public final class EnvironmentManager {
             debugprint(fmt("populateFreeMarketRegion: room map {} not found, skipped", roomMapId));
             return;
         }
-        // 源每房间约 24-28 摊位（坐标硬编码于 FMShopInfoManager）；gms 未移植商店经济，
-        // 先小规模试点：selling=2 / buying=2 / nx=1 为基数并按核数缩放（2 核下实际更少）。
+        // 商人 bot 试点（波 2 后与完整摊位管线并存）：源每房间约 24-28 摊位（坐标硬编码于
+        // FMShopInfoManager）；试点部分以 selling=2 / buying=2 / nx=1 为基数并按核数缩放（2 核下实际更少），
+        // 完整摊位由 ArtificialFreeMarket.populateFreeMarketRegion 异步生成（数量对齐源原值，不缩放）。
         double scale = scaleForCores();
         int selling = (int) Math.round(2 * scale);
         int buying = (int) Math.round(2 * scale);

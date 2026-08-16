@@ -18,6 +18,8 @@ import org.gms.server.bot.dialogue.BotChatter;
 import org.gms.server.bot.dialogue.ConversationManager;
 import org.gms.server.bot.dialogue.TownChatterLines;
 import org.gms.server.bot.environment.EnvironmentManager;
+import org.gms.server.bot.freemarket.ArtificialFreeMarket;
+import org.gms.server.bot.freemarket.FMShopInfoManager;
 import org.gms.server.bot.gcmove.GCMovement;
 import org.gms.server.bot.gcmove.LodCounts;
 import org.gms.server.bot.grind.MapGrindProfile;
@@ -36,8 +38,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * GM4 命令 {@code !env}：手动触发环境生成与各 spawn 子命令（对应 SoloMapling
@@ -46,6 +51,11 @@ import java.util.Random;
  */
 public class EnvironmentCommand extends Command {
     private static final Logger log = LoggerFactory.getLogger(EnvironmentCommand.class);
+
+    // 审计修正（P4）：fmshop/fmshoproom 幂等标记——记录已生成过完整摊位的 FM 房间 mapId
+    // （fmshop 的 region 在此展开为房间列表），重复调用黄字提示并跳过，防止摊位叠加翻倍。
+    // 注意：!env loadenv force 不检查本标记（其叠加风险见 force 分支注释）。
+    private static final Set<Integer> FM_SHOP_ROOMS_GENERATED = ConcurrentHashMap.newKeySet();
 
     {
         setDescription("Environment Commands.");
@@ -377,6 +387,26 @@ public class EnvironmentCommand extends Command {
                 EnvironmentManager.setAndStartBots(fillerIdsY, org.gms.server.bot.BotTypeManager.BotType.SOCIAL_BOT);
                 p.yellowMessage("Filler bot spawn complete. " + fillerIdsY.size() + " SocialBots assigned.");
             }
+            case "fmshoproom" -> {
+                // 审计修正（LOW-2）：先校验 mapId 是否属于 FM 房间（910000001-910000022），
+                // 非法时黄字提示合法范围，避免向任意地图生成摊位。
+                String roomRegion = FMShopInfoManager.getRegionByMapId(input2);
+                if (roomRegion == null || roomRegion.equals("unknown")) {
+                    p.yellowMessage("!env fmshoproom - 非法 mapId '" + input2 + "'（FM 房间合法范围：910000001-910000022）");
+                } else if (!FM_SHOP_ROOMS_GENERATED.add(input2)) {
+                    // 审计修正（P4）：per-mapId 一次性标记，重复调用跳过，防摊位叠加。
+                    p.yellowMessage("!env fmshoproom - 房间 " + input2 + " 已生成过摊位（如确需叠加请使用 !env loadenv force 重跑环境）");
+                } else {
+                    p.yellowMessage("!env fmshoproom " + input2 + " - 房间完整摊位生成已启动（后台异步，日志可见进度）");
+                    BotExecutors.runAsync(() -> {
+                        try {
+                            ArtificialFreeMarket.populateFreeMarketRoom(input2);
+                        } catch (Throwable t) {
+                            log.warn("[EnvironmentCommand] fmshoproom 摊位生成失败 mapId={}", input2, t);
+                        }
+                    });
+                }
+            }
             default -> {
             }
         }
@@ -393,6 +423,8 @@ public class EnvironmentCommand extends Command {
                     p.yellowMessage("!env loadenv force - 强制重跑环境生成（后台执行，日志可见进度）");
                     // 审计修正（m1）：force 与普通 loadenv 一样后台执行——9 波生成耗时数十秒，
                     // 不能在 GM 命令线程上同步阻塞。
+                    // 审计修正（P4）：force 强制重跑完整环境生成，不检查 FM_SHOP_ROOMS_GENERATED
+                    // 幂等标记——进程内已有摊位不会被清理，重跑会叠加（仅限确需叠加时使用）。
                     BotExecutors.runAsync(() -> {
                         try {
                             EnvironmentManager.forceEnvironmentLoad();
@@ -402,6 +434,37 @@ public class EnvironmentCommand extends Command {
                     });
                 } else {
                     p.yellowMessage("!env loadenv - 未知参数 '" + input2 + "'（仅支持 force）");
+                }
+            }
+            case "fmshop" -> {
+                String region = input2.toLowerCase();
+                if (!List.of("henesys", "ludi", "perion", "elnath").contains(region)) {
+                    p.yellowMessage("!env fmshop - 非法 region '" + input2 + "'（合法值：henesys/ludi/perion/elnath）");
+                } else {
+                    // 审计修正（P4）：region 展开为房间列表做 per-mapId 幂等检查，仅对未生成过的
+                    // 房间调用生成，防止重复调用（或先 fmshoproom 单房间再 fmshop 整区）摊位叠加。
+                    List<Integer> roomMapIds = ArtificialFreeMarket.fmInfo.getRegionFMMapId(region);
+                    List<Integer> freshRooms = new ArrayList<>();
+                    for (int roomMapId : roomMapIds) {
+                        if (FM_SHOP_ROOMS_GENERATED.add(roomMapId)) {
+                            freshRooms.add(roomMapId);
+                        }
+                    }
+                    if (freshRooms.isEmpty()) {
+                        p.yellowMessage("!env fmshop " + region + " - 该区域已生成过摊位（如确需叠加请使用 !env loadenv force 重跑环境）");
+                    } else {
+                        p.yellowMessage("!env fmshop " + region + " - 完整摊位生成已启动（后台异步，日志可见进度；"
+                                + freshRooms.size() + "/" + roomMapIds.size() + " 个房间待生成）");
+                        BotExecutors.runAsync(() -> {
+                            try {
+                                for (int roomMapId : freshRooms) {
+                                    ArtificialFreeMarket.populateFreeMarketRoom(roomMapId);
+                                }
+                            } catch (Throwable t) {
+                                log.warn("[EnvironmentCommand] fmshop 摊位生成失败 region={}", region, t);
+                            }
+                        });
+                    }
                 }
             }
             default -> p.yellowMessage("Invalid command - handleStringStringCommand");
@@ -526,6 +589,8 @@ public class EnvironmentCommand extends Command {
         p.yellowMessage("-- FM Spawning --");
         p.yellowMessage("!env spawnfmbots                 - spawn FM entrance bots");
         p.yellowMessage("!env spawnmerchbots              - spawn merchant bots in FM entrance");
+        p.yellowMessage("!env fmshop <region>             - 完整摊位生成管线（henesys/ludi/perion/elnath，后台异步）");
+        p.yellowMessage("!env fmshoproom <mapId>          - 指定 FM 房间完整摊位生成（后台异步）");
         p.yellowMessage("-- Henesys Spawning --");
         p.yellowMessage("!env spawnhenesysbots            - spawn Henesys wanderer bots");
         p.yellowMessage("!env spawngachabots              - spawn gacha bots in Henesys");

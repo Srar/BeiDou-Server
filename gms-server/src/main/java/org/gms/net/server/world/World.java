@@ -1664,6 +1664,13 @@ public class World {
                     int timeOn = dm.getValue().getRight();
                     HiredMerchant hm = dm.getValue().getLeft();
 
+                    // T4-P3：人工摆摊（HiredMerchantArtificial）无持久化语义——不写 DB、无真实店主，
+                    // 永不按 12 小时自动关店；停机时随地图 dispose 一并清理。跳过计时与 forceClose，
+                    // 否则人工摊位会在生成 12 小时后整批「蒸发」。
+                    if (hm instanceof org.gms.server.bot.freemarket.HiredMerchantArtificial) {
+                        continue;
+                    }
+
                     if (timeOn <= 144) {   // 1440 minutes == 24hrs
                         activeMerchants.put(hm.getOwnerId(), new Pair<>(dm.getValue().getLeft(), timeOn + 1));
                     } else {

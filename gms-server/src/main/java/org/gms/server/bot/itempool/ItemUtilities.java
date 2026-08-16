@@ -1,0 +1,77 @@
+package org.gms.server.bot.itempool;
+
+import org.gms.client.inventory.Equip;
+import org.gms.client.inventory.InventoryType;
+import org.gms.client.inventory.Item;
+
+import static org.gms.server.bot.BotLogic.generateCleanEquip;
+import static org.gms.server.bot.replay.DebugUtilities.debugprint;
+import static org.gms.server.bot.itempool.UpgradeSimulator.getEquipMarketValue;
+
+/**
+ * 移植自 SoloMapling {@code soloMapling.itemPool.ItemUtilities}。
+ *
+ * <p>适配点：{@code client.inventory.*} → {@code org.gms.client.inventory.*}；
+ * {@code ArtificialPlayer.BotLogic.generateCleanEquip} → gms 既有等价物
+ * {@code org.gms.server.bot.BotLogic.generateCleanEquip}；DebugUtilities → gms
+ * no-op 等价物 {@code org.gms.server.bot.replay.DebugUtilities}。逻辑与源一致。
+ */
+public class ItemUtilities {
+
+    public static boolean isEquip(Item item) {
+        return item.getInventoryType() == InventoryType.EQUIP;
+    }
+
+    public static boolean isNonEquip(Item item) {
+        return !isEquip(item);
+    }
+
+    public static boolean isCleanEquip(Item item) {
+        if (isEquip(item)) {
+            Equip eq = (Equip) item;
+            Equip cleanEq = (Equip) generateCleanEquip(item.getItemId());
+            int cleanUpgradeSlots = cleanEq.getUpgradeSlots();
+            return eq.getLevel() == 0 && eq.getUpgradeSlots() == cleanUpgradeSlots; // No Upgrades, and Clean slots
+        }
+        return false;
+    }
+
+    public static boolean isUseable(Item item) {
+        return item.getInventoryType() == InventoryType.USE;
+    }
+
+    public static boolean isSetup(Item item) {
+        return item.getInventoryType() == InventoryType.SETUP;
+    }
+
+    public static boolean isETC(Item item) {
+        return item.getInventoryType() == InventoryType.ETC;
+    }
+
+    public static boolean isCash(Item item) {
+        return item.getInventoryType() == InventoryType.CASH;
+    }
+
+    /*
+    getPrice - getItemMarketValue
+    getItemPrice - getItemMarketValue
+    getMarketPrice, getMarketValue
+     */
+    public static Integer getItemMarketValue(Item thisItem) {
+        Integer itemMarketValue = 0;
+        if (ItemUtilities.isEquip(thisItem)) {
+            if (ItemUtilities.isCleanEquip(thisItem)) {
+                itemMarketValue = (ItemDatabase.getInstance().getItemPrice(thisItem.getItemId()));
+//                debugprint("Clean Item Value: ", itemMarketValue);
+            } else if (!ItemUtilities.isCleanEquip(thisItem)) {
+                itemMarketValue = getEquipMarketValue((Equip) thisItem);
+//                debugprint("Scrolled Eq Market Value: ", itemMarketValue);
+            }
+        } else {
+            itemMarketValue = (ItemDatabase.getInstance().getItemPrice(thisItem.getItemId()));
+//            debugprint("Non-Eq item Value: ", itemMarketValue);
+        }
+        return itemMarketValue;
+    }
+
+}

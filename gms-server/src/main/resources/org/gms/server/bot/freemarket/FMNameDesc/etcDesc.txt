@@ -1,92 +1,92 @@
-Crystal Cavern
-The Ore Emporium
-Gemstone Gathering
-Miner's Marvels
-Forged & Found
-The Crystal Vault
-Raw Material Market
-Shard & Stone Depot
-The Glittering Mine
-Metal & Mineral Co.
-Gleaming Treasures
-Veins of Valor
-The Mystic Mine
-Precious Prospects
-Refined Radiance
-Gilded Geodes
-The Ore & Alloy Shop
-Mineral Mysteries
-The Shard Bazaar
-Gems & Gold Galore
-Forged Wonders
-The Crystalline Hoard
-Alloyed Treasures
-Rare Earth Depot
-Ethereal Elements
-Elemental Emporium
-The Gem Crafter
-Ore & Crystal Co.
-Heavenly Metals
-The Gleaming Lode
-Pickaxe Paradise
-Refinery Row
-Nugget Nook
-The Stone Cellar
-Quarry Goods Co.
-Smelted Surplus
-Ingot Exchange
-The Vein Market
-Deep Mine Depot
-Fossil & Fragment
-The Crafting Crate
-Material Matters
-The Hoarder's Heap
-Monster Parts Co.
-Loot & Leftovers
-Trophy Trove
-Drop Table Deals
-ETC Overflow
-The Collector's Bin
-Spare Parts Bazaar
-Quest Item Depot
-Odds & Ends Market
-The Junk Drawer
-Salvage & Supply
-Reagent Reserve
-Component Corner
-The Scrap Yard
-Bits & Pieces Shop
-Leftover Loot Co.
-The Surplus Stash
-Gathered Goods
-Harvest & Hoard
-The Stockpile
-Resource Rack
-Ingredient Index
-Raw Goods Galore
-The Gathering Hall
-Natural Resources
-Chunk & Crystal
-Unrefined Riches
-The Earthen Cache
-Mineral Mart
-Prospector's Pick
-Dig Site Deals
-The Deposit Box
-Rubble & Riches
-The Fragment Forge
-Stardust & Shards
-Moonstone Market
-Adamantium Alley
-Mithril & More
-Orichalcum Outlet
-Steel Seed Supply
-The Smelting Pot
-Alloy Avenue
-The Foundry Floor
-Plate & Powder Co.
-Bronze Age Bazaar
-Iron Vein Vendors
-The Furnace Front
-Cobalt & Carbon
-Ember Ore Exchange
+矿石收购站
+宝石打磨铺
+挖矿人的店
+杂物间小铺
+矿石杂货铺
+矿石小卖部
+矿石批发部
+矿石装备行
+矿石补给站
+原石专卖店
+矿石随便挑
+挖矿装备店
+矿工补给站
+十字镐专卖
+矿镐装备行
+挖矿一条龙
+宝石专卖店
+宝石批发部
+宝石杂货铺
+宝石小卖部
+宝石百宝阁
+珠宝装备行
+钻石专卖店
+蛋白石专卖
+蓝宝石专卖
+红宝石专卖
+祖母绿专卖
+紫水晶专卖
+黄玉装备行
+玛瑙专卖店
+翡翠专卖店
+珍珠装备行
+石榴石专卖
+海蓝石专卖
+月光石专卖
+星尘专卖店
+陨石专卖店
+水晶专卖店
+黑水晶专卖
+魔法粉末店
+矿物百宝轩
+宝石打磨行
+珠宝匠人铺
+首饰材料店
+金属材料行
+钢锭批发部
+铁锭批发部
+铜锭专卖店
+银锭装备行
+金锭专卖店
+铂金锭专卖
+秘银专卖店
+钛金属专卖
+龙金属专卖
+零件批发部
+螺丝专卖店
+齿轮装备行
+零件杂货铺
+怪物掉落物
+掉落物专卖
+任务材料店
+材料随便挑
+材料批发部
+材料补给站
+材料一条街
+素材杂货铺
+药草专卖店
+药材装备行
+种子专卖店
+蘑菇孢子铺
+战利品专卖
+杂物批发部
+杂物小卖部
+杂物一条街
+杂物老字号
+零七八碎铺
+瓶瓶罐罐铺
+破铜烂铁铺
+宝贝疙瘩铺
+值钱玩意店
+收破烂的店
+高价收购站
+回收杂货铺
+捡来的都卖
+挖来的都卖
+打怪爆的货
+矿价全网最低
+血赚不亏矿
+手慢无矿石
+闭眼入矿石
+挖矿人的百宝
+杂物军火库

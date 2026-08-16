@@ -1,86 +1,86 @@
-The Archer's Loft
-Bow & Arrow Bazaar
-The Ranger's Cache
-Sharpshooter Supply
-Crossbow Corner
-The Marksman's Mark
-Arrow Storm Armory
-DEX Gang Gear
-The Quiver Vault
-Sniper's Stockpile
-The Bowmaster's Bin
-Strafe & Strike
-Hurricane Hub
-The Piercing Shop
-The Arrow Rain
-Phoenix Feather Shop
-Frostprey's Find
-The Golden Eagle
-The Silver Hawk
-Puppet Master's Pile
-Concentrate Corner
-Sharp Eyes Supply
-Bow Whack Bazaar
-Arrow Bomb Depot
-Iron Arrow Armory
-The Double Shot
-The Ranger Station
-Crossbow Crafters
-Bolt & Bow Co.
-The Fletching Shop
-Aim & Fire Market
-Dead-Eye Deals
-Long Range Loot
-The Snipe Shop
-Distance Dealers
-The Precision Pick
-Bullseye Bazaar
-The Target Shop
-Trajectory Traders
-Falcon's Feathers
-The Eagle's Eye
-Hawk's Nest Gear
-Predator's Perch
-The Owl's Arsenal
-Talon & Timber
-Wildwood Wares
-Forest Archer Shop
-Elven Armory
-The Woodland Cache
-Leaf & Limb
-Nature's Notch
-The Grove Gear
-Treeborn Traders
-Acorn Arsenal
-The Glade Shop
-Windwalker Wares
-Breeze Bow Bazaar
-Gust & Glide Gear
-The Zephyr Zone
-Storm Archer Supply
-Skyshot Shop
-The Cloud Quiver
-Horizon Hunters
-The Distant Draw
-Longbow Lounge
-Recurve Room
-Compound Cache
-The Short Bow Shack
-Flatbow Finds
-The Yew & Ash
-Maple Bow Market
-The String Shop
-Grip & Draw
-Nock & Release
-The Broadhead Bin
-The Bodkin Box
-Arrowhead Armory
-The Fletch & Fire
-Volley Vault
-Rain of Arrows
-The Barrage Barn
-Multi Shot Market
-Scatter Shot Shop
-Split Shot Supply
-The Burst Bazaar
-Rapid Fire Range
+弓手补给站
+箭矢批发部
+百步穿杨阁
+射就完了铺
+弓箭装备行
+弓手装备店
+猎人装备行
+弩手装备店
+神射装备行
+箭神装备店
+弓手小卖部
+长弓专卖店
+短弓装备行
+弩弓批发部
+强弩装备店
+箭矢专卖店
+木箭批发铺
+铁箭装备行
+钢箭批发部
+箭矢随便买
+箭矢军火库
+弓手军械库
+断魂箭装备
+二连射装备
+爆炸箭装备
+穿透箭装备
+箭雨装备行
+强弓装备店
+集中装备行
+专注装备店
+敏捷装备行
+灵活装备店
+手长装备行
+射程装备店
+远程装备行
+暴击装备店
+命中装备行
+箭无虚发铺
+例无虚发店
+百发百中铺
+箭箭爆头铺
+手慢无装备
+射速装备店
+拉弓就射铺
+鹰眼装备行
+猎鹰装备店
+猎豹装备行
+丛林装备店
+森林装备行
+精灵装备店
+风之装备行
+疾风装备店
+射手装备行
+游侠装备店
+神射手铺子
+弩箭批发部
+弓弦专卖店
+弓匠铺子
+制箭作坊
+箭袋批发部
+箭囊装备行
+箭筒随便挑
+弓手百宝阁
+箭矢杂货铺
+远程军火库
+狙击装备店
+鹰眼百宝轩
+射程就是正义
+手长就是正义
+弓手老字号
+箭客装备行
+满弓装备店
+拉满就射铺
+攒射装备店
+齐射装备行
+万箭齐发铺
+箭如雨下店
+一箭穿心铺
+会心一击店
+要害射击铺
+瞄头装备店
+箭矢管够铺
+弓手万能铺
+神弓批发部
+射术装备行
+穿杨杂货铺

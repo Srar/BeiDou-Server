@@ -1,88 +1,88 @@
-The Arcane Attic
-Mystic Marketplace
-Wand & Staff Shop
-The Wizard's Closet
-Elemental Emporium
-The Mage's Vault
-Spell Caster's Cache
-The Enchanted Shop
-INT Gang Gear
-Magic & More
-The Sorcerer's Stock
-Archmage Arsenal
-Fire & Ice Bazaar
-Lightning Locker
-The Poison Shop
-The Bishop's Bounty
-Cleric's Corner
-Priest's Provisions
-Holy Mage Gear
-The Heal Station
-The F/P Supply
-I/L Depot
-The Elemental Edge
-Meditation Market
-Magic Guard Gear
-The Staff Exchange
-Wand Warehouse
-The Crystal Orb
-Mystic Robes Co.
-The Mana Pool
-Infinity Gear
-The Magic Claw
-Energy Bolt Bazaar
-Thunderbolt Traders
-Ice Strike Shop
-Poison Mist Market
-Fire Arrow Forge
-Blizzard Bazaar
-Meteor Shower Shop
-Chain Lightning Co.
-Genesis Gear
-Angel Ray Armory
-Bahamut's Bounty
-Ifrit's Inventory
-Elquines Exchange
-The Summoner's Stash
-Maple Wizard Wares
-Teleport Market
-The Blink Shop
-MP Eater's Emporium
-Spell Mastery Store
-The Magic Dome
-Enchanter's Estate
-Grimoire Gallery
-The Tome Trader
-Wisdom & Wands
-Intellect Inventory
-The Scholar's Shelf
-Runic Repository
-Alchemist's Alcove
-The Sage's Study
-Conjurer's Cabinet
-The Familiar's Find
-Crystal Ball Cache
-The Hex Shop
-Charm & Curse Co.
-Ritual Relics
-The Cauldron Cache
-Broomstick Bazaar
-Starlight Staff Shop
-The Moonbeam Market
-Celestial Casters
-The Cosmic Cache
-Nebula Gear
-Astral Armory
-The Void Vendor
-Shadow Mage Shop
-Dark Magic Depot
-Necro Nook
-The Lich's Loot
-Spirit Medium Mart
-The Ethereal Edge
-Phantom Mage Picks
-Spectral Staff Shop
-Ghostly Gear Co.
-The Haunted Hoard
-Robe & Ring Rack
-The Earring Exchange
+法师装备店
+魔杖修理铺
+法力充值站
+奥术秘宝阁
+法杖专卖店
+法师小卖部
+魔导装备行
+冰雷装备店
+火毒装备行
+主教装备店
+祭司补给站
+龙神装备行
+夜光装备店
+法袍专卖店
+长袍批发部
+魔杖批发部
+短杖专卖店
+长杖装备行
+魔力装备店
+智慧装备行
+智力就是力量
+魔力满满铺
+法力随便充
+蓝条管够店
+回蓝补给站
+魔法弹药库
+奥术批发部
+咒语装备店
+符咒小卖部
+魔导书专卖
+魔法书铺子
+卷宗百宝阁
+炼金装备行
+制药装备店
+炼金百宝轩
+秘法装备店
+奥术装备行
+秘宝杂货铺
+魔法攻击行
+爆发装备店
+全屏技能铺
+冰咆哮装备
+火凤凰装备
+神圣装备店
+天怒装备行
+落雷装备店
+闪电批发部
+冰冻装备店
+火墙装备行
+魔力爪装备
+魔法弹装备
+法师军火库
+法爷百宝阁
+法神装备店
+大法师装备
+贤者装备行
+先知装备店
+术士装备行
+巫师装备店
+法师老字号
+法系补给站
+智力装备行
+魔攻装备店
+高魔攻铺子
+法伤随便挑
+暴击装备行
+法杖一条街
+魔杖军火库
+水晶球专卖
+魔力水晶铺
+魔法材料店
+咒印装备店
+符文批发部
+法袍裁缝铺
+斗篷专卖店
+帽子装备行
+法帽专卖店
+智力头箍铺
+魔戒装备行
+戒指专卖店
+耳环装备行
+魔力护身符
+魔杖闭眼入
+法爷全网最低
+法师万能铺
+法术杂货铺
+奥义装备行
+秘术百宝阁

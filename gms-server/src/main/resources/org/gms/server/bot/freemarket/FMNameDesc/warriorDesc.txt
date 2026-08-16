@@ -1,91 +1,91 @@
-The Warrior's Keep
-Steel & Strength
-Blade Bazaar
-Heavy Hitter's Shop
-Armored Armory
-The Crusader's Cache
-Sword & Shield Co.
-The Battle Forge
-Iron Will Armory
-Two-Handed Traders
-The Helm Vault
-Warrior's Stockpile
-Brute Force Gear
-The Berserker's Bin
-Knight's Arsenal
-Tank Top Shop
-Frontline Armory
-The Brawler's Bench
-Valhalla Vendors
-The Paladin's Pile
-Dragon Knight Depot
-The Hero's Hoard
-Spearman Surplus
-Page's Provisions
-Fighter's Find
-The White Knight Shop
-Crusader's Corner
-Guardian Gear Co.
-The Defender's Den
-HP Warrior Gear
-Strength Store
-STR Gang Shop
-The Melee Market
-Slash & Smash
-Heavy Armor Hub
-Plate Mail Plaza
-Brave Blades
-The Attack Shop
-Power Strike Picks
-The Ground Smash
-Combo King's Cache
-Brandish Bazaar
-Rage Gear Depot
-Power Guard Parts
-Achilles' Armory
-Rush Hour Gear
-The Maple Warrior
-Beholder's Bounty
-Sacrifice Shop
-The Dragon Roar
-Helm Splitter Hub
-Monster Magnet Mart
-The Brave Warrior
-Swordsman's Supply
-The Fighter's Forge
-Valor & Victory
-The Champion's Chest
-Gladiator Gear
-Conqueror's Cache
-Battle Cry Bazaar
-The Shield Wall
-Titan's Trove
-Warlord's Wares
-The Honor Guard
-Sentinel's Stock
-Noble Knight Gear
-Royal Guard Shop
-The Fortress
-Bastion Blades
-Stronghold Supply
-The Iron Curtain
-Hammer & Anvil
-The War Room
-Combat Ready Co.
-Spartan Supply
-Legion Armory
-The Oath Keeper
-Duty & Steel
-Rampart Gear
-The Battle Standard
-Claymore Cache
-Zweihander Zone
-Polearm Palace
-Spear & Shield
-The Pike Shop
-Halberd Haven
-Mace & Morningstar
-The Blunt Force
-Axe & Armor
-The Lumberjack
-Cleave & Conquer
+战士装备行
+铁血军械库
+重甲批发店
+砍人装备找我
+刀枪剑戟铺
+战士小卖部
+铠甲专卖店
+英雄装备库
+黑骑装备行
+圣骑补给站
+狂战装备店
+双手剑专卖
+枪矛批发部
+重剑无锋铺
+铠甲护体店
+战士军火库
+砍就完了店
+狂暴挥砍铺
+龙咆哮装备
+无双剑铺
+虎咆哮装备行
+突进装备店
+连击装备行
+战神装备库
+米哈尔装备
+魂骑装备行
+战魂装备店
+铁血批发部
+重甲随便挑
+铠甲铺子
+板甲批发
+全身板甲店
+锁子甲专卖
+盾牌专卖店
+大剑小卖部
+阔剑批发部
+巨剑装备行
+战斧装备店
+巨斧专卖店
+锤子装备铺
+钉头锤专卖
+狼牙棒铺子
+长枪专卖店
+长矛批发部
+方天画戟铺
+偃月刀铺子
+青龙刀专卖
+骑士装备行
+十字军装备
+皇家守卫店
+勇者装备行
+沙场老字号
+战士百宝阁
+铁匠铺直营
+千锤百炼铺
+重甲军火库
+战甲补给站
+战吼装备行
+猛攻装备店
+强攻装备行
+上挑一下铺
+狂暴装备店
+血性装备行
+力量就是王道
+血厚防高铺
+挨打装备店
+抗揍装备行
+坦度拉满铺
+前排装备店
+肉盾装备行
+一夫当关铺
+战天斗地行
+铁血真汉子
+正面硬刚铺
+刚就完了店
+战神批发部
+武器一条街
+刀枪剑戟行
+斧钺钩叉铺
+十八般兵器
+兵刃随便挑
+开刃磨刀铺
+刀刃批发部
+军械补给站
+沙场装备库
+铁骑装备行
+圣光装备店
+御龙装备行
+龙骑装备店
+荣誉装备行
+铁血百宝轩

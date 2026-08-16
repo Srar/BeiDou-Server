@@ -35,6 +35,15 @@ public class BotClient extends Client {
     }
 
     /**
+     * bot 会话标记：容量统计（World/Channel 的 channel_capacity 上限）据此排除 bot——
+     * loadenv 会生成数千 bot 注册进 PlayerStorage，计入真实容量会挤掉所有真实玩家登录。
+     */
+    @Override
+    public boolean isBot() {
+        return true;
+    }
+
+    /**
      * no-op：无头客户端绝不能写登录态。基类会向 accounts 表写 loggedin 行
      * （按 getAccID() 定位，bot 的 accId 为 -4，会污染真实数据）并注册/注销
      * 在线会话；bot 没有账号行、没有会话，此处直接跳过。

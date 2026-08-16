@@ -642,8 +642,14 @@ public class World {
 
     public int getWorldCapacityStatus() {
         int worldCap = getChannelsSize() * GameConfig.getServerInt("channel_capacity");
-        int num = players.getSize();
+        // 排除 bot（单锁原子快照）：loadenv 会生成数千 bot 注册进 PlayerStorage，计入会挤满真实玩家名额
+        int num = players.getNonBotSize();
 
+        return computeCapacityStatus(worldCap, num);
+    }
+
+    /** 容量状态三段判定（抽出便于单测）：2=满、1=80% 以上、0=正常。 */
+    static int computeCapacityStatus(int worldCap, int num) {
         int status;
         if (num >= worldCap) {
             status = 2;

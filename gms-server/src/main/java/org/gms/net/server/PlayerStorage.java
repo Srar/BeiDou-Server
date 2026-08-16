@@ -38,6 +38,8 @@ public class PlayerStorage {
     private final Map<String, Character> nameStorage = new LinkedHashMap<>();
     private final Lock rlock;
     private final Lock wlock;
+    // bot 会话计数（Client.isBot() 为真）：容量统计需排除 bot（loadenv 数千 bot 会占满 channel_capacity）
+    private int botCount;
 
     public PlayerStorage() {
         ReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
@@ -48,8 +50,20 @@ public class PlayerStorage {
     public void addPlayer(Character chr) {
         wlock.lock();
         try {
-            storage.put(chr.getId(), chr);
+            Character previous = storage.put(chr.getId(), chr);
+            if (previous != null) {
+                // 同 id 重复注册（防御路径）：先按被覆盖旧角色的类型回退计数，避免 botCount 漂移
+                nameStorage.remove(previous.getName().toLowerCase());
+                Client previousClient = previous.getClient();
+                if (previousClient != null && previousClient.isBot()) {
+                    botCount--;
+                }
+            }
             nameStorage.put(chr.getName().toLowerCase(), chr);
+            Client client = chr.getClient();
+            if (client != null && client.isBot()) {
+                botCount++;
+            }
         } finally {
             wlock.unlock();
         }
@@ -61,6 +75,10 @@ public class PlayerStorage {
             Character mc = storage.remove(chr);
             if (mc != null) {
                 nameStorage.remove(mc.getName().toLowerCase());
+                Client client = mc.getClient();
+                if (client != null && client.isBot()) {
+                    botCount--;
+                }
             }
 
             return mc;
@@ -118,6 +136,8 @@ public class PlayerStorage {
         wlock.lock();
         try {
             storage.clear();
+            nameStorage.clear(); // 与 storage 对称清空，避免残留幽灵名字（getCharacterByName/isNameTaken 污染）
+            botCount = 0;
         } finally {
             wlock.unlock();
         }
@@ -127,6 +147,26 @@ public class PlayerStorage {
         rlock.lock();
         try {
             return storage.size();
+        } finally {
+            rlock.unlock();
+        }
+    }
+
+    /** 当前存储中的 bot 会话数（Client.isBot() 为真）。 */
+    public int getBotCount() {
+        rlock.lock();
+        try {
+            return botCount;
+        } finally {
+            rlock.unlock();
+        }
+    }
+
+    /** 非 bot 在线数（单锁原子快照）：容量统计专用，避免 size 与 botCount 两次读之间被写入穿插。 */
+    public int getNonBotSize() {
+        rlock.lock();
+        try {
+            return storage.size() - botCount;
         } finally {
             rlock.unlock();
         }

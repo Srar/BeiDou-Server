@@ -291,7 +291,8 @@ public final class Channel {
     }
 
     public int getChannelCapacity() {
-        return (int) (Math.ceil(((float) players.getAllCharacters().size() / GameConfig.getServerInt("channel_capacity")) * 800));
+        // 排除 bot：loadenv 的数千 bot 注册在 players 中，计入会把频道负载条撑满
+        return (int) (Math.ceil(((float) players.getNonBotSize() / GameConfig.getServerInt("channel_capacity")) * 800));
     }
 
     public void broadcastPacket(Packet packet) {

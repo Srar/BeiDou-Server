@@ -321,6 +321,16 @@ public class Client extends ChannelInboundHandlerAdapter {
     }
 
     /**
+     * 是否为 bot 会话（{@link BotClient} 覆写返回 true）。
+     * 容量统计等需要区分真实玩家的场景使用，默认非 bot。
+     * 口径说明：与 {@code BotHelpers.isBot(int)}（id 区段 + 注册表）不同，本方法按会话类型判定，
+     * 生产路径两者对 bot 一致（bot 的 client 恒为共享 BotClient）。
+     */
+    public boolean isBot() {
+        return false;
+    }
+
+    /**
      * 设置角色
      * @param player
      */

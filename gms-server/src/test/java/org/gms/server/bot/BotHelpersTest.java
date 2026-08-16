@@ -11,6 +11,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.awt.Point;
+import java.lang.reflect.Method;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -81,6 +84,10 @@ class BotHelpersTest {
     void randomBotNameComesFromPool() {
         // 大池无放回轮盘（对齐 SoloMapling FMShopDescGen 语义）：名字必须来自池，
         // 且连续发放绝不重名（旧实现 20 个小池有放回随机导致满屏「豆豆2/云朵11」）。
+        // 池为懒加载：单独运行本测试类时尚未加载，先触发一次加载再取快照。
+        if (BotHelpers.loadedNamePoolSnapshot().isEmpty()) {
+            BotHelpers.randomBotName();
+        }
         Set<String> poolNames = BotHelpers.loadedNamePoolSnapshot();
         assertFalse(poolNames.isEmpty(), "bot name pool resource must not be empty");
 
@@ -92,6 +99,63 @@ class BotHelpersTest {
             assertTrue(poolNames.contains(name), "generated name not from pool: " + name);
             assertTrue(issued.add(name), "duplicate name issued: " + name);
         }
+    }
+
+    @Test
+    void loadedNamePoolIsEncodingSafe() {
+        // 名字编码安全审计（客户端栈溢出/尾字节风险）：全池名字必须 GBK 可编码、
+        // GBK 字节数 ≤12（v83 客户端名字字段固定 13 字节）且不含危险尾字节。
+        // 池为空时先触发懒加载；若资源文件缺失（打包异常）则跳过断言。
+        if (BotHelpers.loadedNamePoolSnapshot().isEmpty()) {
+            BotHelpers.randomBotName();
+        }
+        Set<String> poolNames = BotHelpers.loadedNamePoolSnapshot();
+        if (poolNames.isEmpty()) {
+            return;
+        }
+
+        Charset gbk = Charset.forName("GBK");
+        CharsetEncoder encoder = gbk.newEncoder();
+        for (String name : poolNames) {
+            assertTrue(encoder.canEncode(name), "name must be GBK-encodable: " + name);
+            byte[] bytes = name.getBytes(gbk);
+            assertTrue(bytes.length <= 12,
+                    "GBK byte length must be <= 12 for the v83 13-byte name field: " + name);
+            // 危险尾字节清单直接引用生产常量，杜绝测试与实现双份清单漂移
+            for (byte b : bytes) {
+                for (byte unsafe : BotHelpers.UNSAFE_TAIL_BYTES) {
+                    assertFalse(b == unsafe,
+                            "name must not contain unsafe tail byte 0x"
+                                    + Integer.toHexString(b & 0xFF).toUpperCase() + ": " + name);
+                }
+            }
+        }
+    }
+
+    /** 反射调用 BotHelpers 私有方法 isNameSafe（加载过滤逻辑的单元级入口）。 */
+    private static boolean isNameSafe(String name) throws Exception {
+        Method method = BotHelpers.class.getDeclaredMethod("isNameSafe", String.class);
+        method.setAccessible(true);
+        return (boolean) method.invoke(null, name);
+    }
+
+    @Test
+    void isNameSafeRejectsOverflowAndUnsafeTailBytes() throws Exception {
+        // 危险尾字节：「啈運星」GBK = 86 91 DF 5C D0 C7，含 0x5C '\'，干扰客户端 C 字符串解析
+        assertFalse(isNameSafe("啈運星"), "GBK byte stream containing 0x5C must be rejected");
+        // 超长全角名：7 个全角字符 → GBK 14 字节 > 12，会溢出 v83 客户端 13 字节名字字段
+        assertFalse(isNameSafe("一二三四五六七"), "GBK byte length > 12 must be rejected");
+        // 字符数超限：13 个 ASCII 字符
+        assertFalse(isNameSafe("abcdefghijklm"), "char length > 12 must be rejected");
+        // 空/空白
+        assertFalse(isNameSafe(""));
+        assertFalse(isNameSafe("   "));
+        assertFalse(isNameSafe(null));
+        // 正常名字通过
+        assertTrue(isNameSafe("糖糖"), "safe name must pass");
+        assertTrue(isNameSafe("Bot"), "safe ASCII name must pass");
+        // 边界：6 个全角字符恰好 12 字节，应通过
+        assertTrue(isNameSafe("一二三四五六"), "12-byte GBK name must pass");
     }
 
     @Test

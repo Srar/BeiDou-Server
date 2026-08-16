@@ -1,6 +1,7 @@
 package org.gms.server.bot.decorate;
 
 import org.gms.server.ItemInformationProvider;
+import org.gms.server.bot.itempool.EquipMetadataCache;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.InputStream;
@@ -17,11 +18,17 @@ import java.util.concurrent.ThreadLocalRandom;
  * (never pick gear the bot can't wear) and bias toward gear near the bot's level,
  * while still allowing occasional lower-level "fashion" picks.
  *
+ * <p>Load-time filtering: ids that don't exist in WZ (checked once via
+ * {@link EquipMetadataCache#equipExists(int)}, O(1) HashSet) are dropped from
+ * the pool, so every runtime pick is guaranteed to be a real WZ equip.
+ *
  * Call {@link #load()} once at startup (QuickEquip does this lazily). Then use
  * {@link #getRandom(String, int, int)} to pick a random item for a given category,
  * bot level and bot gender.
  */
 public class GenericEquipPool {
+
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GenericEquipPool.class);
 
     // Classpath resource (mirrors the SoloMapling in-tree YAML location, relocated to
     // src/main/resources/org/gms/server/bot/decorate/). Loaded via getResourceAsStream
@@ -72,6 +79,12 @@ public class GenericEquipPool {
     public static synchronized void load() {
         if (loaded) return;
 
+        // 防御空池永久缓存：必须先确保装备元数据索引已就绪（get() 双检锁幂等，
+        // 可能阻塞数秒等待一次性构建），再执行 equipExists 过滤。若索引未构建
+        // （如 WZ 未就绪导致 initialize 产出空索引）就过滤，区间内 id 会被全部
+        // 滤掉，随后 loaded=true 把空池永久缓存，之后无法重试。
+        EquipMetadataCache.get();
+
         try (InputStream in = GenericEquipPool.class.getResourceAsStream(YAML_PATH)) {
             if (in == null) {
                 System.err.println("[GenericEquipPool] YAML resource not found: " + YAML_PATH);
@@ -83,6 +96,7 @@ public class GenericEquipPool {
 
             ItemInformationProvider iip = ItemInformationProvider.getInstance();
             int itemCount = 0;
+            int filteredCount = 0;
 
             for (Map.Entry<String, Object> entry : root.entrySet()) {
                 String category = entry.getKey();
@@ -92,6 +106,13 @@ public class GenericEquipPool {
                 List<PoolItem> list = new ArrayList<>();
                 for (Object raw : (List<?>) val) {
                     int id = toInt(raw);
+                    // wz 存在性过滤（一次性 O(n)，HashSet O(1) 判定）：剔除 wz 中不存在的
+                    // id，保证运行时随机到的装备全部合法，绝不把不存在的 id 穿给 bot。
+                    // 必须在 getEquipLevelReq 之前过滤，避免对不存在 id 做 WZ 查询。
+                    if (!EquipMetadataCache.equipExists(id)) {
+                        filteredCount++;
+                        continue;
+                    }
                     int min = iip.getEquipLevelReq(id);
                     int gender = genderFromItemId(id);
                     list.add(new PoolItem(id, min, gender));
@@ -103,6 +124,9 @@ public class GenericEquipPool {
             loaded = true;
             System.out.println("[GenericEquipPool] Loaded " + itemCount
                     + " items across " + pools.size() + " categories (reqLevel cached from WZ)");
+            if (filteredCount > 0) {
+                log.info("[GenericEquipPool] Filtered {} ids not found in WZ", filteredCount);
+            }
         } catch (Exception e) {
             System.err.println("[GenericEquipPool] Failed to load YAML: " + e.getMessage());
             e.printStackTrace();

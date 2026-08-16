@@ -8,6 +8,7 @@ import org.gms.client.inventory.InventoryType;
 import org.gms.client.inventory.Item;
 import org.gms.constants.inventory.ItemConstants;
 import org.gms.server.ItemInformationProvider;
+import org.gms.server.bot.itempool.EquipMetadataCache;
 
 import java.util.List;
 import java.util.Random;
@@ -38,6 +39,15 @@ public class BotCustomization {
 
     public static void EquipBot(Character fakechar, Integer itemId) {
         if (itemId == null) {
+            return;
+        }
+        // wz 存在性兜底校验：v83 客户端渲染 spawn 包 addCharLook 里不存在的装备 id 会崩。
+        // 快速路径为 O(1) HashSet（EquipMetadataCache 索引，装饰热路径恒命中、零 WZ 访问）；
+        // 索引未收录但 WZ 中真实存在（如 170xxxx cash 武器，超出既有装备区间）的 id 放行，
+        // 真正不存在的 id 直接跳过（绝不抛异常、绝不影响其余装饰）。
+        if (!EquipMetadataCache.equipExists(itemId)
+                && ItemInformationProvider.getInstance().getEquipStats(itemId) == null) {
+            log.warn("BotCustomization.EquipBot: item {} does not exist in WZ; skipping", itemId);
             return;
         }
         short dst = getDestinationEquipSlot(itemId);

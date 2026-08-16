@@ -7,6 +7,8 @@ import org.gms.server.maps.MapObject;
 import org.gms.server.maps.MapleMap;
 import org.gms.util.I18nUtil;
 import org.gms.util.Randomizer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -14,6 +16,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +28,8 @@ import java.util.List;
  * Bot 通用判定与工具。
  */
 public final class BotHelpers {
+
+    private static final Logger log = LoggerFactory.getLogger(BotHelpers.class);
 
     /**
      * bot 角色 ID 起点：远离 characters 表自增区间（自增从 1 起），
@@ -38,6 +44,29 @@ public final class BotHelpers {
 
     /** 中国游戏风名字池资源（每行一个名字，生成器见 scripts/genBotNames.py 同源说明）。 */
     private static final String NAME_POOL_RESOURCE = "/org/gms/server/bot/namepool/bot_names.txt";
+
+    /**
+     * 名字编码字符集：服务端 addCharStats（PacketCreator.java:173-175）写 13 字节定长 GBK
+     * 字段（writeFixedString(rightPadded(name,13))），无 short 前缀，
+     * 因此名字长度安全必须按 GBK 字节数判定，而不是字符数。
+     */
+    private static final Charset GBK = Charset.forName("GBK");
+
+    /**
+     * GBK 严格可编码判定器：getBytes(GBK) 会把不可映射字符（emoji/韩文等）静默替换为
+     * 0x3F '?' 放行，必须先经 {@link #GBK_ENCODER} 的 canEncode 严格校验。
+     * CharsetEncoder 本身非线程安全，但 canEncode 是只读操作（不改变 encoder 内部状态），
+     * 并发调用安全；且 isNameSafe 仅由 synchronized 的 randomBotName 加载路径与测试调用。
+     */
+    private static final CharsetEncoder GBK_ENCODER = GBK.newEncoder();
+
+    /**
+     * C 字符串危险尾字节：GBK 字节流中出现这些字节会干扰客户端对名字的 C 字符串解析
+     * （0x5C '\' 转义、0x7C '|'、0x7B '{'、0x7D '}'、0x5B '['、0x5D ']'、0x40 '@'）。
+     * 中文的 GBK 第二字节范围为 0x40-0xFE（除 0x7F），因此部分汉字（如「聖」「驚」）
+     * 的编码第二字节恰好是这些值——审计发现的增量风险，需在字节流层面过滤。
+     */
+    static final byte[] UNSAFE_TAIL_BYTES = {0x5C, 0x7C, 0x7B, 0x7D, 0x5B, 0x5D, 0x40};
 
     /**
      * 无放回名字轮盘（对齐 SoloMapling FMShopDescGen.getRandomIGN 语义）：
@@ -98,25 +127,65 @@ public final class BotHelpers {
         return fallbackName();
     }
 
-    /** 一次性加载并洗牌名字池（每行一个，过滤空白与超长行）。 */
+    /** 一次性加载并洗牌名字池（每行一个；按编码安全过滤空白、超长与含危险尾字节的名字）。 */
     private static void loadNamePool() {
         try (InputStream in = BotHelpers.class.getResourceAsStream(NAME_POOL_RESOURCE)) {
             if (in == null) {
                 return;
             }
+            int totalLines = 0;
+            int filtered = 0;
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
+                    totalLines++;
                     String name = line.trim();
-                    if (!name.isEmpty() && name.length() <= 12) {
+                    if (isNameSafe(name)) {
                         NAME_POOL.add(name);
+                    } else {
+                        filtered++;
                     }
                 }
             }
+            log.info("Bot 名字池加载完成: 总行数 {}, 过滤 {} 个, 剩余 {} 个", totalLines, filtered, NAME_POOL.size());
             Collections.shuffle(NAME_POOL);
         } catch (IOException e) {
             // 资源缺失/损坏：保留空池，randomBotName 走 i18n 回退
         }
+    }
+
+    /**
+     * 名字是否通过全部编码安全过滤（空白、字符数、GBK 可编码性、GBK 字节数、危险尾字节）。
+     * <p>
+     * 审计依据：服务端 PacketCreator.addCharStats 用 {@code writeFixedString(rightPadded(name, 13))}
+     * 写 13 字节定长 GBK 字段。全角字符 GBK 占 2 字节，若名字
+     * GBK 字节数超过 12，经右填充后仍会溢出 13 字节字段——客户端对名字字段未设防
+     * 阈值，存在栈溢出风险。因此过滤条件为「字符数 ≤12 且 GBK 字节数 ≤12」双条件。
+     * <p>
+     * 另在字节流层面过滤 {@link #UNSAFE_TAIL_BYTES} 危险尾字节（如 0x5C '\'），
+     * 防止客户端对名字做 C 字符串解析时被干扰。
+     */
+    private static boolean isNameSafe(String name) {
+        if (name == null || name.isBlank() || name.length() > 12) {
+            return false;
+        }
+        // 严格 GBK 可编码校验必须先于 getBytes：不可映射字符会被静默替换为 0x3F '?'，
+        // 否则 emoji/韩文等名字会绕过长度与尾字节过滤（审计 A3-Low1）。
+        if (!GBK_ENCODER.canEncode(name)) {
+            return false;
+        }
+        byte[] gbk = name.getBytes(GBK);
+        if (gbk.length > 12) {
+            return false;
+        }
+        for (byte b : gbk) {
+            for (byte unsafe : UNSAFE_TAIL_BYTES) {
+                if (b == unsafe) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /** i18n 小池兜底（资源缺失场景）：随机取一个并加随机数字后缀降低撞名率。 */

@@ -2,6 +2,7 @@ package org.gms.server.bot.decorate;
 
 import org.gms.constants.inventory.EquipType;
 import org.gms.server.ItemInformationProvider;
+import org.gms.server.bot.itempool.EquipMetadataCache;
 import org.gms.util.Pair;
 import org.yaml.snakeyaml.Yaml;
 
@@ -19,11 +20,17 @@ import java.util.concurrent.ThreadLocalRandom;
  * No level filter (NX has no reqLevel). Gender is resolved per item at load
  * time: explicit YAML override > body-slot ID-digit convention > unisex default.
  *
+ * <p>Load-time filtering: ids that don't exist in WZ (checked once via
+ * {@link EquipMetadataCache#equipExists(int)}, O(1) HashSet) are dropped from
+ * the pool, so every runtime pick is guaranteed to be a real WZ equip.
+ *
  * Call {@link #load()} once at startup (BotDecorateNX does this lazily).
  * Use {@link #getRandom(String, int)} to pick a random item for a given
  * category and bot gender.
  */
 public class NXItemPool {
+
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NXItemPool.class);
 
     // Classpath resource (mirrors the SoloMapling in-tree YAML location, relocated to
     // src/main/resources/org/gms/server/bot/decorate/). Loaded via getResourceAsStream
@@ -129,6 +136,7 @@ public class NXItemPool {
             if (root == null) root = Collections.emptyMap();
 
             int itemCount = 0;
+            int filteredCount = 0;
             for (Map.Entry<String, Object> entry : root.entrySet()) {
                 String category = entry.getKey();
                 Object val = entry.getValue();
@@ -138,8 +146,14 @@ public class NXItemPool {
                 for (Object raw : (List<?>) val) {
                     PoolItem item = parseEntry(raw, category);
                     if (item != null) {
-                        list.add(item);
-                        itemCount++;
+                        // wz 存在性过滤（一次性 O(n)，HashSet O(1) 判定）：剔除 wz 中
+                        // 不存在的 id，保证运行时随机到的 NX 装备全部合法。
+                        if (EquipMetadataCache.equipExists(item.id)) {
+                            list.add(item);
+                            itemCount++;
+                        } else {
+                            filteredCount++;
+                        }
                     }
                 }
                 pools.put(category, list);
@@ -155,17 +169,29 @@ public class NXItemPool {
                 if (existing != null && !existing.isEmpty()) continue;
 
                 List<PoolItem> cacheItems = loadCashItems(category, mapping.getValue());
-                if (!cacheItems.isEmpty()) {
-                    pools.put(category, cacheItems);
-                    cacheCount += cacheItems.size();
+                // isCash() 已保证 stats!=null，但统一过一遍存在性索引兜底（应恒为 0 剔除）。
+                List<PoolItem> validItems = new ArrayList<>();
+                for (PoolItem item : cacheItems) {
+                    if (EquipMetadataCache.equipExists(item.id)) {
+                        validItems.add(item);
+                    } else {
+                        filteredCount++;
+                    }
+                }
+                if (!validItems.isEmpty()) {
+                    pools.put(category, validItems);
+                    cacheCount += validItems.size();
                     System.out.println("[NXItemPool]   Auto-populated '" + category
-                            + "' with " + cacheItems.size() + " cash items from ItemInformationProvider");
+                            + "' with " + validItems.size() + " cash items from ItemInformationProvider");
                 }
             }
 
             loaded = true;
             System.out.println("[NXItemPool] Loaded " + itemCount + " curated + "
                     + cacheCount + " auto items across " + pools.size() + " categories");
+            if (filteredCount > 0) {
+                log.info("[NXItemPool] Filtered {} ids not found in WZ", filteredCount);
+            }
         } catch (Exception e) {
             System.err.println("[NXItemPool] Failed to load YAML: " + e.getMessage());
             e.printStackTrace();

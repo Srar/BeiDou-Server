@@ -3,6 +3,7 @@ package org.gms.server.bot.decorate;
 import org.gms.client.Character;
 import org.gms.server.bot.BotCustomization;
 import org.gms.server.bot.BotTier;
+import org.gms.server.bot.itempool.EquipMetadataCache;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -215,7 +216,8 @@ public class BotDecorateNX {
 
     private static boolean tryOverall(Character bot, int gender) {
         Integer id = NXItemPool.getRandom("overalls", gender);
-        if (id == null) return false;
+        // 装备前 wz 存在性校验（O(1) HashSet；池加载时已过滤，此处为兜底）。
+        if (id == null || !EquipMetadataCache.equipExists(id)) return false;
         BotCustomization.EquipBot(bot, id);
         return true;
     }
@@ -223,7 +225,11 @@ public class BotDecorateNX {
     private static boolean tryTopBottom(Character bot, int gender) {
         Integer topId = NXItemPool.getRandom("tops", gender);
         Integer botId = NXItemPool.getRandom("bottoms", gender);
-        if (topId == null || botId == null) return false;
+        // 装备前 wz 存在性校验（O(1) HashSet；池加载时已过滤，此处为兜底）。
+        if (topId == null || botId == null
+                || !EquipMetadataCache.equipExists(topId) || !EquipMetadataCache.equipExists(botId)) {
+            return false;
+        }
         BotCustomization.EquipBot(bot, topId);
         BotCustomization.EquipBot(bot, botId);
         return true;
@@ -243,7 +249,8 @@ public class BotDecorateNX {
 
     private static boolean equipFromCategory(Character bot, String category, int gender) {
         Integer itemId = NXItemPool.getRandom(category, gender);
-        if (itemId == null) return false;
+        // 装备前 wz 存在性校验（O(1) HashSet；池加载时已过滤，此处为兜底）。
+        if (itemId == null || !EquipMetadataCache.equipExists(itemId)) return false;
         BotCustomization.EquipBot(bot, itemId);
         return true;
     }

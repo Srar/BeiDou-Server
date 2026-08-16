@@ -351,23 +351,29 @@ public class ArtificialFreeMarket {
         return false; // Default case
     }
 
+    // gms 增强：特价后缀从源 3 种扩到 12 种变体（577 摊位下防重复感）。
+    private static final List<String> QUITTING_SALE_SUFFIXES = List.of(
+            " 退游清仓大甩卖", " 老板跑路价", " 关店最后一天", " 退坑甩卖");
+    private static final List<String> CHEAP_SALE_SUFFIXES = List.of(
+            " 便宜甩卖", " 骨折价", " 血亏甩卖", " 今日特价", " 全场五折起", " 不赚差价", " 手慢无", " 老客户专享");
+
     private static void applySpecialShopType(HiredMerchantArtificial merchant) {
         Random random = new Random();
         int roll = random.nextInt(10_000);
         if (roll == 0) { // 1 in 10,000 chance
             setOneMesoShop(merchant);
-            setMerchantDescription(merchant, " 1 MESO SHOP!!!");
+            setMerchantDescription(merchant, " 一币店!!!");
             return;
         }
         if (roll < 100) { // 100 in 10,000 chance (1%)
             // Quitting Sale
             applyQuittingSaleDiscount(merchant);
-            appendMerchantDescription(merchant, " QUITTING SALE");
+            appendMerchantDescription(merchant, QUITTING_SALE_SUFFIXES.get(random.nextInt(QUITTING_SALE_SUFFIXES.size())));
             return;
         }
         if (roll < 800) { // 800 in 10,000 chance (7%)
             applyCheapSaleDiscount(merchant);
-            appendMerchantDescription(merchant, " Cheap");
+            appendMerchantDescription(merchant, CHEAP_SALE_SUFFIXES.get(random.nextInt(CHEAP_SALE_SUFFIXES.size())));
             return;
         }
     }

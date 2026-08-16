@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,7 +25,8 @@ public class FMShopDescGen {
 
     // classpath 资源路径（jar 部署兼容：gms 资源统一放在 src/main/resources 下按包路径组织）
     static final String filePath_FMNameDesc = "/org/gms/server/bot/freemarket/FMNameDesc/";
-    static List<String> topFMClans = new ArrayList<>();
+    // gms 增强：删除源 topFMClans 静态缓存（一次性填 7 个候选永久复用导致同词反复出现），
+    // getRandomTopFMClan 已改为直接走无放回轮盘。
 
     protected static final Map<String, String> typeToFilePath;
 
@@ -94,7 +96,9 @@ public class FMShopDescGen {
 
     protected static String FMClanAdvertisement() {
         String fmClan = getRandomTopFMClan();
-        fmClan = emblemizeFirstLetter(fmClan);
+        // gms 增强：源对公会名做首字母徽章化（[S]parkshooter 英文风格），中文语境下
+        // 首字被拆出加方括号观感怪异（[巅]峰对决），禁用——公会名原样显示。
+        // fmClan = emblemizeFirstLetter(fmClan);
 
         if (Math.random() < 0.99) { // .7
             fmClan = asciiBorderString(fmClan, 19);
@@ -298,14 +302,9 @@ public class FMShopDescGen {
 
 
     protected static String getRandomTopFMClan() {
-        if (topFMClans.isEmpty()) {
-            for (int i = 0; i < 7; i++) {
-                topFMClans.add(getRandomStoreDescription("fmclan"));
-            }
-        }
-        Random random = new Random();
-        int randomIndex = random.nextInt(topFMClans.size());
-        return topFMClans.get(randomIndex);
+        // gms 增强：源用 topFMClans 静态缓存一次性填 7 个候选后永久复用（同批摊位反复
+        // 撞同词，如「求带飞」连续出现），改为直接走无放回轮盘（见 getRandomStoreDescription）。
+        return getRandomStoreDescription("fmclan");
     }
 
     private static List<String> namePool;
@@ -320,6 +319,9 @@ public class FMShopDescGen {
      * 调用方降级为空字符串。
      */
     private static final Map<String, List<String>> DESC_LINE_CACHE = new ConcurrentHashMap<>();
+
+    /** gms 增强：每描述文件的取词无放回轮盘（key = classpath 资源路径，耗尽重洗）。 */
+    private static final Map<String, ArrayDeque<String>> DESC_WHEELS = new ConcurrentHashMap<>();
 
     /**
      * gms 增强：外部（BotGeneration）登记已发放的 bot 角色名。gms 的 bot 名由
@@ -405,7 +407,18 @@ public class FMShopDescGen {
             // T4-P5：空文件/资源缺失降级为空字符串（源实现最终 return "null" 字符串进描述）。
             return "";
         }
-        return lines.get(new Random().nextInt(lines.size()));
+        // gms 增强：无放回轮盘——577 摊位同批生成时同一词只出现一次（池耗尽才重洗）。
+        // 源为有放回 reservoir 抽样，摊位数大时同词反复出现（如公会名「求带飞」连撞 3 摊）。
+        synchronized (DESC_WHEELS) {
+            ArrayDeque<String> wheel = DESC_WHEELS.get(filePath);
+            if (wheel == null || wheel.isEmpty()) {
+                List<String> shuffled = new ArrayList<>(lines);
+                Collections.shuffle(shuffled);
+                wheel = new ArrayDeque<>(shuffled);
+                DESC_WHEELS.put(filePath, wheel);
+            }
+            return wheel.poll();
+        }
     }
 
     /**
@@ -430,6 +443,10 @@ public class FMShopDescGen {
         }
     }
 
+    /**
+     * 源首字母徽章化（[S]parkshooter 英文风格）。gms 中文语境下已禁用调用
+     * （见 {@link #FMClanAdvertisement()}），方法保留备查，勿再接入中文招牌。
+     */
     protected static String emblemizeFirstLetter(String str) {
         if (str == null || str.isEmpty()) {
             return str; // Return as is if the string is null or empty
@@ -454,11 +471,12 @@ public class FMShopDescGen {
     }
 
     protected static String selectRandomAsciiBorderCharacters(int maxBorderStyleLength) {
-        List<String> borderStyles = new ArrayList<>(List.of("-", "~", "~~", ".:", "*"));
+        // gms 增强：中文招牌语境下去掉 "~~"（删除线感）与 ".:"/"'~."（英文标点组合），
+        // 并去掉 "~"（单波浪在中文招牌中像语气修饰而非边框），保留干净边框样式。
+        List<String> borderStyles = new ArrayList<>(List.of("-", "*"));
         borderStyles.add("--");
 //        borderStyles.add("==");
         borderStyles.add("++");
-        borderStyles.add("'~.");
 
         // Filter the list to only include styles within the length constraint
         List<String> filteredStyles = new ArrayList<>();

@@ -58,7 +58,7 @@ public final class BotBuffDriver {
      */
     public static boolean castSkill(Character bot, int skillId) {
         if (bot == null || bot.getMap() == null) return false;
-        BotBuffEffects.showBuff(bot, skillId);
+        BotBuffEffects.showBuffUnchecked(bot, skillId); // GM 调试路径：无视观察门控，全量广播
         return true;
     }
 
@@ -77,12 +77,14 @@ public final class BotBuffDriver {
                 continue; // not due yet
             }
             final int sid = skillId;
+            final boolean forceCast = force;
             // Stagger: each due buff fires ~STAGGER_MS after the previous, in order,
             // off-thread (never blocks the caller). The recast timer is set now so the
             // loop won't re-trigger before the scheduled cast runs. castBuff shows the
             // bot's animation and, for party buffs, spreads to nearby party members.
+            // force（GM !bot buff）走非门控全量广播；普通 tick 走观察门控。
             // gms 移植：SoloMapling 的 MethodScheduler.runAfterDelay -> gms BotTiming.after。
-            BotTiming.after(cast * STAGGER_MS, () -> BotBuffEffects.castBuff(bot, sid));
+            BotTiming.after(cast * STAGGER_MS, () -> BotBuffEffects.castBuff(bot, sid, forceCast));
 
             int durationMs = BotBuffEffects.durationOf(sid);
             long recastAt = durationMs > 0 ? now + (long) (durationMs * 0.9) : now + FALLBACK_RECAST_MS;

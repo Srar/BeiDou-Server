@@ -34,6 +34,10 @@ public class BotDecorationQueue {
     private static final long TICK_INTERVAL_MS = 250;
     // Delay before first tick after start (ms) - lets bots finish spawning
     private static final long INITIAL_DELAY_MS = 5000;
+    // 波次错峰步长：同一 tick 拉出的 bot 若同时装饰，会在同帧刷出几十条换装广播
+    // （2026-08-17 客户端 error 5 崩溃的高危来源）。按序延迟 BOT_STAGGER_MS * i，
+    // 把各 bot 的装饰（及随后的换装广播）打散到不同时刻。
+    private static final long BOT_STAGGER_MS = 150;
 
     /**
      * Queue a bot for deferred full decoration.
@@ -83,7 +87,7 @@ public class BotDecorationQueue {
 
     /**
      * Process one tick: pull up to BATCH_SIZE bots from each category
-     * and decorate them in parallel (one async task per category).
+     * and decorate them (one async task per category).
      */
     private static void processTick() {
         for (Map.Entry<String, ConcurrentLinkedQueue<Integer>> entry : queues.entrySet()) {
@@ -93,7 +97,9 @@ public class BotDecorationQueue {
                 Integer botId = queue.poll();
                 if (botId == null) break;
 
-                BotExecutors.runAsync(() -> decorateBot(botId));
+                // 错峰调度（延迟 index * BOT_STAGGER_MS）：替代原先 runAsync 的同帧并行装饰，
+                // 避免同 tick 的 bot 集体换装导致同帧几十条 UPDATE_CHAR_LOOK 广播。
+                BotExecutors.schedule(() -> decorateBot(botId), i * BOT_STAGGER_MS);
             }
         }
     }

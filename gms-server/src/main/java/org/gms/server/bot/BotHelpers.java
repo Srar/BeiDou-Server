@@ -2,6 +2,7 @@ package org.gms.server.bot;
 
 import org.gms.client.Character;
 import org.gms.server.ItemInformationProvider;
+import org.gms.server.bot.gcmove.LodCounts;
 import org.gms.server.maps.MapItem;
 import org.gms.server.maps.MapObject;
 import org.gms.server.maps.MapleMap;
@@ -100,6 +101,29 @@ public final class BotHelpers {
     /** 是否为 bot 角色。 */
     public static boolean isBot(Character chr) {
         return chr != null && isBot(chr.getId());
+    }
+
+    /**
+     * 图上是否有真实玩家在观察（bot 广播门控用）。
+     * <p>
+     * 观察轮运行时走 LodCounts O(1) 查询（FULL tier = 有真人）；未运行时回退
+     * 线性扫描（先拷贝快照，防与进出图并发抛 ConcurrentModificationException）。
+     * 供换装/buff 等纯视觉广播使用：无人观察的图跳过广播，显著降低客户端
+     * 接收包量与坏数据触达概率（2026-08-17 客户端崩溃事故的预防性降载）。
+     */
+    public static boolean hasRealPlayerObserver(MapleMap map) {
+        if (map == null) {
+            return false;
+        }
+        if (LodCounts.trackerRunning()) {
+            return LodCounts.isMapFull(map.getId());
+        }
+        for (Character chr : new ArrayList<>(map.getCharacters())) {
+            if (!isBot(chr)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

@@ -35,14 +35,40 @@ public final class BotBuffEffects {
      * Broadcast the buff visual for skillId on the bot to everyone on its
      * map. Returns the buff's WZ duration in ms (for recast cadence), or 0 if the
      * skill/effect can't be resolved. Does NOT apply any stat.
+     *
+     * Observer-gated: when the map has no real player watching it, both visual
+     * broadcasts (showBuffEffect + giveForeignBuff) are skipped - the bot's own
+     * client isn't on the map and nobody else would see the aura, so an idle map
+     * stays packet-free. The WZ duration is still resolved and returned, so the
+     * caller's recast timers stay on cadence (a skipped broadcast is not a failed
+     * cast).
      */
     public static int showBuff(Character bot, int skillId) {
+        return showBuffInternal(bot, skillId, false);
+    }
+
+    /*
+     * Unchecked variant of showBuff: always broadcasts, observer or not. Backs the
+     * GM debug paths (!bot castbuff / givebuff) so a forced visual check is never
+     * silently dropped by the observer gate.
+     */
+    public static int showBuffUnchecked(Character bot, int skillId) {
+        return showBuffInternal(bot, skillId, true);
+    }
+
+    private static int showBuffInternal(Character bot, int skillId, boolean unchecked) {
         if (bot == null || bot.getMap() == null) return 0;
 
-        // The cast animation only needs the skill id - fire it regardless of
-        // whether the StatEffect resolves, so the visual is never skipped.
-        bot.getMap().broadcastMessage(bot,
-                PacketCreator.showBuffEffect(bot.getId(), skillId, CAST_EFFECT_ID), false);
+        // 观察门控：无人观察且非强制路径时跳过全部视觉广播。duration 仍照常
+        // 解析返回，保证 castBuff 的 recast 计时不受门控影响。
+        boolean skipped = !unchecked && !BotHelpers.hasRealPlayerObserver(bot.getMap());
+
+        if (!skipped) {
+            // The cast animation only needs the skill id - fire it regardless of
+            // whether the StatEffect resolves, so the visual is never skipped.
+            bot.getMap().broadcastMessage(bot,
+                    PacketCreator.showBuffEffect(bot.getId(), skillId, CAST_EFFECT_ID), false);
+        }
 
         // The persistent aura needs the buff's stat list (cheap memoized lookup,
         // no applyTo). Skip silently if the skill has no stat ups.
@@ -51,7 +77,7 @@ public final class BotBuffEffects {
         StatEffect effect = skill.getEffect(skill.getMaxLevel());
         if (effect == null) return 0;
 
-        if (!effect.getStatups().isEmpty()) {
+        if (!skipped && !effect.getStatups().isEmpty()) {
             bot.getMap().broadcastMessage(bot,
                     PacketCreator.giveForeignBuff(bot.getId(), effect.getStatups()), false);
         }
@@ -80,10 +106,20 @@ public final class BotBuffEffects {
      * the skill is a PARTY buff (has an area-of-effect box), also grants it to the
      * bot's nearby party members - real players get the working buff, party-member
      * bots get the cosmetic aura. Self-only buffs stay on the bot. Returns the
-     * buff's WZ duration (ms) for recast cadence.
+     * buff's WZ duration (ms) for recast cadence. The two-arg form is
+     * observer-gated (the normal recast tick path); pass force=true to bypass the
+     * gate (GM !bot buff force path).
      */
     public static int castBuff(Character bot, int skillId) {
-        showBuff(bot, skillId);
+        return castBuff(bot, skillId, false);
+    }
+
+    public static int castBuff(Character bot, int skillId, boolean force) {
+        if (force) {
+            showBuffUnchecked(bot, skillId); // GM 强制路径：无视观察门控，全量广播
+        } else {
+            showBuff(bot, skillId);          // 普通 recast tick：无人观察的图跳过广播
+        }
 
         Skill skill = SkillFactory.getSkill(skillId);
         if (skill == null) return 0;
@@ -103,7 +139,7 @@ public final class BotBuffEffects {
      * Used by the !bot givebuff command.
      */
     public static void givePartyBuff(Character bot, int skillId, Collection<Character> targets) {
-        showBuff(bot, skillId);
+        showBuffUnchecked(bot, skillId); // GM 命令路径：保持视觉完整，不走观察门控
         if (targets == null || targets.isEmpty()) return;
 
         Skill skill = SkillFactory.getSkill(skillId);
@@ -145,7 +181,7 @@ public final class BotBuffEffects {
      * cosmetic. Useful for extending key party buffs (Holy Symbol, Maple Warrior, ...).
      */
     public static void giveExtendedBuff(Character bot, int skillId, Collection<Character> targets, int durationMs) {
-        showBuff(bot, skillId);
+        showBuffUnchecked(bot, skillId); // GM 命令路径：保持视觉完整，不走观察门控
         if (targets == null || targets.isEmpty()) return;
 
         Skill skill = SkillFactory.getSkill(skillId);
@@ -156,7 +192,7 @@ public final class BotBuffEffects {
         for (Character target : targets) {
             if (target == null || target == bot) continue;
             if (BotHelpers.isBot(target)) {
-                showBuff(target, skillId);                       // party-member bots stay cosmetic
+                showBuffUnchecked(target, skillId); // GM 命令路径：目标 bot 视觉同样不走门控
             } else {
                 applyBuffWithDuration(target, effect, skillId, durationMs);
             }

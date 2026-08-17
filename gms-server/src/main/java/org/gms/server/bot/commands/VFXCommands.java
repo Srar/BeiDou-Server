@@ -2,6 +2,7 @@ package org.gms.server.bot.commands;
 
 import org.gms.client.Character;
 import org.gms.client.inventory.Equip;
+import org.gms.server.bot.BotHelpers;
 import org.gms.util.PacketCreator;
 
 /**
@@ -12,6 +13,11 @@ import org.gms.util.PacketCreator;
 public class VFXCommands {
 
     public static void botScroll(Character fakechar, Equip.ScrollResult result) {
+        // 观察门控：卷轴特效仅在有真人观察时广播，无人观察的图跳过广播，
+        // 降低客户端渲染负载（bot 周期性表演的降载修复）。
+        if (!BotHelpers.hasRealPlayerObserver(fakechar.getMap())) {
+            return;
+        }
         fakechar.getMap().broadcastMessage(PacketCreator.getScrollEffect(fakechar.getId(), result, false, false));
     }
 

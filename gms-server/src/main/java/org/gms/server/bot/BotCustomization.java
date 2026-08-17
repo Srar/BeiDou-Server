@@ -9,9 +9,12 @@ import org.gms.client.inventory.Item;
 import org.gms.constants.inventory.ItemConstants;
 import org.gms.server.ItemInformationProvider;
 import org.gms.server.bot.itempool.EquipMetadataCache;
+import org.gms.server.maps.MapleMap;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 public class BotCustomization {
@@ -91,6 +94,19 @@ public class BotCustomization {
         return itemId >= 1700000 && itemId < 1800000;
     }
 
+    // ── 换装广播节流（2026-08-17 客户端崩溃事故的降载修复） ──────────────────
+    // bot 波次性集体换装会在同帧刷出几十条 UPDATE_CHAR_LOOK，且无人观察的图也全量广播，
+    // 是客户端 error 5 崩溃的高危来源。此处对每 bot 的换装广播做最小间隔节流：
+    // 装备照常穿上（不影响装备状态），仅「广播侧」被节流——窗口内多次换装只发首条，
+    // 窗口结束后补发一次最终状态；无人观察的图直接跳过广播（进图/spawn 时自然同步）。
+    static final long MIN_LOOK_BROADCAST_INTERVAL_MS = 3000;
+
+    /** botId → 上次换装广播时间戳（毫秒）。 */
+    private static final Map<Integer, Long> LAST_LOOK_BROADCAST_MS = new ConcurrentHashMap<>();
+
+    /** botId → 窗口内是否存在尚未广播的换装变更（待补发）。 */
+    private static final Map<Integer, Boolean> DIRTY_LOOK_BOTS = new ConcurrentHashMap<>();
+
     public static void EquipItem(Character fakechar, Integer itemId, short dst) {
         if (itemId == null) {
             return;
@@ -111,7 +127,92 @@ public class BotCustomization {
         }
         source.setPosition(dst); // set the position of Equip to dst (see body part)
         equipped.addItemFromDB(source); // Actually equip the item
-        fakechar.equipChanged(); // Update fakechar avatar, doesn't work if they're not on screen
+        // Update fakechar avatar, doesn't work if they're not on screen.
+        // 广播侧节流：装备已落库，这里只决定「立即广播 / 延迟补发 / 跳过」。
+        scheduleLookBroadcast(fakechar);
+    }
+
+    /**
+     * 换装广播节流入口（装备已落库，仅决定广播侧行为）：
+     * <ol>
+     *   <li>无人观察（无真实玩家）的图：跳过广播且不记录时间——bot 换装状态会在后续
+     *       spawn/进图广播中自然同步，无需补发；</li>
+     *   <li>距上次广播未满 {@link #MIN_LOOK_BROADCAST_INTERVAL_MS}：标记 dirty 并调度
+     *       窗口结束后的补发（已有待补发任务则跳过重复调度）；</li>
+     *   <li>否则立即广播并记录时间戳。</li>
+     * </ol>
+     * 包级可见（非 private）：ItemInformationProvider 离线单测无法初始化，单测直接
+     * 以本方法为断言面（等价于「装备落库后的一次换装广播决策」），不经过 EquipItem 全路径。
+     */
+    static void scheduleLookBroadcast(Character fakechar) {
+        int botId = fakechar.getId();
+        MapleMap map = fakechar.getMap();
+        if (!BotHelpers.hasRealPlayerObserver(map)) {
+            // 无人图：跳过广播（含清掉此前遗留的 dirty——若已有补发任务，其执行时会发现 dirty
+            // 已清空而直接放弃，不产生广播）。
+            DIRTY_LOOK_BOTS.remove(botId);
+            return;
+        }
+        if (shouldBroadcastNow(botId)) {
+            noteBroadcast(botId);
+            fakechar.equipChanged();
+            return;
+        }
+        // 节流窗口内：标记 dirty 并调度窗口结束后的补发；dirty 已存在说明补发任务已排定，
+        // 不重复调度（补发时广播的是届时最终状态，窗口内后续换装都会被它覆盖）。
+        if (DIRTY_LOOK_BOTS.putIfAbsent(botId, Boolean.TRUE) != null) {
+            return;
+        }
+        long waitMs = MIN_LOOK_BROADCAST_INTERVAL_MS
+                - (System.currentTimeMillis() - LAST_LOOK_BROADCAST_MS.get(botId));
+        int mapId = map.getId();
+        BotExecutors.schedule(() -> flushLookBroadcast(fakechar, botId, mapId), waitMs);
+    }
+
+    /**
+     * 节流窗口结束后的补发：bot 仍在原图且仍有未同步变更时才广播最终状态。
+     * 防泄漏：bot 已销毁（getMap()==null）或已换图则只清 dirty 不广播（换图/spawn 广播
+     * 携带当前外观）；补发时重新检查观察者（期间真人可能已离开）。
+     */
+    private static void flushLookBroadcast(Character fakechar, int botId, int mapId) {
+        // 先认领 dirty：清除失败说明状态已被换图/销毁等路径清理，直接放弃。
+        if (!Boolean.TRUE.equals(DIRTY_LOOK_BOTS.remove(botId))) {
+            return;
+        }
+        MapleMap map = fakechar.getMap();
+        if (map == null || map.getId() != mapId) {
+            return; // bot 已销毁或换图：无需补发
+        }
+        if (!BotHelpers.hasRealPlayerObserver(map)) {
+            return; // 补发时真人已离开：无人图不广播
+        }
+        noteBroadcast(botId);
+        fakechar.equipChanged();
+    }
+
+    /**
+     * 时间窗口判定（包级可见，供单测直接覆盖）：距该 bot 上次广播是否已满
+     * {@link #MIN_LOOK_BROADCAST_INTERVAL_MS}。首次换装（无记录）恒为 true。
+     */
+    static boolean shouldBroadcastNow(int botId) {
+        return shouldBroadcastNow(botId, System.currentTimeMillis());
+    }
+
+    /** 时间注入版（供单测覆盖时间边界，生产代码不直接使用）。 */
+    static boolean shouldBroadcastNow(int botId, long now) {
+        Long last = LAST_LOOK_BROADCAST_MS.get(botId);
+        return last == null || now - last >= MIN_LOOK_BROADCAST_INTERVAL_MS;
+    }
+
+    /** 记录一次已发生的换装广播时间戳。 */
+    static void noteBroadcast(int botId) {
+        LAST_LOOK_BROADCAST_MS.put(botId, System.currentTimeMillis());
+    }
+
+    /** 仅供单测：清空节流状态，避免用例间串扰。 */
+    static void resetLookBroadcastState() {
+        LAST_LOOK_BROADCAST_MS.clear();
+        DIRTY_LOOK_BOTS.clear();
     }
 
     public static int getRandomChairId() {

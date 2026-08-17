@@ -21,6 +21,10 @@ import java.util.concurrent.ThreadLocalRandom;
  * <p>Load-time filtering: ids that don't exist in WZ (checked once via
  * {@link EquipMetadataCache#equipExists(int)}, O(1) HashSet) are dropped from
  * the pool, so every runtime pick is guaranteed to be a real WZ equip.
+ * Additionally, ids outside the v83 standard equip ID ranges (checked via
+ * {@link EquipMetadataCache#isStandardV83EquipId(int)}) are dropped — server wz
+ * (5725) contains custom equips the v83 client (5609) cannot render, and a bot
+ * wearing one would crash the client when its look is broadcast.
  *
  * Call {@link #load()} once at startup (QuickEquip does this lazily). Then use
  * {@link #getRandom(String, int, int)} to pick a random item for a given category,
@@ -97,6 +101,7 @@ public class GenericEquipPool {
             ItemInformationProvider iip = ItemInformationProvider.getInstance();
             int itemCount = 0;
             int filteredCount = 0;
+            int standardFilteredCount = 0;
 
             for (Map.Entry<String, Object> entry : root.entrySet()) {
                 String category = entry.getKey();
@@ -113,6 +118,13 @@ public class GenericEquipPool {
                         filteredCount++;
                         continue;
                     }
+                    // v83 标准装备 ID 区间过滤（与 equipExists 两层互补）：服务端 wz
+                    // （5725 图）有、客户端（5609 图）没有的自定义装备不在标准区间内，
+                    // 穿给 bot 后广播会导致客户端渲染崩溃——区间外 id 一律不进池。
+                    if (!EquipMetadataCache.isStandardV83EquipId(id)) {
+                        standardFilteredCount++;
+                        continue;
+                    }
                     int min = iip.getEquipLevelReq(id);
                     int gender = genderFromItemId(id);
                     list.add(new PoolItem(id, min, gender));
@@ -126,6 +138,9 @@ public class GenericEquipPool {
                     + " items across " + pools.size() + " categories (reqLevel cached from WZ)");
             if (filteredCount > 0) {
                 log.info("[GenericEquipPool] Filtered {} ids not found in WZ", filteredCount);
+            }
+            if (standardFilteredCount > 0) {
+                log.info("[GenericEquipPool] Filtered {} ids outside v83 standard equip ranges", standardFilteredCount);
             }
         } catch (Exception e) {
             System.err.println("[GenericEquipPool] Failed to load YAML: " + e.getMessage());

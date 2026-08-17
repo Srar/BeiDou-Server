@@ -23,6 +23,10 @@ import java.util.concurrent.ThreadLocalRandom;
  * <p>Load-time filtering: ids that don't exist in WZ (checked once via
  * {@link EquipMetadataCache#equipExists(int)}, O(1) HashSet) are dropped from
  * the pool, so every runtime pick is guaranteed to be a real WZ equip.
+ * Additionally, ids outside the v83 standard equip ID ranges (checked via
+ * {@link EquipMetadataCache#isStandardV83EquipId(int)}) are dropped — server wz
+ * (5725) contains custom equips the v83 client (5609) cannot render, and a bot
+ * wearing one would crash the client when its look is broadcast.
  *
  * Call {@link #load()} once at startup (BotDecorateNX does this lazily).
  * Use {@link #getRandom(String, int)} to pick a random item for a given
@@ -137,6 +141,7 @@ public class NXItemPool {
 
             int itemCount = 0;
             int filteredCount = 0;
+            int standardFilteredCount = 0;
             for (Map.Entry<String, Object> entry : root.entrySet()) {
                 String category = entry.getKey();
                 Object val = entry.getValue();
@@ -149,8 +154,15 @@ public class NXItemPool {
                         // wz 存在性过滤（一次性 O(n)，HashSet O(1) 判定）：剔除 wz 中
                         // 不存在的 id，保证运行时随机到的 NX 装备全部合法。
                         if (EquipMetadataCache.equipExists(item.id)) {
-                            list.add(item);
-                            itemCount++;
+                            // v83 标准装备 ID 区间过滤（与 equipExists 两层互补）：服务端
+                            // wz（5725 图）有、客户端（5609 图）没有的自定义装备不在标准
+                            // 区间内，穿给 bot 后广播会导致客户端渲染崩溃——区间外不进池。
+                            if (EquipMetadataCache.isStandardV83EquipId(item.id)) {
+                                list.add(item);
+                                itemCount++;
+                            } else {
+                                standardFilteredCount++;
+                            }
                         } else {
                             filteredCount++;
                         }
@@ -173,7 +185,13 @@ public class NXItemPool {
                 List<PoolItem> validItems = new ArrayList<>();
                 for (PoolItem item : cacheItems) {
                     if (EquipMetadataCache.equipExists(item.id)) {
-                        validItems.add(item);
+                        // v83 标准装备 ID 区间过滤（与 equipExists 两层互补）：区间外
+                        // （服务端 wz 有、客户端没有的自定义装备）一律不进池。
+                        if (EquipMetadataCache.isStandardV83EquipId(item.id)) {
+                            validItems.add(item);
+                        } else {
+                            standardFilteredCount++;
+                        }
                     } else {
                         filteredCount++;
                     }
@@ -191,6 +209,9 @@ public class NXItemPool {
                     + cacheCount + " auto items across " + pools.size() + " categories");
             if (filteredCount > 0) {
                 log.info("[NXItemPool] Filtered {} ids not found in WZ", filteredCount);
+            }
+            if (standardFilteredCount > 0) {
+                log.info("[NXItemPool] Filtered {} ids outside v83 standard equip ranges", standardFilteredCount);
             }
         } catch (Exception e) {
             System.err.println("[NXItemPool] Failed to load YAML: " + e.getMessage());

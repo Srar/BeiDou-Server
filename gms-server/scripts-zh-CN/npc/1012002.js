@@ -72,7 +72,7 @@ function action(mode, type, selection) {
                 selStr += "\r\n#L" + i + "#" + "#z" + items[i] + "##k - 需要弓箭手等级 Lv. " + (10 + (i * 5)) + "#l#b";
             }
         } else if (selection == 2) { //glove refine
-            var selStr = "好的,你想要製作哪一种手套呢?#b";
+            var selStr = "好的,你想要制作哪一种手套呢?#b";
             items = [1082012, 1082013, 1082016, 1082048, 1082068, 1082071, 1082084, 1082089];
             for (var i = 0; i < items.length; i++) {
                 selStr += "\r\n#L" + i + "#" + "#z" + items[i] + "##k - 需要弓箭手等级 Lv. " + (15 + (i * 5) > 40 ? ((i - 1) * 10) : 15 + (i * 5)) + "#l#b";

@@ -38,7 +38,7 @@ var advQuest = 0;
 function start() {
     const GameConstants = Java.type('org.gms.constants.game.GameConstants');
     if (cm.isQuestStarted(6330)) {
-        if (cm.getEventInstance() != null) {    // missing script for skill test found thanks to Jade™
+        if (cm.getEventInstance() != null) {    // missing script for skill test found thanks to Jade?
             advQuest = 5;                       // string visibility thanks to iPunchEm & Glvelturall
             cm.sendNext("一点也不错。我们到外面讨论一下吧！");
         } else if (cm.getQuestProgressInt(6330, 6331) == 0) {

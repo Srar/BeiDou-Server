@@ -41,7 +41,7 @@ function action(mode, type, selection) {
 
         if (status == 0) {
             var selStr = "是的，我确实拥有这个锻炉。如果你愿意付钱，我可以为你提供一些服务。#b"
-            var options = ["精炼矿石", "精炼宝石", "我有铁甲猪蹄...", "升級拳套"];
+            var options = ["精炼矿石", "精炼宝石", "我有铁甲猪蹄...", "升级拳套"];
             for (var i = 0; i < options.length; i++) {
                 selStr += "\r\n#L" + i + "# " + options[i] + "#l";
             }
@@ -113,7 +113,7 @@ function action(mode, type, selection) {
                 cost = costSet[0];
             }
 
-            var prompt = "所以，你要我做一些 #t" + item + "#s? 在这种情況下，有多少你要我做多少个??";
+            var prompt = "所以，你要我做一些 #t" + item + "#s? 在这种情况下，有多少你要我做多少个??";
 
             cm.sendGetNumber(prompt, 1, 1, 100)
         } else if (status == 3) {
@@ -147,7 +147,7 @@ function action(mode, type, selection) {
                 prompt += qty + " #t" + item + "#?";
             }
 
-            prompt += " 在这种情況下，我要为了做出好的品质。请确保您背包是否有这么多空间可以放!#b";
+            prompt += " 在这种情况下，我要为了做出好的品质。请确保您背包是否有这么多空间可以放!#b";
 
             if (mats instanceof Array) {
                 for (var i = 0; i < mats.length; i++) {

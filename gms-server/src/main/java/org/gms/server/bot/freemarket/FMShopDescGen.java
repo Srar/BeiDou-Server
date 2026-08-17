@@ -4,6 +4,7 @@ import org.gms.client.inventory.Equip;
 import org.gms.client.inventory.InventoryType;
 import org.gms.client.inventory.Item;
 import org.gms.server.ItemInformationProvider;
+import org.gms.server.bot.BotHelpers;
 import org.gms.server.bot.itempool.ScrolledItemComparator;
 import org.gms.server.maps.PlayerShopItem;
 
@@ -380,7 +381,9 @@ public class FMShopDescGen {
             BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
             String line;
             while ((line = reader.readLine()) != null) {
-                if (!line.isEmpty() && line.length() <= 12) {
+                // gms 崩溃防护：店名会渲染在客户端雇佣商店 UI——含 GBK 扩展区字符
+                // （繁体/生僻字/日文符号，客户端 GB2312 字库无字形映射）的店名渲染即崩。
+                if (!line.isEmpty() && line.length() <= 12 && BotHelpers.isClientFontSafe(line)) {
                     names.add(line);
                 }
             }
@@ -423,6 +426,7 @@ public class FMShopDescGen {
 
     /**
      * 一次性加载描述文件为行池（含空行，与源 reservoir 扫描的候选集一致）。
+     * gms 崩溃防护：丢弃含 GBK 扩展区字符的行（客户端招牌渲染无字形映射即崩）。
      * 失败返回空列表（不抛异常，调用方降级为空字符串）。
      */
     private static List<String> loadDescLines(String filePath) {
@@ -434,7 +438,10 @@ public class FMShopDescGen {
             BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
             String line;
             while ((line = reader.readLine()) != null) {
-                lines.add(line);
+                // 空行保留（与源 reservoir 候选集一致）；非空行必须客户端字库安全
+                if (line.isEmpty() || BotHelpers.isClientFontSafe(line)) {
+                    lines.add(line);
+                }
             }
             return lines;
         } catch (IOException e) {

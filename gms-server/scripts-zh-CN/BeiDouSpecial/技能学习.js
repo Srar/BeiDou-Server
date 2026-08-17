@@ -40,7 +40,7 @@ function showSkillList() {
     text += "点击技能自动完成：#n\r\n\r\n";
     text += "1. 学习技能（未学会时）\r\n";
     text += "2. 绑定到指定按键\r\n\r\n";
-    text += "#b════════════════#k\r\n\r\n";
+    text += "#b————————————————#k\r\n\r\n";
     
     // 根据技能状态显示不同的文本
     if (hasDoubleJump) {
@@ -105,20 +105,20 @@ function handleSkillSelection(selection) {
 
 function showResult(result) {
     var text = OldTitle;
-    text += "#b════════════════#k\r\n";
+    text += "#b————————————————#k\r\n";
     
     if (result.success) {
         text += "#e操作结果#n\r\n";
-        text += "#b════════════════#k\r\n\r\n";
+        text += "#b————————————————#k\r\n\r\n";
         text += result.message;
-        text += "\r\n\r\n#b════════════════#k\r\n\r\n";
+        text += "\r\n\r\n#b————————————————#k\r\n\r\n";
         text += "#L0#再学其他技能#l\r\n";
         text += "#L1#完成#l";
     } else {
         text += "#r操作失败#n\r\n";
-        text += "#b════════════════#k\r\n\r\n";
+        text += "#b————————————————#k\r\n\r\n";
         text += result.message;
-        text += "\r\n\r\n#b════════════════#k\r\n\r\n";
+        text += "\r\n\r\n#b————————————————#k\r\n\r\n";
         text += "#L0#再试一次#l\r\n";
         text += "#L1#返回#l\r\n";
         text += "#L2#取消#l";

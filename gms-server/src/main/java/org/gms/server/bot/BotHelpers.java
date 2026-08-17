@@ -155,12 +155,19 @@ public final class BotHelpers {
     }
 
     /**
-     * 名字是否通过全部编码安全过滤（空白、字符数、GBK 可编码性、GBK 字节数、危险尾字节）。
+     * 名字是否通过全部编码安全过滤（空白、字符数、GBK 可编码性、GBK 字节数、
+     * GB2312 客户端字库范围、危险尾字节）。
      * <p>
      * 审计依据：服务端 PacketCreator.addCharStats 用 {@code writeFixedString(rightPadded(name, 13))}
      * 写 13 字节定长 GBK 字段。全角字符 GBK 占 2 字节，若名字
      * GBK 字节数超过 12，经右填充后仍会溢出 13 字节字段——客户端对名字字段未设防
      * 阈值，存在栈溢出风险。因此过滤条件为「字符数 ≤12 且 GBK 字节数 ≤12」双条件。
+     * <p>
+     * GB2312 字库过滤（客户端崩溃防护，事故实锤）：客户端中文版字库基于 GB2312
+     * （含 01-09 区符号），GBK 扩展区字符（繁体/生僻字/日文符号，如「菂」0xC785、
+     * 「頹」0xEE6A、「ゞ」0xA967）在客户端无字形映射，渲染角色名时查表越界崩溃
+     * （客户端崩溃报告 error code 5 拒绝访问）。2026-08-17 事故中，崩溃前最后一条
+     * 服务端发包为 SPAWN_PLAYER，bot 名「頹廢菂愛」全部落在 GBK 扩展区。
      * <p>
      * 另在字节流层面过滤 {@link #UNSAFE_TAIL_BYTES} 危险尾字节（如 0x5C '\'），
      * 防止客户端对名字做 C 字符串解析时被干扰。
@@ -178,11 +185,76 @@ public final class BotHelpers {
         if (gbk.length > 12) {
             return false;
         }
+        if (!isGb2312Safe(gbk)) {
+            return false;
+        }
         for (byte b : gbk) {
             for (byte unsafe : UNSAFE_TAIL_BYTES) {
                 if (b == unsafe) {
                     return false;
                 }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 客户端字库安全判定（公共工具）：字符串全部字符可被客户端 GB2312 字库渲染。
+     * 规则：ASCII 可视字符（0x20-0x7E）放行；GBK 双字节对必须落在 GB2312 编码空间
+     * （高位 0xA1-0xF7 且低位 0xA1-0xFE，含 01-09 区符号与一二级汉字）。
+     * 落在 GBK 扩展区（高位 0x81-0xA0 或低位 0x40-0xA0）的繁体/生僻字/日文符号
+     * 一律拦截——客户端无字形映射，渲染即崩（2026-08-17 事故：bot 名「頹廢菂愛」
+     * 的 SPAWN_PLAYER 包触发客户端崩溃，error code 5 拒绝访问）。
+     * 不可 GBK 编码（emoji/韩文等）同样判不安全；本方法供名字/店名/公会名/招牌
+     * 等所有「发往客户端的字符串」统一过滤。
+     */
+    public static boolean isClientFontSafe(String text) {
+        if (text == null || text.isEmpty()) {
+            return false;
+        }
+        if (!GBK_ENCODER.canEncode(text)) {
+            return false;
+        }
+        byte[] gbk = text.getBytes(GBK);
+        for (int i = 0; i < gbk.length; i++) {
+            int first = gbk[i] & 0xFF;
+            if (first < 0x80) {
+                if (first < 0x20) {
+                    return false; // 控制字符不进入客户端可见文本
+                }
+                continue;
+            }
+            if (i + 1 >= gbk.length) {
+                return false; // GBK 不存在孤立高位字节；防御性拦截
+            }
+            int hi = first;
+            int lo = gbk[++i] & 0xFF;
+            if (hi < 0xA1 || hi > 0xF7 || lo < 0xA1 || lo > 0xFE) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * GB2312 客户端字库范围过滤：ASCII 单字节直接放行；双字节对必须落在
+     * GB2312 编码空间（高位 0xA1-0xF7 且低位 0xA1-0xFE，含 01-09 区符号与一二级汉字）。
+     * 落在 GBK 扩展区（高位 0x81-0xA0 或低位 0x40-0xA0）的繁体/生僻字/日文符号
+     * 一律拦截——客户端无字形映射，渲染即崩。
+     */
+    private static boolean isGb2312Safe(byte[] gbk) {
+        for (int i = 0; i < gbk.length; i++) {
+            int first = gbk[i] & 0xFF;
+            if (first < 0x80) {
+                continue; // ASCII：空白/控制字符已由 isBlank 与字符数检查挡掉
+            }
+            if (i + 1 >= gbk.length) {
+                return false; // GBK 不存在孤立高位字节；防御性拦截
+            }
+            int hi = first;
+            int lo = gbk[++i] & 0xFF;
+            if (hi < 0xA1 || hi > 0xF7 || lo < 0xA1 || lo > 0xFE) {
+                return false;
             }
         }
         return true;

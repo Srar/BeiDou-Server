@@ -13,7 +13,7 @@ BaseFunction:                                                             type |
 8:  sendGetNumber(str,int def, int min, int max) -[弹出输入数字的对话框]   0   |  确定=1,结束=0              |  输入的数字
 9:  setGetText(str) -[保存指定的字符串]                                    \   |          \                  |     \
 10: sendGetText(str) -[弹出带有输入字符串的对话框]                         0   |  确定=1,结束=0              |     \
-11: getText(str) -[返回sendGetText(str)/setGetText(str)寫入的字符串]       \   |          \                  |     \
+11: getText(str) -[返回sendGetText(str)/setGetText(str)写入的字符串]       \   |          \                  |     \
 
 AllowFunction-could use directly
 -gainMeso获取金币(int gain);

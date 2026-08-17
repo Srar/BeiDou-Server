@@ -121,6 +121,21 @@ class BotHelpersTest {
             byte[] bytes = name.getBytes(gbk);
             assertTrue(bytes.length <= 12,
                     "GBK byte length must be <= 12 for the v83 13-byte name field: " + name);
+            // GB2312 客户端字库范围：双字节对必须高位 0xA1-0xF7 且低位 0xA1-0xFE
+            // （客户端无扩展区字形映射，渲染即崩——2026-08-17 崩溃事故根因）
+            for (int i = 0; i < bytes.length; i++) {
+                int first = bytes[i] & 0xFF;
+                if (first < 0x80) {
+                    continue;
+                }
+                assertTrue(i + 1 < bytes.length, "dangling GBK lead byte: " + name);
+                int hi = first;
+                int lo = bytes[++i] & 0xFF;
+                assertTrue(hi >= 0xA1 && hi <= 0xF7 && lo >= 0xA1 && lo <= 0xFE,
+                        "name contains char outside GB2312 client font range (0x"
+                                + Integer.toHexString(hi).toUpperCase() + Integer.toHexString(lo).toUpperCase()
+                                + "): " + name);
+            }
             // 危险尾字节清单直接引用生产常量，杜绝测试与实现双份清单漂移
             for (byte b : bytes) {
                 for (byte unsafe : BotHelpers.UNSAFE_TAIL_BYTES) {
@@ -156,6 +171,25 @@ class BotHelpersTest {
         assertTrue(isNameSafe("Bot"), "safe ASCII name must pass");
         // 边界：6 个全角字符恰好 12 字节，应通过
         assertTrue(isNameSafe("一二三四五六"), "12-byte GBK name must pass");
+    }
+
+    @Test
+    void isNameSafeRejectsGbkExtensionCharacters() throws Exception {
+        // GBK 扩展区字符（客户端 GB2312 字库无字形映射，渲染即崩）：
+        // 2026-08-17 事故中崩溃前最后一条 SPAWN_PLAYER 的 bot 名「頹廢菂愛」，
+        // 其中「菂」= 0xC785、「頹」= 0xEE6A、「廢」= 0x8F55——全部落在扩展区。
+        assertFalse(isNameSafe("頹廢菂愛"), "GBK extension chars must be rejected");
+        assertFalse(isNameSafe("菂"), "rare char outside GB2312 must be rejected");
+        assertFalse(isNameSafe("轉身離開ゞ"), "traditional chars / kana mark must be rejected");
+        assertFalse(isNameSafe("天真菂回憶"), "the crash-scene char must be rejected");
+        assertFalse(isNameSafe("℡乖℡"), "symbol outside GB2312 must be rejected");
+        assertFalse(isNameSafe("﹏狼﹏"), "wavy dash outside GB2312 must be rejected");
+        // GB2312 区内字符放行：简体汉字、常用符号（☆）、全角数字
+        assertTrue(isNameSafe("转身离开"), "simplified Chinese must pass");
+        assertTrue(isNameSafe("天真回忆"), "simplified Chinese must pass");
+        assertTrue(isNameSafe("低调小老虎"), "simplified Chinese must pass");
+        assertTrue(isNameSafe("☆蓝☆"), "GB2312 symbol zone must pass");
+        assertTrue(isNameSafe("小①"), "full-width digit must pass");
     }
 
     @Test

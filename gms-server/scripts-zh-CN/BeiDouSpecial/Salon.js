@@ -943,7 +943,7 @@ function action(mode, type, selection) {
     }
 
     if (status === 0) {
-        var text = "#e#r BeiDouMS 真漂亮整形医院（感谢ColaMintヾ小明湖畔的分享）#k#n\r\n";
+        var text = "#e#r BeiDouMS 真漂亮整形医院（感谢ColaMint?小明湖畔的分享）#k#n\r\n";
         text += "我的鼻子是假的，我的眼睛是假的，但我的美丽是真的！\r\n\r\n"
         text += "#L10#第一批发型#l\t#L11#第二批发型#l\t#L12#第三批发型（未开放）#l\t\r\n";
         text += "#L13#第四批发型（未开放）#l\t#L14#第五批发型（未开放）#l\r\n";

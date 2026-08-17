@@ -14,7 +14,7 @@
 #   add a Henesys entry with a small `wanderers` only if you want a light top-up on top of them.
 #
 # To add an interior sub-map, append another `{map: <id>, count: <n>}` under that town's `maps:` —
-# NPC-anchored placement is near-perfect in interiors since the NPCs define the room. 2–4 bots make a
+# NPC-anchored placement is near-perfect in interiors since the NPCs define the room. 2-4 bots make a
 # small room look lived-in. Seeded with main town maps only; interiors are added during curation.
 #
 # CURATION OVERRIDES (optional, per map) — the algorithm is the floor; these are the hand-polish on top.

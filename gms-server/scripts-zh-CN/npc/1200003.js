@@ -22,16 +22,16 @@ function action(mode, type, selection) {
 	status--;
 
     if (status == 0) {
-    cm.sendYesNo("搭上了这艘船，你可以前往更大的大陆冒险。 只要給我 #e80 金币#n，我会帶你去 #b金银岛#k 你想要去金银岛吗？");
+    cm.sendYesNo("搭上了这艘船，你可以前往更大的大陆冒险。 只要给我 #e80 金币#n，我会带你去 #b金银岛#k 你想要去金银岛吗？");
     } else if (status == 1) {
 	if (cm.haveItem(4031801)) {
-    cm.sendNextPrev("既然你有推荐信，我不会收你任何的费用。收起來，我们前往金银岛，坐好，旅途中可能会有点动荡！");
+    cm.sendNextPrev("既然你有推荐信，我不会收你任何的费用。收起来，我们前往金银岛，坐好，旅途中可能会有点动荡！");
 	} else {
 	    cm.sendNext("真的只要 #e80 金币#n 就能搭船!!");
 	}
     } else if (status == 2) {
 	if (cm.haveItem(4032338)) {
-	    cm.sendNextPrev("既然你有推荐信，我不会收你任何的费用。收起來，我们前往金银岛，坐好，旅途中可能会有点动荡！");
+	    cm.sendNextPrev("既然你有推荐信，我不会收你任何的费用。收起来，我们前往金银岛，坐好，旅途中可能会有点动荡！");
 	} else {
 	    if (cm.getLevel() >= 8) {
 		if (cm.getMeso() < 80) {

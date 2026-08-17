@@ -1,7 +1,9 @@
 package org.gms.server.bot.dialogue;
 
+import lombok.extern.slf4j.Slf4j;
 import org.gms.client.Character;
 import org.gms.server.bot.BotSM;
+import org.gms.util.I18nUtil;
 import org.gms.util.PacketCreator;
 import org.gms.util.Randomizer;
 import org.yaml.snakeyaml.Yaml;
@@ -12,12 +14,24 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Bot 对话句柄（对应 SoloMapling BotDialogueHandler 1:1 移植）。
  * 从 BotDialoguePack 的 YAML 节点加载台词、按节点/上下文/替换串播放。
  */
+@Slf4j
 public class BotDialogueHandler {
+
+    /**
+     * YAML 根节点静态缓存（按 classpath 路径键）：classpath 资源运行期不变，
+     * 首次加载后复用，避免每 tick 概率重读 + 重解析（转换风暴期的高频解析开销）。
+     * 读取方只读不写，跨线程共享安全。
+     */
+    private static final Map<String, Map<String, Object>> YAML_ROOT_CACHE = new ConcurrentHashMap<>();
+
+    /** 加载失败/资源缺失哨兵：缓存后不再每 tick 重试，告警只打一次。 */
+    private static final Map<String, Object> YAML_MISSING = Collections.emptyMap();
 
     private Character chr;
 
@@ -123,25 +137,30 @@ public class BotDialogueHandler {
     public static Map<String, Object> readDialogueYaml(String dialoguePack, String dialogueType, String dialogueNode) {
         String filePath = "BotDialoguePack/" + dialoguePack;
 
-        Map<String, Object> dialogueConstructorNode = null;
+        Map<String, Object> root = YAML_ROOT_CACHE.computeIfAbsent(filePath, BotDialogueHandler::loadDialogueYamlRoot);
+        if (root == null || root == YAML_MISSING) {
+            return null;
+        }
+        Map<String, Object> botTypeNode = (Map<String, Object>) root.get(dialogueType);
+        if (botTypeNode != null) {
+            return (Map<String, Object>) botTypeNode.get(dialogueNode);
+        }
+        return null;
+    }
+
+    /** 首次加载某个 YAML 并解析成根节点；失败缓存 {@link #YAML_MISSING} 哨兵。 */
+    private static Map<String, Object> loadDialogueYamlRoot(String filePath) {
         try (InputStream in = BotDialogueHandler.class.getResourceAsStream(filePath)) {
             if (in == null) {
-                System.out.println("[BotDialogueHandler] YAML resource not found: " + filePath);
-                return null;
+                log.warn(I18nUtil.getLogMessage("BotDialogueHandler.yaml.missing", filePath));
+                return YAML_MISSING;
             }
-            Yaml yaml = new Yaml();
-            Map<String, Object> root = (Map<String, Object>) yaml.load(in);
-            if (root == null) {
-                return null;
-            }
-            Map<String, Object> BotTypeNode = (Map<String, Object>) root.get(dialogueType);
-            if (BotTypeNode != null) {
-                dialogueConstructorNode = (Map<String, Object>) BotTypeNode.get(dialogueNode);
-            }
+            Map<String, Object> root = (Map<String, Object>) new Yaml().load(in);
+            return root == null ? YAML_MISSING : root;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn(I18nUtil.getLogMessage("BotDialogueHandler.yaml.fail", filePath), e);
+            return YAML_MISSING;
         }
-        return dialogueConstructorNode;
     }
 
     public static DialogueConstructor getDialogueCon(String BotTypeDialoguePath, String BotType, String DialogueNodeName) {
@@ -385,7 +404,8 @@ public class BotDialogueHandler {
             try {
                 return Integer.parseInt((String) obj);
             } catch (NumberFormatException e) {
-                System.err.println("Error converting String to int: " + obj);
+                // 去同步 stdout（同 System.out.println 问题），改走 slf4j。
+                log.warn("[BotDialogueHandler] Error converting String to int: {}", obj);
             }
         }
         return 0;

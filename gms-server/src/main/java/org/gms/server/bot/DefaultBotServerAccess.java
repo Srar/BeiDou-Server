@@ -6,6 +6,7 @@ import org.gms.config.GameConfig;
 import org.gms.net.server.Server;
 import org.gms.net.server.channel.Channel;
 import org.gms.net.server.world.World;
+import org.gms.server.bot.gcmove.GCMovement;
 import org.gms.server.maps.MapleMap;
 import org.gms.util.I18nUtil;
 
@@ -50,6 +51,9 @@ public final class DefaultBotServerAccess implements BotServerAccess {
 
     @Override
     public void removeBotFromServer(Character bot) {
+        // 销毁/回滚路径释放 gcmove 移动引擎资源（disable 幂等，内部判空并取消
+        // follow/travel/fidget），防 BotMovementState 随销毁风暴永久泄漏。
+        GCMovement.disable(bot);
         int world = bot.getWorld();
         int channel = bot.getClient().getChannel();
         Channel ch = Server.getInstance().getChannel(world, channel);

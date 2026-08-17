@@ -13,12 +13,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -167,6 +169,21 @@ class BotTypeManagerTest {
         BotTypeManager.stopAllBots();
         assertFalse(BotStorage.getBotById(botId).getRunning());
         assertFalse(BotTickService.isRegistered(botId));
+    }
+
+    @Test
+    void convertBotTypeDeliversConvertedInstanceToCallback() {
+        BotTypeManager.BotType.SOCIAL_BOT.createAndSetBot(chr);
+        BotTypeManager.manuallyStartBot(chr);
+
+        AtomicReference<BotSM> delivered = new AtomicReference<>();
+        boolean converted = BotTypeManager.convertBotType(chr, BotTypeManager.BotType.IDLE_BOT, delivered::set);
+
+        assertTrue(converted);
+        assertNotNull(delivered.get(), "callback must receive the converted bot");
+        assertInstanceOf(IdleBot.class, delivered.get(), "callback must receive the new IdleBot instance");
+        assertSame(delivered.get(), BotStorage.getBotById(botId),
+                "callback must receive the exact instance registered in BotStorage");
     }
 
     @Test

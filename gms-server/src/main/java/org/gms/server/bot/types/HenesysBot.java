@@ -9,6 +9,7 @@ import org.gms.server.bot.gcmove.GCMovement;
 import org.gms.server.bot.messaging.ChatMessage;
 import org.gms.server.bot.messaging.MessageQueue;
 import org.gms.server.maps.MapleMap;
+import org.gms.util.I18nUtil;
 import org.gms.util.Randomizer;
 
 import java.util.ArrayList;
@@ -202,7 +203,7 @@ public class HenesysBot extends BotSM {
             checkPrioritySpeed();
             log.info(getChr().getName() + " changing map to " + chosen);
         } catch (Exception e) {
-            log.info("HenesysBot map change failed: " + e.getMessage());
+            log.warn("HenesysBot map change failed: " + e.getMessage());
         }
     }
 
@@ -266,7 +267,8 @@ public class HenesysBot extends BotSM {
                 return;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            // 去同步 stdout（printStackTrace 会在日志锁上 pin 虚拟线程 carrier），改走 slf4j。
+            log.debug(I18nUtil.getLogMessage("HenesysBot.processMessages.error", e.getMessage()), e);
         }
     }
 }

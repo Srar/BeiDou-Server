@@ -2,8 +2,8 @@ package org.gms.server.bot.types;
 
 import lombok.extern.slf4j.Slf4j;
 import org.gms.client.Character;
+import org.gms.server.bot.BotDebugHandler;
 import org.gms.server.bot.BotSM;
-import org.gms.server.bot.BotStorage;
 import org.gms.server.bot.BotTiming;
 import org.gms.server.bot.BotTypeManager;
 import org.gms.server.bot.dialogue.BotDialogueHandler;
@@ -69,7 +69,12 @@ public class HenesysJQBot extends BotSM {
     public void updateState() {
         super.updateState();
         if (checkIfNotRunningOrPaused()) return;
-        getDebugger().debugLoggingFull(String.format("%s JQState: %s", getChr().getName(), jqState), String.format("%s", jqState));
+        // 每 tick 高频日志降级（s2）：debugLoggingFull 只收已格式化 String（无变参重载，
+        // BotDebugHandler 不在本批修改范围），故先把文件日志开关判断前置，format 仅在
+        // FILE_LOGGING_ENABLED=true 时发生（默认关闭：每 tick 省两次字符串拼接）。
+        if (BotDebugHandler.isFileLoggingEnabled()) {
+            getDebugger().debugLoggingFull(String.format("%s JQState: %s", getChr().getName(), jqState), String.format("%s", jqState));
+        }
 
         switch (jqState) {
             case RESET:
@@ -115,7 +120,7 @@ public class HenesysJQBot extends BotSM {
         try {
             GCMovement.move(getChr(), JQ_START.x, JQ_START.y);
         } catch (Exception e) {
-            log.info("[HenesysJQBot] Failed to navigate to JQ start: " + e.getMessage());
+            log.warn("[HenesysJQBot] Failed to navigate to JQ start: " + e.getMessage());
         }
     }
 
@@ -125,7 +130,9 @@ public class HenesysJQBot extends BotSM {
         String recordingName = variants[random.nextInt(variants.length)];
         lastAttemptSuccess = selectedTier == 7;
 
-        log.info("[HenesysJQBot] " + getChr().getName() + " attempting " + recordingName
+        // 每 tick 高频日志降级 debug：转换风暴时大量 bot 交错换型，info 会在
+        // log4j2 同步 Appender 锁上排队 pin 住虚拟线程 carrier。
+        log.debug("[HenesysJQBot] " + getChr().getName() + " attempting " + recordingName
                 + " (tier=" + selectedTier + ", highest=" + highestCompletedTier + ")");
 
         if (Randomizer.nextInt(3) == 0) {
@@ -141,7 +148,7 @@ public class HenesysJQBot extends BotSM {
             // BotMoveStream）；gms 未移植录制引擎，改用 gcmove 图导航做一次近似攀爬替代。
             wanderOnPetPark();
         } catch (Exception e) {
-            log.info("[HenesysJQBot] Recording playback error: " + e.getMessage());
+            log.warn("[HenesysJQBot] Recording playback error: " + e.getMessage());
             return;
         }
 
@@ -168,7 +175,7 @@ public class HenesysJQBot extends BotSM {
                 try {
                     GCMovement.move(getChr(), randomX, 274); // break up stack after successful jq finish.
                 } catch (Exception e) {
-                    log.info("[HenesysJQBot] Failed to disperse after success: " + e.getMessage());
+                    log.warn("[HenesysJQBot] Failed to disperse after success: " + e.getMessage());
                 }
             });
             waitFor(2000); // hold REST until the dispersal walk has kicked off
@@ -205,7 +212,8 @@ public class HenesysJQBot extends BotSM {
 
         if (hasReachedTop) {
             if (random.nextDouble() < CONTINUE_JQ_CHANCE) {
-                log.info("[HenesysJQBot] " + getChr().getName() + " continuing JQ (experienced).");
+                // 每 tick 高频日志降级 debug（转换风暴日志降级，见 attemptJQ 注释）。
+                log.debug("[HenesysJQBot] " + getChr().getName() + " continuing JQ (experienced).");
                 jqState = JQState.NAVIGATE_TO_JQ;
             } else {
                 log.info("[HenesysJQBot] " + getChr().getName() + " done with JQ, converting.");
@@ -278,7 +286,7 @@ public class HenesysJQBot extends BotSM {
             BotGameSupport.blockingSleep(1000);
             log.info("[HenesysJQBot] " + getChr().getName() + " exited Pet Park.");
         } catch (Exception e) {
-            log.info("[HenesysJQBot] Failed to navigate to exit: " + e.getMessage());
+            log.warn("[HenesysJQBot] Failed to navigate to exit: " + e.getMessage());
         }
     }
 
@@ -292,11 +300,14 @@ public class HenesysJQBot extends BotSM {
 
     private void convertToHenesysBot() {
         log.info("[HenesysJQBot] " + getChr().getName() + " converting to HenesysBot.");
-        BotTypeManager.convertBotType(getChr(), BotTypeManager.BotType.HENESYS_BOT);
-        BotSM newBot = BotStorage.getBotById(getChr().getId());
-        if (newBot instanceof HenesysBot) {
-            ((HenesysBot) newBot).setLastJQConversionTime(System.currentTimeMillis());
-        }
+        // JQ 冷却改在转换流程内设置（convertBotType 的 onConverted 回调直接拿到新实例），
+        // 不再于 convert 返回后回读注册表——并发转换/替换会把 10 分钟冷却落到错误实例，
+        // 闸门失效引发 ping-pong 加速。
+        BotTypeManager.convertBotType(getChr(), BotTypeManager.BotType.HENESYS_BOT, newBot -> {
+            if (newBot instanceof HenesysBot) {
+                ((HenesysBot) newBot).setLastJQConversionTime(System.currentTimeMillis());
+            }
+        });
     }
 
     private void chatLine(String dialogueNode) {

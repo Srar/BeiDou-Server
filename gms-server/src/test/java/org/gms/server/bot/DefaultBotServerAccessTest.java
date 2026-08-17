@@ -2,10 +2,13 @@ package org.gms.server.bot;
 
 import org.gms.client.Character;
 import org.gms.client.Client;
+import org.gms.client.inventory.Inventory;
+import org.gms.client.inventory.InventoryType;
 import org.gms.net.server.PlayerStorage;
 import org.gms.net.server.Server;
 import org.gms.net.server.channel.Channel;
 import org.gms.net.server.world.World;
+import org.gms.server.bot.gcmove.GCMovement;
 import org.gms.server.maps.MapManager;
 import org.gms.server.maps.MapleMap;
 import org.gms.test.BotTestSupport;
@@ -16,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -101,6 +105,37 @@ class DefaultBotServerAccessTest {
 
         // 生产路径要求：channel/world 为空（如已关停）时移除必须容忍
         DefaultBotServerAccess.INSTANCE.removeBotFromServer(bot);
+    }
+
+    @Test
+    void removeBotFromServerReleasesGCMovementState() {
+        Character bot = newBotCharacter();
+        when(bot.getId()).thenReturn(CHARACTER_ID);
+        when(server.getChannel(0, 1)).thenReturn(null);
+        when(server.getWorld(0)).thenReturn(null);
+
+        // GCMovement.enable 判活：已注册（或带地图）bot 才建状态。mock bot 无 map，
+        // 先注册进 BotStorage（mock BotSM 的 getChr() 为 null，addActiveBot 容忍并跳过索引），
+        // enable 走「map 为 null」分支照常创建 BotMovementState（跳过地图初始化）。
+        // fromCharacter 的装备栏速度/跳跃统计需要空装备栏（默认 null 会 NPE）。
+        Inventory equipped = mock(Inventory.class);
+        when(bot.getInventory(InventoryType.EQUIPPED)).thenReturn(equipped);
+        when(equipped.iterator()).thenReturn(Collections.emptyIterator());
+
+        BotSM registered = mock(BotSM.class);
+        BotStorage.addActiveBot(CHARACTER_ID, registered);
+        try {
+            GCMovement.enable(bot);
+            assertTrue(GCMovement.isEnabled(bot), "enable must create the movement state");
+
+            DefaultBotServerAccess.INSTANCE.removeBotFromServer(bot);
+
+            assertFalse(GCMovement.isEnabled(bot),
+                    "removeBotFromServer must release the movement engine state");
+        } finally {
+            GCMovement.disable(bot); // 幂等兜底：断言失败也不残留移动状态
+            BotStorage.removeActiveBot(CHARACTER_ID);
+        }
     }
 
     @Test

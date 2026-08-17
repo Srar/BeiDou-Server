@@ -1,6 +1,7 @@
 package org.gms.server.bot.gcmove;
 
 import org.gms.client.Character;
+import org.gms.server.bot.BotStorage;
 import org.gms.server.bot.travel.BotScriptedWarp;
 import org.gms.server.maps.MapleMap;
 import org.gms.server.maps.Rope;
@@ -43,6 +44,15 @@ public final class GCMovement {
     /* Put a bot under dynamic control: build its profile, warm the map graph, start the tick. */
     public static void enable(Character bot) {
         if (bot == null) {
+            return;
+        }
+        // 判活（M2）：已销毁 bot（注册表摘除且地图引用置空）的迟到 move/travel 调用不得重建
+        // BotMovementState——否则 disable 之后在途 macro tick 会把状态复活成永久泄漏。
+        // 销毁流程（BotGeneration.removeBotFromServer）在 disable 之前即 setMap(null)，
+        // 故 map 判空同时堵住 disable→removeActiveBot 之间的窗口。
+        // 未注册但 map 非 null 放行：gcmove 包内引擎单测（MovementExecutionTest 等）直接
+        // 驱动未注册 bot，是合法的引擎级测试路径；生产路径均为「注册（addActiveBot）后 enable」。
+        if (!BotStorage.botLoggedIn(bot.getId()) && bot.getMap() == null) {
             return;
         }
         ObserverTracker.ensureStarted(); // LOD observability poll (idempotent)

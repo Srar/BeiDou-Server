@@ -36,6 +36,8 @@ import org.gms.net.packet.InPacket;
 import org.gms.net.packet.Packet;
 import org.gms.net.packet.logging.LoggingUtil;
 import org.gms.net.packet.logging.MonitoredChrLogger;
+import org.gms.net.packet.trace.PacketTraceBuffer;
+import org.gms.net.packet.trace.PacketTraceRegistry;
 import org.gms.net.server.Server;
 import org.gms.net.server.channel.Channel;
 import org.gms.net.server.coordinator.login.LoginBypassCoordinator;
@@ -190,6 +192,12 @@ public class Client extends ChannelInboundHandlerAdapter {
 
         this.remoteAddress = getRemoteAddress(channel);
         this.ioChannel = channel;
+
+        // 每连接收发包环形记录：上线注册（崩溃诊断用）
+        PacketTraceBuffer traceBuffer = channel.attr(PacketTraceRegistry.CHANNEL_KEY).get();
+        if (traceBuffer != null) {
+            PacketTraceRegistry.registerOnline(remoteAddress, traceBuffer);
+        }
     }
 
     private static String getRemoteAddress(io.netty.channel.Channel channel) {
@@ -259,6 +267,12 @@ public class Client extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
+        // 断连前先归档该连接的收发包环形记录，确保断连瞬间证据固化
+        PacketTraceBuffer traceBuffer = ctx.channel().attr(PacketTraceRegistry.CHANNEL_KEY).get();
+        if (traceBuffer != null && remoteAddress != null && !"null".equals(remoteAddress)) {
+            PacketTraceRegistry.archive(remoteAddress, traceBuffer);
+        }
+
         closeMapleSession();
     }
 

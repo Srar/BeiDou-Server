@@ -7,6 +7,10 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.gms.net.packet.InPacket;
 import org.gms.net.packet.Packet;
+import org.gms.net.packet.trace.PacketTraceBuffer;
+import org.gms.net.packet.trace.PacketTraceConfig;
+import org.gms.net.packet.trace.PacketTraceEntry;
+import org.gms.net.packet.trace.PacketTraceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.gms.util.HexTool;
@@ -20,6 +24,21 @@ public class InPacketLogger extends ChannelInboundHandlerAdapter implements Pack
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         if (GameConfig.getServerBoolean("use_debug_show_packet") && msg instanceof InPacket packet) {
             log(packet);
+        }
+
+        // 每连接收发包环形记录：客户端→服务端
+        if (PacketTraceConfig.enabled() && msg instanceof InPacket packet) {
+            byte[] content = packet.getBytes();
+            if (content != null && content.length >= 2) {
+                short opcode = LoggingUtil.readFirstShort(content);
+                if (PacketTraceConfig.includeMove() || !LoggingUtil.isIgnoredRecvPacket(opcode)) {
+                    PacketTraceBuffer buffer = ctx.channel().attr(PacketTraceRegistry.CHANNEL_KEY).get();
+                    if (buffer != null) {
+                        buffer.add(PacketTraceEntry.of(PacketTraceEntry.DIR_RECV, content,
+                                OpcodeConstants.recvOpcodeNames.get((int) opcode)));
+                    }
+                }
+            }
         }
 
         ctx.fireChannelRead(msg);

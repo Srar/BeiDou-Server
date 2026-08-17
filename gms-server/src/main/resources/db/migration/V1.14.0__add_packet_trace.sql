@@ -11,8 +11,8 @@ WHERE NOT EXISTS (
 );
 
 INSERT INTO `game_config`(`config_type`, `config_sub_type`, `config_clazz`, `config_code`, `config_value`, `config_desc`, `update_time`)
-SELECT 'server', 'Debug', 'java.lang.Integer', 'packet_trace_capacity', '512',
-       '客户端崩溃诊断：每连接环形缓冲容量（包数），默认 512（Crash diagnosis: per-connection ring buffer capacity in packets, default 512）', NOW()
+SELECT 'server', 'Debug', 'java.lang.Integer', 'packet_trace_capacity', '2048',
+       '客户端崩溃诊断：每连接环形缓冲容量（包数），默认 2048（约 2 分钟窗口）（Crash diagnosis: per-connection ring buffer capacity in packets, default 2048, about 2 minutes）', NOW()
 WHERE NOT EXISTS (
     SELECT 1 FROM `game_config` WHERE `config_code` = 'packet_trace_capacity'
 );

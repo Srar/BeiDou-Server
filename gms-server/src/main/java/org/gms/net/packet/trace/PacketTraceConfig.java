@@ -12,7 +12,7 @@ import org.gms.config.GameConfig;
 public final class PacketTraceConfig {
 
     private static volatile boolean enabled;
-    private static volatile int capacity = 1024;
+    private static volatile int capacity = 2048;
     private static volatile boolean includeMove;
     private static volatile long lastRefreshMillis;
 
@@ -57,7 +57,7 @@ public final class PacketTraceConfig {
                 enabled = GameConfig.getServerBoolean("packet_trace_enabled");
                 capacity = GameConfig.getServerInt("packet_trace_capacity");
                 if (capacity <= 0) {
-                    capacity = 1024;
+                    capacity = 2048;
                 }
                 includeMove = GameConfig.getServerBoolean("packet_trace_include_move");
             } catch (RuntimeException ignored) {

@@ -119,10 +119,10 @@ public class ShopOfferResponse {
                 player.getName(), delay / 60000));
 
         BotTiming.after(delay, () -> {
+            // M2 修复（复审加固）：unlock 前置，广播异常也不会遗留锁
+            system.unlockItem(ownerId, shopItem);
             shopItem.setPrice((int) acceptedPrice);
             shop.broadcast(PacketCreator.getPlayerShopItemUpdate(shop));
-            // M2 修复：成交后释放锁，物品可再次参与议价（旧实现为永久锁）
-            system.unlockItem(ownerId, shopItem);
 
             if (player.getClient() != null) {
                 player.sendPacket(PacketCreator.getWhisperReceive(

@@ -41,6 +41,8 @@ public final class GCMovement {
     private static final Map<Integer, BotMovementState> STATES = new ConcurrentHashMap<>();
     private static final Map<Integer, Runnable> ARRIVAL_CALLBACKS = new ConcurrentHashMap<>();
     private static final Map<Integer, Runnable> ABANDON_CALLBACKS = new ConcurrentHashMap<>();
+    /** enable 拿锁失败的 warn 节流时间戳（每 bot 30s 最多 warn 一次，重试路径防日志刷屏） */
+    private static final Map<Integer, Long> LOCK_BUSY_WARN_AT = new ConcurrentHashMap<>();
 
     // ── Lifecycle ───────────────────────────────────────────────────────────
 
@@ -68,7 +70,15 @@ public final class GCMovement {
             if (STATES.containsKey(bot.getId())) {
                 return; // 并发 enable：另一线程刚建好会话并持锁，本线程不算失败
             }
-            log.warn(I18nUtil.getLogMessage("GCMovement.enable.lockBusy", bot.getId()));
+            // 节流：重试路径（如 GCTravel 300ms 轮询）会高频触达此分支，每 bot 30s 最多 warn 一次，其余走 debug
+            long now = System.currentTimeMillis();
+            Long last = LOCK_BUSY_WARN_AT.putIfAbsent(bot.getId(), now);
+            if (last == null || now - last >= 30_000) {
+                LOCK_BUSY_WARN_AT.put(bot.getId(), now);
+                log.warn(I18nUtil.getLogMessage("GCMovement.enable.lockBusy", bot.getId()));
+            } else {
+                log.debug(I18nUtil.getLogMessage("GCMovement.enable.lockBusy", bot.getId()));
+            }
             return;
         }
         try {

@@ -332,7 +332,7 @@ public class Character extends AbstractCharacterObject {
     private final Pet[] pets = new Pet[3];
     @Getter
     @Setter
-    private PlayerShop playerShop = null;
+    private volatile PlayerShop playerShop = null;
     @Getter
     @Setter
     private Shop shop = null;

@@ -2,6 +2,9 @@ package org.gms.server.bot.replay.navigation;
 
 import org.gms.client.Character;
 import org.gms.server.maps.Portal;
+import org.gms.util.I18nUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.util.List;
@@ -13,6 +16,8 @@ import static org.gms.server.bot.replay.navigation.PathFinder.createPath;
 import static org.gms.server.bot.replay.navigation.PathFinder.getNavElements;
 
 public class FMMovementCommands {
+
+    private static final Logger log = LoggerFactory.getLogger(FMMovementCommands.class);
 //
 //    private static int getRowByDoor(int door) {
 //        if (door >= 1 && door <= 6) return 1;
@@ -94,6 +99,10 @@ public class FMMovementCommands {
         }
 
         Point endPt = getDoorPosition(endDoor);
+        if (endPt == null) {
+            log.warn(I18nUtil.getLogMessage("FMBot.doorPoint.missing", endDoor));
+            return;
+        }
         fmPathFinder(fakechar, endPt);
         if (!isPointNear(fakechar.getPosition(), getDoorPosition(endDoor), 20)) {
             BotMoveSmallDistanceX(fakechar, getDoorPosition(endDoor));

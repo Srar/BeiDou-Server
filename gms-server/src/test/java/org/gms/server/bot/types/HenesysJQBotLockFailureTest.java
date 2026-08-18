@@ -16,6 +16,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * JQ 攀爬锁竞争成功判定回归（m2-R2）：attemptJQ 的 lastAttemptSuccess 曾在
@@ -43,7 +44,7 @@ class HenesysJQBotLockFailureTest {
         HenesysJQBot bot = new HenesysJQBot(chr);
 
         // 模拟 gcmove 动态会话（或任何他方）持锁：回放拿锁必然失败
-        assert MovementCommands.tryAcquireMovementLock(chr);
+        assertTrue(MovementCommands.tryAcquireMovementLock(chr), "测试前置：应能取得移动锁");
         try {
             // 录制品读取钉死为成功（不抛异常），让流程走到 tryAcquire 的 lockBusy 分支；
             // Randomizer.nextInt 钉死为 1：跳过 BotTiming.after 与 scheduleMidJQChat 的调度。

@@ -18,6 +18,12 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+import static org.gms.server.bot.environment.platform.PlatformPlacement.botMoveToPlatformAnyUnoccupiedSpotAware;
+import static org.gms.server.bot.environment.platform.PlatformPlacement.getCurrentPlatform;
+import static org.gms.server.bot.environment.platform.PlatformPlacement.getMainPlatformIds;
+import static org.gms.server.bot.freemarket.BotRand.getRandomElement;
+import static org.gms.server.bot.replay.MovementCommands.nudgeAwayFromOverlap;
+
 @Slf4j
 public class HenesysBot extends BotSM {
     private HenesysBotState henesysBotState = HenesysBotState.RESET;
@@ -107,7 +113,7 @@ public class HenesysBot extends BotSM {
                 changeMap();
                 lastMapChangeTime = System.currentTimeMillis();
                 doRandomEmote();
-                wanderToRandomLedge();
+                wanderToMainPlatform();
                 setHenesysBotState(HenesysBotState.IDLE);
                 break;
             default:
@@ -153,19 +159,34 @@ public class HenesysBot extends BotSM {
     }
 
     /**
-     * Moves the bot to another platform on the current map (gcmove 图导航随机游走；
-     * PlatformPlacement 已移植（org.gms.server.bot.environment.platform）但换位 API
-     * 未接线，本类用 gcmove 踱步等价替代).
+     * Moves the bot to another platform on the current map.
+     * Uses weighted rolls for variety - sometimes stays on current platform,
+     * sometimes moves to a nearby one, sometimes picks from the full map.
+     * 换位 API 接线：走 PlatformPlacement.botMoveToPlatformAnyUnoccupiedSpotAware
+     * 占位感知换位（避免 bot 互相堆叠），移动后以概率 nudgeAwayFromOverlap 推开重叠者。
      */
     private void wanderPlatforms() {
-        MapleMap map = getChr().getMap();
-        if (map == null) return;
-        List<GCMovement.Ledge> ledges = GCMovement.walkableLedges(map);
-        if (ledges.isEmpty()) return;
+        List<String> platforms = getWanderablePlatforms(getChr().getMapId());
+        if (platforms.isEmpty()) return;
 
-        if (Randomizer.nextInt(5) == 0 || Randomizer.nextInt(10) == 0 || Randomizer.nextInt(35) == 0) {
-            GCMovement.Ledge ledge = ledges.get(Randomizer.nextInt(ledges.size()));
-            GCMovement.move(getChr(), ledge.centerX(), ledge.centerY());
+        boolean moved = false;
+        if (Randomizer.nextInt(5) == 0) {
+            String current = getCurrentPlatform(getChr());
+            if (platforms.contains(current)) {
+                botMoveToPlatformAnyUnoccupiedSpotAware(getChr(), current);
+                moved = true;
+            }
+        } else if (Randomizer.nextInt(10) == 0) {
+            botMoveToPlatformAnyUnoccupiedSpotAware(getChr(),
+                    getRandomElement(platforms.size() > 1 ? platforms.subList(0, 2) : platforms));
+            moved = true;
+        } else if (Randomizer.nextInt(35) == 0) {
+            botMoveToPlatformAnyUnoccupiedSpotAware(getChr(), getRandomElement(platforms));
+            moved = true;
+        }
+
+        if (moved && Randomizer.nextInt(2) == 0) {
+            nudgeAwayFromOverlap(getChr());
         }
     }
 
@@ -234,14 +255,23 @@ public class HenesysBot extends BotSM {
         return target == null ? 0 : target.getCharacters().size();
     }
 
-    private void wanderToRandomLedge() {
-        MapleMap map = getChr().getMap();
-        if (map == null) return;
-        List<GCMovement.Ledge> ledges = GCMovement.walkableLedges(map);
-        if (!ledges.isEmpty()) {
-            GCMovement.Ledge ledge = ledges.get(Randomizer.nextInt(ledges.size()));
-            GCMovement.move(getChr(), ledge.centerX(), ledge.centerY());
+    private void wanderToMainPlatform() {
+        int mapId = getChr().getMapId();
+        List<String> platforms = getWanderablePlatforms(mapId);
+        if (!platforms.isEmpty()) {
+            botMoveToPlatformAnyUnoccupiedSpotAware(getChr(), getRandomElement(platforms));
         }
+    }
+
+    /**
+     * 可游走平台语义列表（SoloMapling 原语义）：宠物公园（PET_PARK）只有 m1
+     * 可游走（其余为 JQ 专用台阶），其他 Henesys 地图取主平台（m*）全集。
+     */
+    private List<String> getWanderablePlatforms(int mapId) {
+        if (mapId == PET_PARK) {
+            return List.of("m1");
+        }
+        return getMainPlatformIds(mapId);
     }
 
     private void convertToJQBot() {

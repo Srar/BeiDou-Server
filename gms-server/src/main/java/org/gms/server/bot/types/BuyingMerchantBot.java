@@ -5,13 +5,11 @@ import org.gms.server.bot.BotSM;
 import org.gms.server.bot.commands.SocialCommands;
 import org.gms.server.bot.freemarket.BotEconomy;
 import org.gms.server.bot.freemarket.FMItem;
-import org.gms.server.bot.gcmove.GCMovement;
 import org.gms.server.bot.messaging.ChatMessage;
 import org.gms.server.bot.messaging.MessageQueue;
 import org.gms.server.bot.trade.BotTradeSM;
 import org.gms.util.Randomizer;
 
-import java.awt.Point;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -19,6 +17,9 @@ import java.util.function.Supplier;
 
 import static org.gms.server.bot.BotTypeManager.BotType.NX_MERCHANT_BOT;
 import static org.gms.server.bot.BotTypeManager.convertBotType;
+import static org.gms.server.bot.environment.platform.PlatformPlacement.botMoveToPlatformAnyUnoccupiedSpotDynamic;
+import static org.gms.server.bot.environment.platform.PlatformPlacement.getCurrentPlatform;
+import static org.gms.server.bot.environment.platform.PlatformPlacement.getMainPlatformIds;
 import static org.gms.server.bot.freemarket.BotRand.getRandomElement;
 import static org.gms.server.bot.freemarket.BotRand.rollChanceInverse;
 import static org.gms.server.bot.freemarket.BotShopCatalog.generateDarkScrollsList;
@@ -136,30 +137,25 @@ public class BuyingMerchantBot extends BotSM {
         return msg;
     }
 
+    // Dynamic movement lands on the exact picked pixel, so the old nudgeAwayFromOverlap
+    // band-aid (recorded paths piling bots onto fixed endpoints) is no longer needed here.
     private boolean tryPlatformShuffleWhileAdvertising() {
-        // gms 移植：PlatformPlacement 已移植（org.gms.server.bot.environment.platform）
-        // 但换位 API 未接线，本类用 gcmove 踱步等价替代。
+        // 换位 API 接线：占位感知换位（Dynamic 引擎落在精确像素，避免商人 bot 堆叠在同一"点位"）。
         if (rollChanceInverse(10)) {
-            nudgeRandomly();
+            botMoveToPlatformAnyUnoccupiedSpotDynamic(getChr(), getCurrentPlatform(getChr()));
             return true;
         } else if (rollChanceInverse(20)) {
-            nudgeRandomly();
+            botMoveToPlatformAnyUnoccupiedSpotDynamic(getChr(), getRandomElement(List.of("m1", "m5")));
             return true;
         } else if (rollChanceInverse(30)) {
-            nudgeRandomly();
+            botMoveToPlatformAnyUnoccupiedSpotDynamic(getChr(), getRandomElement(List.of("m1", "m2")));
             return true;
         } else if (rollChanceInverse(70)) {
-            nudgeRandomly();
+            int currentMap = getChr().getMapId();
+            botMoveToPlatformAnyUnoccupiedSpotDynamic(getChr(), getRandomElement(getMainPlatformIds(currentMap)));
             return true;
         }
         return false;
-    }
-
-    private void nudgeRandomly() {
-        Character chr = getChr();
-        Point pos = chr.getPosition();
-        int dx = Randomizer.nextInt(41) - 20;
-        GCMovement.move(chr, pos.x + dx, pos.y);
     }
 
     private void handleIdleActions() {
@@ -167,15 +163,16 @@ public class BuyingMerchantBot extends BotSM {
             movedDuringAdvertise = false;
             return;
         }
-        // gms 移植：等价 PlatformPlacement 换位。
+        // 换位 API 接线：空闲拍占位感知换位（同 tryPlatformShuffleWhileAdvertising 语义）。
         if (rollChanceInverse(10)) {
-            nudgeRandomly();
+            botMoveToPlatformAnyUnoccupiedSpotDynamic(getChr(), getCurrentPlatform(getChr()));
         } else if (rollChanceInverse(20)) {
-            nudgeRandomly();
+            botMoveToPlatformAnyUnoccupiedSpotDynamic(getChr(), getRandomElement(List.of("m1", "m5")));
         } else if (rollChanceInverse(30)) {
-            nudgeRandomly();
+            botMoveToPlatformAnyUnoccupiedSpotDynamic(getChr(), getRandomElement(List.of("m1", "m2")));
         } else if (rollChanceInverse(70)) {
-            nudgeRandomly();
+            int currentMap = getChr().getMapId();
+            botMoveToPlatformAnyUnoccupiedSpotDynamic(getChr(), getRandomElement(getMainPlatformIds(currentMap)));
         }
     }
 

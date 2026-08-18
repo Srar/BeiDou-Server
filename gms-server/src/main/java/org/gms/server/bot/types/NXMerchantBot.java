@@ -6,13 +6,11 @@ import org.gms.server.Trade;
 import org.gms.server.bot.BotSM;
 import org.gms.server.bot.BotTiming;
 import org.gms.server.bot.commands.SocialCommands;
-import org.gms.server.bot.gcmove.GCMovement;
 import org.gms.server.bot.messaging.ChatMessage;
 import org.gms.server.bot.messaging.MessageQueue;
 import org.gms.server.bot.trade.BotTradeSM;
 import org.gms.util.Randomizer;
 
-import java.awt.Point;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -24,6 +22,8 @@ import static org.gms.server.bot.commands.MapleMessengerCommands.botLeaveMesseng
 import static org.gms.server.bot.commands.MapleMessengerCommands.botSendChatFull;
 import static org.gms.server.bot.commands.MapleMessengerCommands.isMessengerInviteAccepted;
 import static org.gms.server.bot.commands.MapleMessengerCommands.sendMessengerInviteComplete;
+import static org.gms.server.bot.environment.platform.PlatformPlacement.botMoveToPlatformAnyUnoccupiedSpotDynamic;
+import static org.gms.server.bot.environment.platform.PlatformPlacement.getCurrentPlatform;
 import static org.gms.server.bot.freemarket.BotRand.getRandomElement;
 import static org.gms.server.bot.freemarket.BotRand.rollChanceInverse;
 import static org.gms.server.bot.freemarket.BotRand.waitForCondition;
@@ -121,23 +121,15 @@ public class NXMerchantBot extends BotSM {
     // Dynamic movement lands on the exact picked pixel, so the old nudgeAwayFromOverlap
     // band-aid (recorded paths piling bots onto fixed endpoints) is no longer needed here.
     private boolean tryPlatformShuffle() {
-        // gms 移植：PlatformPlacement 已移植（org.gms.server.bot.environment.platform）
-        // 但换位 API 未接线，本类用 gcmove 踱步等价替代。
+        // 换位 API 接线：占位感知换位（Dynamic 引擎落在精确像素，避免商人 bot 堆叠在同一"点位"）。
         if (rollChanceInverse(15)) {
-            nudgeRandomly();
+            botMoveToPlatformAnyUnoccupiedSpotDynamic(getChr(), getCurrentPlatform(getChr()));
             return true;
         } else if (rollChanceInverse(40)) {
-            nudgeRandomly();
+            botMoveToPlatformAnyUnoccupiedSpotDynamic(getChr(), getRandomElement(List.of("m1", "m5")));
             return true;
         }
         return false;
-    }
-
-    private void nudgeRandomly() {
-        Character chr = getChr();
-        Point pos = chr.getPosition();
-        int dx = Randomizer.nextInt(41) - 20;
-        GCMovement.move(chr, pos.x + dx, pos.y);
     }
 
     private void convertBack() {

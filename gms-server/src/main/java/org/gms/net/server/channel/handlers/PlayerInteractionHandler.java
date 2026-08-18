@@ -41,7 +41,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.gms.server.ItemInformationProvider;
 import org.gms.server.Trade;
-import org.gms.server.bot.freemarket.shopoffer.OfferParser;
 import org.gms.server.bot.freemarket.shopoffer.ShopOfferSystem;
 import org.gms.server.bot.freemarket.shopoffer.ShopOfferWelcome;
 import org.gms.server.maps.FieldLimit;
@@ -356,8 +355,8 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler {
                     if (shop != null) {
                         shop.chat(c, chatMsg);
                         ShopOfferSystem.getInstance().onPlayerShopChat(chr, shop, chatMsg);
-                        boolean offerParsed = OfferParser.parse(chatMsg, shop.getItems()) != null;
-                        ShopOfferWelcome.onPlayerChat(chr, shop, offerParsed);
+                        // M3：offerParsed 判定移入 ShopOfferWelcome 门控之后，handler 只传原始消息
+                        ShopOfferWelcome.onPlayerChat(chr, shop, chatMsg);
                     }
                 } else if (chr.getMiniGame() != null) {
                     MiniGame game = chr.getMiniGame();

@@ -36,14 +36,28 @@ public class ShopOfferResponse {
     static final int AFK_DELAY_MAX_MINUTES = 30;
 
     public static void handlePresentOwner(Character player, PlayerShop shop, OfferParser.ParsedOffer offer, HaggleSession session) {
-        Character owner = shop.getOwner();
-        session.incrementAttempt();
+        if (player == null || shop == null || offer == null || session == null) {
+            return;
+        }
+        // M5 修复：延迟回调店内复核。应答排队（2-6 秒）期间玩家可能已离店，
+        // 离店后不得再成交/踢人/记 banned（离店时 PlayerShop 引用已被置空）。
+        if (player.getPlayerShop() != shop) {
+            return;
+        }
 
-        if (session.hasExceededAttempts()) {
+        Character owner = shop.getOwner();
+        // M1 修复：登记与上限判定原子化（返回登记后的累计次数），
+        // 并发连发报价不会丢计数导致踢人上限失效。
+        if (session.incrementAttempt() >= HaggleSession.MAX_ATTEMPTS) {
             String msg = getDialogueLine("KickResponse", offer, null);
             shopOwnerChat(shop, owner, msg);
-            BotTiming.after(2000, () -> shop.banPlayer(player.getName()));
-            ShopOfferSystem.getInstance().removeSession(player.getId());
+            BotTiming.after(2000, () -> {
+                // 踢人回调同样复核店内状态：已离店的玩家不再 ban（避免误记）
+                if (player.getPlayerShop() == shop) {
+                    shop.banPlayer(player.getName());
+                }
+            });
+            ShopOfferSystem.getInstance().removeSession(player.getId(), owner.getId());
             return;
         }
 
@@ -90,12 +104,16 @@ public class ShopOfferResponse {
         String itemName = offer.getItemName();
         String ownerName = shop.getOwner().getName();
         int ownerId = shop.getOwner().getId();
-        int itemIndex = offer.getItemIndex();
         PlayerShopItem shopItem = offer.getShopItem();
         String roomLabel = getFMRoomLabel(shop.getMapId());
         int delay = afkDelayMillis();
 
-        system.lockItem(ownerId, itemIndex);
+        // M2 修复：原子尝试锁定（物品身份 key）。同一物品已有待处理改价时放弃，
+        // 防止两个玩家几乎同时报价同一物品导致重复排程。
+        if (!system.tryLockItem(ownerId, shopItem)) {
+            log.info(I18nUtil.getLogMessage("ShopOfferSystem.log.itemLocked", player.getName()));
+            return;
+        }
 
         log.info(I18nUtil.getLogMessage("ShopOfferSystem.log.afkScheduled", itemName, acceptedPrice,
                 player.getName(), delay / 60000));
@@ -103,6 +121,8 @@ public class ShopOfferResponse {
         BotTiming.after(delay, () -> {
             shopItem.setPrice((int) acceptedPrice);
             shop.broadcast(PacketCreator.getPlayerShopItemUpdate(shop));
+            // M2 修复：成交后释放锁，物品可再次参与议价（旧实现为永久锁）
+            system.unlockItem(ownerId, shopItem);
 
             if (player.getClient() != null) {
                 player.sendPacket(PacketCreator.getWhisperReceive(
@@ -124,11 +144,14 @@ public class ShopOfferResponse {
 
         long acceptedPrice = offer.getOfferPrice();
         String itemName = offer.getItemName();
-        int itemIndex = offer.getItemIndex();
         String roomLabel = getFMRoomLabel(mapId);
         int delay = afkDelayMillis();
 
-        system.lockItem(ownerId, itemIndex);
+        // M2 修复：原子尝试锁定（物品身份 key），同一物品已有待处理改价时放弃
+        if (!system.tryLockItem(ownerId, shopItem)) {
+            log.info(I18nUtil.getLogMessage("ShopOfferSystem.log.hiredItemLocked", player.getName()));
+            return;
+        }
 
         log.info(I18nUtil.getLogMessage("ShopOfferSystem.log.afkScheduled", itemName, acceptedPrice,
                 player.getName(), delay / 60000));
@@ -138,6 +161,8 @@ public class ShopOfferResponse {
             if (broadcastUpdate != null) {
                 broadcastUpdate.run();
             }
+            // M2 修复：成交后释放锁，物品可再次参与议价（旧实现为永久锁）
+            system.unlockItem(ownerId, shopItem);
 
             if (player.getClient() != null) {
                 player.sendPacket(PacketCreator.getWhisperReceive(
@@ -161,8 +186,9 @@ public class ShopOfferResponse {
         offer.getShopItem().setPrice((int) finalPrice);
         shop.broadcast(PacketCreator.getPlayerShopItemUpdate(shop));
 
-        ShopOfferSystem.getInstance().lockItem(owner.getId(), offer.getItemIndex());
-        ShopOfferSystem.getInstance().removeSession(player.getId());
+        // PRESENT 成交即时生效、无待处理改价窗口，不需要物品锁（M2：旧实现此处
+        // 加的 ownerId_itemIndex 永久锁既锁错对象也从不释放）；只结束议价会话。
+        ShopOfferSystem.getInstance().removeSession(player.getId(), owner.getId());
 
         log.info(I18nUtil.getLogMessage("ShopOfferSystem.log.accepted", offer.getItemName(), finalPrice, player.getName()));
     }
@@ -202,6 +228,14 @@ public class ShopOfferResponse {
         map.put("{player}", player != null ? player.getName() : "");
         map.put("{listing_price}", offer != null ? formatPrice(offer.getShopItem().getPrice()) : "");
         return map;
+    }
+
+    /** {player} 占位替换（M4：欢迎台词与报价台词共用同一替换逻辑，替换为玩家名）。 */
+    public static String replacePlayerPlaceholder(String line, Character player) {
+        if (line == null) {
+            return null;
+        }
+        return line.replace("{player}", player != null ? player.getName() : "");
     }
 
     private static String getFMRoomLabel(int mapId) {

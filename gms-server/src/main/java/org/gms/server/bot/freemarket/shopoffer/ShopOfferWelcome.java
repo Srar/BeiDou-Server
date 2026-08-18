@@ -50,18 +50,26 @@ public class ShopOfferWelcome {
             if (visitor.getPlayerShop() != shop) {
                 return;
             }
-            String line = getWelcomeLine();
+            String line = getWelcomeLine(visitor);
             if (line != null) {
                 shop.chat(shop.getOwner(), line);
             }
         });
     }
 
-    public static void onPlayerChat(Character player, PlayerShop shop, boolean offerParsed) {
-        if (offerParsed) {
+    /**
+     * 店内闲聊计数（M3 修复：handler 只传原始消息，报价解析移入门控之后——
+     * 真人店铺的每条聊天不再触发全量 WZ 解析；bot 店铺在门控通过后才解析，
+     * 报价消息不参与闲聊计数）。
+     */
+    public static void onPlayerChat(Character player, PlayerShop shop, String message) {
+        if (player == null || shop == null || message == null) {
             return;
         }
         if (!BotHelpers.isBot(shop.getOwner())) {
+            return;
+        }
+        if (OfferParser.parse(message, shop.getItems()) != null) {
             return;
         }
 
@@ -94,13 +102,16 @@ public class ShopOfferWelcome {
         hintedPlayers.removeIf(k -> k.startsWith(ownerId + "_"));
     }
 
-    private static String getWelcomeLine() {
+    private static String getWelcomeLine(Character visitor) {
         BotDialogueHandler.DialogueConstructor dialog =
                 BotDialogueHandler.getDialogueCon(DIALOGUE_PATH, BOT_TYPE, "WelcomeResponse");
         if (dialog == null || dialog.getDialogue().isEmpty()) {
             return null;
         }
         List<String> lines = dialog.getDialogue();
-        return lines.get(Randomizer.nextInt(lines.size()));
+        String line = lines.get(Randomizer.nextInt(lines.size()));
+        // M4 修复：WelcomeResponse 部分台词含 {player} 占位符，
+        // 复用 ShopOfferResponse 的替换逻辑替换为访客名，避免占位符原样发给客户端
+        return ShopOfferResponse.replacePlayerPlaceholder(line, visitor);
     }
 }

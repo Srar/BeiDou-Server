@@ -41,6 +41,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -59,7 +60,10 @@ public class PlayerShop extends AbstractMapObject {
     private final List<SoldItem> sold = new LinkedList<>();
     private String description;
     private int boughtnumber = 0;
-    private final List<String> bannedList = new ArrayList<>();
+    // M5 修复：banPlayer 由 BotTiming 延迟回调（虚拟线程）触发、isBanned 在
+    // Netty 线程的 visitShop 路径读取，普通 ArrayList 跨线程读写不安全；
+    // CopyOnWriteArrayList 并发安全且 addIfAbsent 使「查重+加入」原子化。
+    private final CopyOnWriteArrayList<String> bannedList = new CopyOnWriteArrayList<>();
     private final List<Pair<Character, String>> chatLog = new LinkedList<>();
     private final Map<Integer, Byte> chatSlot = new LinkedHashMap<>();
     private final Lock visitorLock = new ReentrantLock(true);
@@ -580,9 +584,7 @@ public class PlayerShop extends AbstractMapObject {
     }
 
     public void banPlayer(String name) {
-        if (!bannedList.contains(name)) {
-            bannedList.add(name);
-        }
+        bannedList.addIfAbsent(name);
 
         Character target = null;
         visitorLock.lock();

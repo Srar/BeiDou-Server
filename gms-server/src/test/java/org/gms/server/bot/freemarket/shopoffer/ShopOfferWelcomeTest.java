@@ -21,7 +21,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -76,10 +78,11 @@ class ShopOfferWelcomeTest {
             assertTrue(delayCap.getValue() >= 15_000 && delayCap.getValue() <= 20_000, "打招呼延迟应在 15-20 秒内");
 
             runnableCap.getValue().run();
-            // Randomizer.nextInt → 0 → WelcomeResponse 第一行
+            // Randomizer.nextInt → 0 → WelcomeResponse 第一行；M4：{player} 占位替换为访客名
             BotDialogueHandler.DialogueConstructor dialog =
                     BotDialogueHandler.getDialogueCon("ShopOfferDialogue.yaml", "ShopOffer", "WelcomeResponse");
-            assertEquals(dialog.getDialogue().get(0), capturedChatLine(shop));
+            String expected = ShopOfferResponse.replacePlayerPlaceholder(dialog.getDialogue().get(0), visitor);
+            assertEquals(expected, capturedChatLine(shop));
             verify(shop).chat(eq(owner), any());
         }
     }
@@ -133,9 +136,11 @@ class ShopOfferWelcomeTest {
         try (MockedStatic<BotHelpers> helpers = mockStatic(BotHelpers.class);
              MockedStatic<ShopOfferSystem> sys = mockStatic(ShopOfferSystem.class);
              MockedStatic<Randomizer> rnd = mockStatic(Randomizer.class);
-             MockedStatic<BotTiming> timing = mockStatic(BotTiming.class)) {
+             MockedStatic<BotTiming> timing = mockStatic(BotTiming.class);
+             MockedStatic<OfferParser> parser = mockStatic(OfferParser.class)) {
             rnd.when(Randomizer::nextInt).thenReturn(0);
             helpers.when(() -> BotHelpers.isBot(any(Character.class))).thenReturn(true);
+            parser.when(() -> OfferParser.parse(anyString(), anyList())).thenReturn(null); // 非报价闲聊
             ShopOfferSystem system = mock(ShopOfferSystem.class);
             sys.when(ShopOfferSystem::getInstance).thenReturn(system);
             when(system.getOrAssignMode(BOT_OWNER_ID)).thenReturn(ShopOfferSystem.ShopMode.PRESENT);
@@ -145,16 +150,16 @@ class ShopOfferWelcomeTest {
             when(shop.getOwner()).thenReturn(owner);
             Character visitor = visitorIn(shop);
 
-            ShopOfferWelcome.onPlayerChat(visitor, shop, false); // 第 1 条
+            ShopOfferWelcome.onPlayerChat(visitor, shop, "随便聊聊"); // 第 1 条
             timing.verify(() -> BotTiming.after(anyLong(), any()), never());
 
-            ShopOfferWelcome.onPlayerChat(visitor, shop, false); // 第 2 条 → 提示
+            ShopOfferWelcome.onPlayerChat(visitor, shop, "在吗"); // 第 2 条 → 提示
             ArgumentCaptor<Runnable> runnableCap = ArgumentCaptor.forClass(Runnable.class);
             timing.verify(() -> BotTiming.after(anyLong(), runnableCap.capture()));
             runnableCap.getValue().run();
             verify(shop).chat(eq(owner), eq("小提示：想砍价的话，输入价格（50m、1.5b）和物品名。同名多件用 1st/2nd/3rd 区分！"));
 
-            ShopOfferWelcome.onPlayerChat(visitor, shop, false); // 第 3 条 → 已提示不再触发
+            ShopOfferWelcome.onPlayerChat(visitor, shop, "多少钱"); // 第 3 条 → 已提示不再触发
             timing.verify(() -> BotTiming.after(anyLong(), any()), times(1));
         }
     }
@@ -163,8 +168,11 @@ class ShopOfferWelcomeTest {
     void parsedOfferChatSkipsHintCounting() {
         try (MockedStatic<BotHelpers> helpers = mockStatic(BotHelpers.class);
              MockedStatic<ShopOfferSystem> sys = mockStatic(ShopOfferSystem.class);
-             MockedStatic<BotTiming> timing = mockStatic(BotTiming.class)) {
+             MockedStatic<BotTiming> timing = mockStatic(BotTiming.class);
+             MockedStatic<OfferParser> parser = mockStatic(OfferParser.class)) {
             helpers.when(() -> BotHelpers.isBot(any(Character.class))).thenReturn(true);
+            parser.when(() -> OfferParser.parse(anyString(), anyList()))
+                    .thenReturn(mock(OfferParser.ParsedOffer.class)); // 报价消息
             ShopOfferSystem system = mock(ShopOfferSystem.class);
             sys.when(ShopOfferSystem::getInstance).thenReturn(system);
             when(system.getOrAssignMode(BOT_OWNER_ID)).thenReturn(ShopOfferSystem.ShopMode.PRESENT);
@@ -174,8 +182,8 @@ class ShopOfferWelcomeTest {
             when(shop.getOwner()).thenReturn(owner);
             Character visitor = visitorIn(shop);
 
-            ShopOfferWelcome.onPlayerChat(visitor, shop, true);
-            ShopOfferWelcome.onPlayerChat(visitor, shop, true);
+            ShopOfferWelcome.onPlayerChat(visitor, shop, "50m Red Potion");
+            ShopOfferWelcome.onPlayerChat(visitor, shop, "60m Red Potion");
 
             timing.verify(() -> BotTiming.after(anyLong(), any()), never());
         }

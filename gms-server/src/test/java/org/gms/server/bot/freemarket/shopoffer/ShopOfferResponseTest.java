@@ -71,7 +71,7 @@ class ShopOfferResponseTest {
             Packet itemUpdate = mock(Packet.class);
             pc.when(() -> PacketCreator.getPlayerShopItemUpdate(shop)).thenReturn(itemUpdate);
 
-            Character player = player();
+            Character player = playerIn(shop);
             OfferParser.ParsedOffer offer = new OfferParser.ParsedOffer("Red Potion", 0, 50_000_000L, item);
             HaggleSession session = new HaggleSession(PLAYER_ID, BOT_OWNER_ID);
 
@@ -80,8 +80,9 @@ class ShopOfferResponseTest {
             assertEquals(50_000_000, item.getPrice(), "成交应把价格改为报价");
             verify(shop).broadcast(itemUpdate);
             verify(shop).chat(eq(owner), argThat(argThatNoPlaceholderAndContains("50m", "Red Potion")));
-            verify(systemMock).lockItem(BOT_OWNER_ID, 0);
-            verify(systemMock).removeSession(PLAYER_ID);
+            // PRESENT 成交即时生效、无待处理改价窗口：不占用物品锁（M2）
+            verify(systemMock, never()).tryLockItem(anyInt(), any());
+            verify(systemMock).removeSession(PLAYER_ID, BOT_OWNER_ID);
         }
     }
 
@@ -102,7 +103,7 @@ class ShopOfferResponseTest {
             when(shop.getOwner()).thenReturn(owner);
             PlayerShopItem item = shopItem(100_000_000);
 
-            Character player = player();
+            Character player = playerIn(shop);
             OfferParser.ParsedOffer offer = new OfferParser.ParsedOffer("Red Potion", 0, 50_000_000L, item);
             HaggleSession session = new HaggleSession(PLAYER_ID, BOT_OWNER_ID);
 
@@ -128,7 +129,7 @@ class ShopOfferResponseTest {
             when(shop.getOwner()).thenReturn(owner);
             PlayerShopItem item = shopItem(100_000_000);
 
-            ShopOfferResponse.handlePresentOwner(player(), shop,
+            ShopOfferResponse.handlePresentOwner(playerIn(shop), shop,
                     new OfferParser.ParsedOffer("Red Potion", 0, 50_000_000L, item),
                     new HaggleSession(PLAYER_ID, BOT_OWNER_ID));
 
@@ -138,6 +139,37 @@ class ShopOfferResponseTest {
     }
 
     // ─────────────────────────── PRESENT：3 次上限踢人 ───────────────────────────
+
+    @Test
+    void presentCallbackSkipsPlayerWhoLeftShop() {
+        try (MockedStatic<OfferEvaluator> evaluator = mockStatic(OfferEvaluator.class);
+             MockedStatic<ShopOfferSystem> sys = mockStatic(ShopOfferSystem.class);
+             MockedStatic<BotTiming> timing = mockStatic(BotTiming.class)) {
+            ShopOfferSystem systemMock = mock(ShopOfferSystem.class);
+            sys.when(ShopOfferSystem::getInstance).thenReturn(systemMock);
+            evaluator.when(() -> OfferEvaluator.evaluate(anyLong(), anyInt()))
+                    .thenReturn(OfferEvaluator.Decision.ACCEPT);
+
+            Character owner = botOwner();
+            PlayerShop shop = mock(PlayerShop.class);
+            when(shop.getOwner()).thenReturn(owner);
+            PlayerShopItem item = shopItem(100_000_000);
+            // 应答排队期间玩家已离店：getPlayerShop() 返回 null（离店时被清空）
+            Character player = player();
+            when(player.getPlayerShop()).thenReturn(null);
+
+            ShopOfferResponse.handlePresentOwner(player, shop,
+                    new OfferParser.ParsedOffer("Red Potion", 0, 50_000_000L, item),
+                    new HaggleSession(PLAYER_ID, BOT_OWNER_ID));
+
+            assertEquals(100_000_000, item.getPrice(), "离店不得成交改价");
+            verify(shop, never()).chat(any(Character.class), anyString());
+            verify(shop, never()).broadcast(any());
+            verify(shop, never()).banPlayer(anyString());
+            verify(systemMock, never()).removeSession(anyInt(), anyInt());
+            timing.verify(() -> BotTiming.after(anyLong(), any()), never());
+        }
+    }
 
     @Test
     void thirdAttemptKicksAndBansPlayer() {
@@ -155,7 +187,7 @@ class ShopOfferResponseTest {
             PlayerShop shop = mock(PlayerShop.class);
             when(shop.getOwner()).thenReturn(owner);
             PlayerShopItem item = shopItem(100_000_000);
-            Character player = player();
+            Character player = playerIn(shop);
             OfferParser.ParsedOffer offer = new OfferParser.ParsedOffer("Red Potion", 0, 50_000_000L, item);
             HaggleSession session = new HaggleSession(PLAYER_ID, BOT_OWNER_ID);
 
@@ -170,7 +202,7 @@ class ShopOfferResponseTest {
             timing.verify(() -> BotTiming.after(eq(2000L), banCap.capture()));
             banCap.getValue().run();
             verify(shop).banPlayer("PlayerX");
-            verify(systemMock).removeSession(PLAYER_ID);
+            verify(systemMock).removeSession(PLAYER_ID, BOT_OWNER_ID);
         }
     }
 
@@ -196,7 +228,7 @@ class ShopOfferResponseTest {
             session.setCounterPrice(70_000_000L);
 
             // 玩家报价 75m ≥ 还价 70m → 以还价成交，不走 evaluate
-            ShopOfferResponse.handlePresentOwner(player(), shop,
+            ShopOfferResponse.handlePresentOwner(playerIn(shop), shop,
                     new OfferParser.ParsedOffer("Red Potion", 0, 75_000_000L, item), session);
 
             assertEquals(70_000_000, item.getPrice(), "成交价应为店主还价而非玩家新报价");
@@ -224,13 +256,14 @@ class ShopOfferResponseTest {
             PlayerShopItem item = shopItem(100_000_000);
             Packet itemUpdate = mock(Packet.class);
             pc.when(() -> PacketCreator.getPlayerShopItemUpdate(shop)).thenReturn(itemUpdate);
+            when(systemMock.tryLockItem(BOT_OWNER_ID, item)).thenReturn(true);
 
             Character player = playerWithClient();
             OfferParser.ParsedOffer offer = new OfferParser.ParsedOffer("Red Potion", 0, 50_000_000L, item);
 
             ShopOfferResponse.handleAFKOwner(player, shop, offer, systemMock);
 
-            verify(systemMock).lockItem(BOT_OWNER_ID, 0);
+            verify(systemMock).tryLockItem(BOT_OWNER_ID, item);
 
             ArgumentCaptor<Long> delayCap = ArgumentCaptor.forClass(Long.class);
             ArgumentCaptor<Runnable> runnableCap = ArgumentCaptor.forClass(Runnable.class);
@@ -244,6 +277,7 @@ class ShopOfferResponseTest {
 
             assertEquals(50_000_000, item.getPrice(), "延迟到期应改价");
             verify(shop).broadcast(itemUpdate);
+            verify(systemMock).unlockItem(BOT_OWNER_ID, item); // M2：成交后释放锁
             ArgumentCaptor<String> whisperCap = ArgumentCaptor.forClass(String.class);
             pc.verify(() -> PacketCreator.getWhisperReceive(eq("OwnerBot"), eq(1), eq(false), whisperCap.capture()));
             assertTrue(whisperCap.getValue().contains("Red Potion"), "私聊应提及物品名");
@@ -290,6 +324,7 @@ class ShopOfferResponseTest {
             when(shop.getMapId()).thenReturn(910000001);
             PlayerShopItem item = shopItem(100_000_000);
             pc.when(() -> PacketCreator.getPlayerShopItemUpdate(shop)).thenReturn(mock(Packet.class));
+            when(systemMock.tryLockItem(BOT_OWNER_ID, item)).thenReturn(true);
 
             Character player = mock(Character.class);
             when(player.getId()).thenReturn(PLAYER_ID);
@@ -324,13 +359,14 @@ class ShopOfferResponseTest {
             PlayerShopItem item = shopItem(100_000_000);
             Character player = playerWithClient();
             ShopOfferSystem systemMock = mock(ShopOfferSystem.class);
+            when(systemMock.tryLockItem(BOT_OWNER_ID, item)).thenReturn(true);
             Runnable broadcastUpdate = mock(Runnable.class);
 
             ShopOfferResponse.handleHiredMerchantAFK(player, "OwnerBot", BOT_OWNER_ID, 910000001,
                     item, new OfferParser.ParsedOffer("Red Potion", 0, 50_000_000L, item),
                     systemMock, broadcastUpdate);
 
-            verify(systemMock).lockItem(BOT_OWNER_ID, 0);
+            verify(systemMock).tryLockItem(BOT_OWNER_ID, item);
 
             ArgumentCaptor<Runnable> runnableCap = ArgumentCaptor.forClass(Runnable.class);
             timing.verify(() -> BotTiming.after(anyLong(), runnableCap.capture()));
@@ -338,6 +374,7 @@ class ShopOfferResponseTest {
 
             assertEquals(50_000_000, item.getPrice());
             verify(broadcastUpdate).run();
+            verify(systemMock).unlockItem(BOT_OWNER_ID, item); // M2：成交后释放锁
             verify(player).sendPacket(any());
         }
     }
@@ -383,6 +420,13 @@ class ShopOfferResponseTest {
         Character player = mock(Character.class);
         when(player.getId()).thenReturn(PLAYER_ID);
         when(player.getName()).thenReturn("PlayerX");
+        return player;
+    }
+
+    /** 仍在店内的玩家（M5 店内复核：handlePresentOwner 要求 getPlayerShop() == shop）。 */
+    private static Character playerIn(PlayerShop shop) {
+        Character player = player();
+        when(player.getPlayerShop()).thenReturn(shop);
         return player;
     }
 

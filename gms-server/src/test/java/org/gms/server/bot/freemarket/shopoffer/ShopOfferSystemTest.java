@@ -42,7 +42,7 @@ import static org.mockito.Mockito.when;
  */
 class ShopOfferSystemTest {
 
-    private static final int BOT_OWNER_ID = 9_700_001;
+    private static final int BOT_OWNER_ID = BotHelpers.BOT_BASE_ID + 100_001;
     private static final int PLAYER_ID = 5;
 
     @BeforeAll
@@ -109,7 +109,7 @@ class ShopOfferSystemTest {
             ShopOfferSystem system = ShopOfferSystem.getInstance();
             shopModes(system).put(BOT_OWNER_ID, ShopOfferSystem.ShopMode.PRESENT);
             HaggleSession existing = new HaggleSession(PLAYER_ID, BOT_OWNER_ID);
-            sessions(system).put(PLAYER_ID, existing);
+            sessions(system).put(ShopOfferSystem.buildSessionKey(PLAYER_ID, BOT_OWNER_ID), existing);
 
             system.onPlayerShopChat(player, shop, "50m Red Potion");
 
@@ -165,7 +165,7 @@ class ShopOfferSystemTest {
             parser.when(() -> OfferParser.parse(anyString(), anyList())).thenReturn(offer);
 
             ShopOfferSystem system = ShopOfferSystem.getInstance();
-            system.lockItem(BOT_OWNER_ID, 0);
+            system.tryLockItem(BOT_OWNER_ID, items.get(0));
 
             system.onPlayerShopChat(player(), shop, "50m Red Potion");
 
@@ -255,7 +255,7 @@ class ShopOfferSystemTest {
             parser.when(() -> OfferParser.parse(anyString(), anyList())).thenReturn(offer);
 
             ShopOfferSystem system = ShopOfferSystem.getInstance();
-            system.lockItem(BOT_OWNER_ID, 0);
+            system.tryLockItem(BOT_OWNER_ID, item);
             system.onHiredMerchantChat(player(), merchant, "50m Red Potion");
 
             response.verifyNoInteractions();
@@ -285,7 +285,7 @@ class ShopOfferSystemTest {
             AtomicLong clock = new AtomicLong(0);
             HaggleSession expired = new HaggleSession(PLAYER_ID, BOT_OWNER_ID, clock::get);
             clock.set(HaggleSession.EXPIRY_MS + 1);
-            sessions(system).put(PLAYER_ID, expired);
+            sessions(system).put(ShopOfferSystem.buildSessionKey(PLAYER_ID, BOT_OWNER_ID), expired);
 
             system.onPlayerShopChat(player, shop, "50m Red Potion");
 
@@ -327,8 +327,8 @@ class ShopOfferSystemTest {
     }
 
     @SuppressWarnings("unchecked")
-    private static Map<Integer, HaggleSession> sessions(ShopOfferSystem system) {
-        return (Map<Integer, HaggleSession>) readField(system, "activeSessions");
+    private static Map<String, HaggleSession> sessions(ShopOfferSystem system) {
+        return (Map<String, HaggleSession>) readField(system, "activeSessions");
     }
 
     @SuppressWarnings("unchecked")

@@ -33,8 +33,18 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ShopOfferSystem {
 
     private static ShopOfferSystem instance;
-    private final Map<Integer, HaggleSession> activeSessions = new ConcurrentHashMap<>();
+    /**
+     * 议价会话表：key 为「玩家 × 店主」复合键（见 {@link #buildSessionKey}）。
+     * 修复 C2：旧实现仅以 playerId 为 key，玩家在 A 店拿到还价后可去 B 店复用
+     * A 店的 counter/attempts 低价成交；复合键使跨店会话天然隔离。
+     */
+    private final Map<String, HaggleSession> activeSessions = new ConcurrentHashMap<>();
     private final Map<Integer, ShopMode> shopModes = new ConcurrentHashMap<>();
+    /**
+     * 待处理改价锁：key 为「店主 × 物品身份」（itemId + 商店物品对象身份，见
+     * {@link #buildLockKey}），不再使用会随商店物品增删漂移的下标；且成交回调
+     * 完成后会 remove（见 ShopOfferResponse 的 unlockItem），不再是永久锁（修复 M2）。
+     */
     private final Set<String> lockedItems = ConcurrentHashMap.newKeySet();
 
     private static final double PRESENT_CHANCE = 0.60;
@@ -75,7 +85,7 @@ public class ShopOfferSystem {
             return;
         }
 
-        String lockKey = buildLockKey(shop.getOwner().getId(), offer.getItemIndex());
+        String lockKey = buildLockKey(shop.getOwner().getId(), offer.getShopItem());
         if (lockedItems.contains(lockKey)) {
             log.info(I18nUtil.getLogMessage("ShopOfferSystem.log.itemLocked", player.getName()));
             return;
@@ -91,7 +101,8 @@ public class ShopOfferSystem {
         int responseDelay = 2000 + Randomizer.nextInt(4000);
 
         if (mode == ShopMode.PRESENT) {
-            HaggleSession existingSession = activeSessions.get(player.getId());
+            String sessionKey = buildSessionKey(player.getId(), shop.getOwner().getId());
+            HaggleSession existingSession = activeSessions.get(sessionKey);
             if (existingSession != null) {
                 existingSession.touch();
                 BotTiming.after(
@@ -102,7 +113,7 @@ public class ShopOfferSystem {
             }
 
             HaggleSession session = new HaggleSession(player.getId(), shop.getOwner().getId());
-            activeSessions.put(player.getId(), session);
+            activeSessions.put(sessionKey, session);
             BotTiming.after(
                     responseDelay,
                     () -> ShopOfferResponse.handlePresentOwner(player, shop, offer, session)
@@ -116,6 +127,15 @@ public class ShopOfferSystem {
         if (player == null || merchant == null || message == null) {
             return;
         }
+        // C1 修复：真人雇佣商店无门控，访客聊天可静默改价。HiredMerchant 只持有 ownerId
+        // （店主可能离线，无 Character 对象），因此用区段判据 isBotId 而非 isBot(Character)。
+        // 判据选择理由：bot 摊主 ownerId 由 artificialMerchantIdCounter 分配
+        // （BotHelpers.BOT_BASE_ID + 10_000_000 起），恒落在 bot 区段；真人店主 id 来自
+        // 数据库自增，不可能进入该区段。isBot(int) 的「注册表命中」判据（BotStorage.botLoggedIn
+        // 仅覆盖在线 bot）会误伤店主离线的 bot 店，故此处只做区段判定。
+        if (!BotHelpers.isBotId(merchant.getOwnerId())) {
+            return;
+        }
 
         List<PlayerShopItem> items = merchant.getItems();
         OfferParser.ParsedOffer offer = OfferParser.parse(message, items);
@@ -124,7 +144,7 @@ public class ShopOfferSystem {
         }
 
         String ownerName = merchant.getOwner();
-        String lockKey = buildLockKey(merchant.getOwnerId(), offer.getItemIndex());
+        String lockKey = buildLockKey(merchant.getOwnerId(), offer.getShopItem());
         if (lockedItems.contains(lockKey)) {
             log.info(I18nUtil.getLogMessage("ShopOfferSystem.log.hiredItemLocked", player.getName()));
             return;
@@ -140,20 +160,40 @@ public class ShopOfferSystem {
         );
     }
 
-    public void lockItem(int ownerId, int itemIndex) {
-        lockedItems.add(buildLockKey(ownerId, itemIndex));
+    /**
+     * 尝试锁定物品（原子操作）：已存在相同物品身份的待处理改价时返回 false，
+     * 供 AFK 成交排程前竞态兜底——两个玩家几乎同时报价同一物品时，
+     * 只有先到者能排程，避免对同一物品排两次改价。
+     */
+    public boolean tryLockItem(int ownerId, PlayerShopItem item) {
+        return lockedItems.add(buildLockKey(ownerId, item));
     }
 
-    public void removeSession(int playerId) {
-        activeSessions.remove(playerId);
+    /** 成交回调完成后释放锁（M2：锁随成交结束移除，不再是永久锁）。 */
+    public void unlockItem(int ownerId, PlayerShopItem item) {
+        lockedItems.remove(buildLockKey(ownerId, item));
     }
 
-    private String buildLockKey(int ownerId, int itemIndex) {
-        return ownerId + "_" + itemIndex;
+    public void removeSession(int playerId, int ownerId) {
+        activeSessions.remove(buildSessionKey(playerId, ownerId));
+    }
+
+    /**
+     * 物品锁定 key：以物品身份（itemId + 商店物品对象身份）标识，而非商品下标。
+     * 下标在物品被购买/下架后会漂移，旧 key（ownerId_itemIndex）会锁错商品或
+     * 因下标不复存在而失去锁的语义。
+     */
+    private String buildLockKey(int ownerId, PlayerShopItem item) {
+        return ownerId + "_" + item.getItem().getItemId() + "_" + System.identityHashCode(item);
+    }
+
+    /** 会话 key：玩家 × 店主 复合键（C2：跨店还价会话隔离）。 */
+    static String buildSessionKey(int playerId, int shopOwnerId) {
+        return playerId + "_" + shopOwnerId;
     }
 
     private void cleanExpiredSessions() {
-        Iterator<Map.Entry<Integer, HaggleSession>> it = activeSessions.entrySet().iterator();
+        Iterator<Map.Entry<String, HaggleSession>> it = activeSessions.entrySet().iterator();
         while (it.hasNext()) {
             if (it.next().getValue().isExpired()) {
                 it.remove();

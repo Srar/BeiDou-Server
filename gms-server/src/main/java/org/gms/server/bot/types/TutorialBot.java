@@ -16,9 +16,12 @@ import org.gms.server.bot.commands.DropCommands;
 import org.gms.server.bot.gcmove.GCMovement;
 import org.gms.server.bot.messaging.ChatMessage;
 import org.gms.server.bot.messaging.MessageQueue;
+import org.gms.server.bot.replay.MovementCommands;
+import org.gms.server.bot.replay.MovementRecording;
 import org.gms.server.bot.trade.BotTradeCommands;
 import org.gms.server.maps.MapItem;
 import org.gms.server.maps.MapObject;
+import org.gms.util.I18nUtil;
 import org.gms.util.Randomizer;
 
 import java.awt.Point;
@@ -42,12 +45,15 @@ import static org.gms.server.bot.commands.SocialCommands.displayPlayerChatComman
 import static org.gms.server.bot.commands.VFXCommands.botScrollSuccess;
 import static org.gms.server.bot.freemarket.NXCodeManager.createCompleteNXCode;
 import static org.gms.server.bot.freemarket.NXCodeManager.generateGiftCardCode;
+import static org.gms.server.bot.replay.InPacketReader.getMovementRecording;
+import static org.gms.server.bot.replay.MovementCommands.BotMoveStream;
+import static org.gms.server.bot.replay.MovementCommands.pathFinderBeta;
 
 /**
  * 引导型 Bot（逐行移植自 SoloMapling TutorialBot，607 行）。
  * TRADE_MESOS=1B / POWER_ELIXIR=2000005 / ONYX_APPLE=2022179 / ILBI=2070006。
- * gms 底座差异：录制引擎移动命令（botFaceTowardsPoint/pathFinderBeta/BotMoveStream）
- * 用 gcmove/broadcastStance 等价 + TODO 占位。
+ * gms 底座差异：录制引擎移动命令已接线（pathFinderBeta 护送 + tutorial2 录制回程），
+ * 剩余 botFaceTowardsPoint 仍以 broadcastStance 等价。
  */
 @Slf4j
 public class TutorialBot extends BotSM {
@@ -134,6 +140,10 @@ public class TutorialBot extends BotSM {
         getDebugger().debugLoggingFull(String.format("%s TutorialBotState: %s", this.getChr().getName(), tutorialBotState), String.format("%s", tutorialBotState));
         switch (tutorialBotState) {
             case RESET:
+                // 录制引擎接线（P5-H2）：释放出生链（BotStartupManager.spawnOne）enable 的
+                // gcmove 会话与移动锁，恢复 SoloMapling「教程 bot 移动走录制引擎」的语义——
+                // 否则 pathFinderBeta/回放永远拿不到锁。重复进入 RESET 时幂等。
+                GCMovement.disable(getChr());
                 resetTutorialBotState();
                 setTutorialBotState(TutorialBotState.WAIT_FOR_PLAYER_IN_RANGE);
                 break;
@@ -593,9 +603,9 @@ public class TutorialBot extends BotSM {
     }
 
     private void escort_player_to_portal() {
-        // gms 移植：源 pathFinderBeta(getChr(), new Point(927,485))（录制引擎）；
-        // 用 gcmove 图导航等价。TODO(录制引擎)：落地后恢复 pathFinderBeta。
-        GCMovement.move(getChr(), 927, 485);
+        // 录制引擎接线（P5-H2）：恢复 SoloMapling 的 pathFinderBeta 护送路径（录制导航，
+        // 内部拿/放移动锁，锁被 gcmove 会话占住时安全跳过）。
+        pathFinderBeta(getChr(), new Point(927, 485));
         BotHelpers.blockingSleep(2000);
     }
 
@@ -611,11 +621,25 @@ public class TutorialBot extends BotSM {
     }
 
     private void returnToWaitingSpot() {
-        // gms 移植：源读录制路径（getMovementRecording("tutorial2") + BotMoveStream）回等待点；
-        // 录制引擎已移植（org.gms.server.bot.replay 包 + movementDataPackets/map10000/tutorial2.*），
-        // 但此处未接入录制回放，TODO(录制回放)：待接入后恢复。当前广播站立帧并等待一拍。
-        getChr().broadcastStance();
-        waitFor(1000); // settle beat before RESET ticks
+        // 录制引擎接线（P5-H2）：恢复 SoloMapling 的 tutorial2 录制回放返回等待点。
+        // 回放前拿移动锁（gcmove 会话持锁时放弃本轮）；录制品缺失时退回站立帧兜底。
+        String tutorialReturn = "tutorial2";
+        try {
+            MovementRecording mvr = getMovementRecording(getChr().getMapId(), tutorialReturn);
+            if (!MovementCommands.tryAcquireMovementLock(getChr())) {
+                log.warn(I18nUtil.getLogMessage("TutorialBot.playback.lockBusy", getChr().getId()));
+                return;
+            }
+            try {
+                BotMoveStream(mvr, getChr());
+            } finally {
+                MovementCommands.releaseMovementLock(getChr());
+            }
+        } catch (Exception e) {
+            log.warn(I18nUtil.getLogMessage("TutorialBot.playback.failed", getChr().getId()));
+            getChr().broadcastStance();
+            waitFor(1000); // settle beat before RESET ticks
+        }
     }
 
     private void botWaitingForPlayerFlavorText() {

@@ -8,13 +8,20 @@ import org.gms.server.bot.BotTiming;
 import org.gms.server.bot.BotTypeManager;
 import org.gms.server.bot.dialogue.BotDialogueHandler;
 import org.gms.server.bot.gcmove.GCMovement;
+import org.gms.server.bot.replay.MovementCommands;
+import org.gms.server.bot.replay.MovementRecording;
 import org.gms.server.maps.MapleMap;
 import org.gms.server.maps.Portal;
+import org.gms.util.I18nUtil;
 import org.gms.util.Randomizer;
 
 import java.awt.Point;
 import java.util.List;
 import java.util.Random;
+
+import static org.gms.server.bot.replay.InPacketReader.getMovementRecording;
+import static org.gms.server.bot.replay.MovementCommands.BotMoveStream;
+import static org.gms.server.bot.replay.MovementCommands.pathFinderAware;
 
 @Slf4j
 public class HenesysJQBot extends BotSM {
@@ -78,6 +85,11 @@ public class HenesysJQBot extends BotSM {
 
         switch (jqState) {
             case RESET:
+                // 录制引擎接线（P5-H2）：释放出生链（BotStartupManager.spawnOne）enable 的
+                // gcmove 会话与移动锁，恢复 SoloMapling「JQ bot 全程走录制引擎」的语义——
+                // 否则 pathFinderAware/回放永远拿不到锁。转换路径（HenesysBot→JQBot）已
+                // disable 过，此处幂等。
+                GCMovement.disable(getChr());
                 waitForRandom(2000, 17000); // startup stagger so cohorts don't climb in lockstep
                 jqState = JQState.NAVIGATE_TO_JQ;
                 break;
@@ -118,7 +130,9 @@ public class HenesysJQBot extends BotSM {
         }
 
         try {
-            GCMovement.move(getChr(), JQ_START.x, JQ_START.y);
+            // 录制引擎接线（P5-H2）：恢复 SoloMapling 的 pathFinderAware（录制导航，调用级拿锁）；
+            // 不再用异步 gcmove——其会话会占住移动锁，使 attemptJQ 的回放拿锁失败。
+            pathFinderAware(getChr(), JQ_START);
         } catch (Exception e) {
             log.warn("[HenesysJQBot] Failed to navigate to JQ start: " + e.getMessage());
         }
@@ -144,12 +158,24 @@ public class HenesysJQBot extends BotSM {
         }
 
         try {
-            // TODO(P5-H2): 源播放跳跳场录像 TIER_RECORDINGS[selectedTier-1]（getMovementRecording +
-            // BotMoveStream）；录制引擎已移植（org.gms.server.bot.replay 包），此处未接入回放，
-            // 改用 gcmove 图导航做一次近似攀爬替代。
-            wanderOnPetPark();
+            // 录制引擎接线（P5-H2）：恢复 SoloMapling 的 7 tier 录像攀爬回放
+            //（getMovementRecording + BotMoveStream）。回放前拿移动锁（gcmove 会话持锁时
+            // 放弃本轮，下一 tick RECOVER 后重试），保证回放与 gcmove 不并发驱动本角色。
+            MovementRecording mvr = getMovementRecording(PET_PARK_MAP, recordingName);
+            if (!MovementCommands.tryAcquireMovementLock(getChr())) {
+                log.warn(I18nUtil.getLogMessage("HenesysJQBot.playback.lockBusy", getChr().getId()));
+                return;
+            }
+            try {
+                BotMoveStream(mvr, getChr());
+            } finally {
+                MovementCommands.releaseMovementLock(getChr());
+            }
         } catch (Exception e) {
-            log.warn("[HenesysJQBot] Recording playback error: " + e.getMessage());
+            // 录制品缺失/损坏时保留 gcmove 兜底攀爬，行为不劣于移植前。
+            log.warn(I18nUtil.getLogMessage("HenesysJQBot.playback.failed",
+                    getChr().getId(), recordingName));
+            wanderOnPetPark();
             return;
         }
 
@@ -158,6 +184,7 @@ public class HenesysJQBot extends BotSM {
     }
 
     private void wanderOnPetPark() {
+        // 兜底攀爬（仅录制品缺失/损坏时使用）：随机 ledge gcmove 图导航。
         MapleMap map = getChr().getMap();
         if (map == null) return;
         List<GCMovement.Ledge> ledges = GCMovement.walkableLedges(map);
@@ -174,7 +201,9 @@ public class HenesysJQBot extends BotSM {
             int randomX = -1810 + random.nextInt(693);
             BotTiming.afterRandom(500, 1500, () -> {
                 try {
-                    GCMovement.move(getChr(), randomX, 274); // break up stack after successful jq finish.
+                    // 录制引擎接线（P5-H2）：恢复 SoloMapling 的 pathFinderAware 分散；
+                    // 异步 gcmove 会话会占住移动锁，令下一轮 ATTEMPT_JQ 回放拿锁失败。
+                    pathFinderAware(getChr(), new Point(randomX, 274)); // break up stack after successful jq finish.
                 } catch (Exception e) {
                     log.warn("[HenesysJQBot] Failed to disperse after success: " + e.getMessage());
                 }

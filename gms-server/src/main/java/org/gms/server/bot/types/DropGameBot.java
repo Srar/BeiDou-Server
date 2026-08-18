@@ -5,17 +5,26 @@ import org.gms.client.Character;
 import org.gms.client.Skill;
 import org.gms.client.SkillFactory;
 import org.gms.server.StatEffect;
+import org.gms.server.ThreadManager;
+import org.gms.server.bot.BotExecutors;
 import org.gms.server.bot.BotHelpers;
 import org.gms.server.bot.BotSM;
 import org.gms.server.bot.BotTiming;
 import org.gms.server.bot.gcmove.GCMovement;
 import org.gms.server.bot.party.BotPartyCommands;
+import org.gms.server.bot.replay.MovementCommands;
+import org.gms.server.bot.replay.MovementRecording;
 import org.gms.server.bot.trade.BotTradeCommands;
 import org.gms.server.bot.trade.BotTradeQueue;
 import org.gms.server.bot.trade.BotTradeSM;
+import org.gms.util.I18nUtil;
 import org.gms.util.Randomizer;
 
 import java.util.List;
+import java.util.concurrent.Future;
+
+import static org.gms.server.bot.replay.InPacketReader.getMovementRecording;
+import static org.gms.server.bot.replay.MovementCommands.BotMoveStream;
 
 @Slf4j
 public class DropGameBot extends BotSM {
@@ -28,6 +37,7 @@ public class DropGameBot extends BotSM {
     private static final int DROP_INTERVAL_MAX_MS = 6000;
     private static final int PARTY_TIMEOUT_MS = 15_000;
     private static final int HASTE_SKILL_ID = 4101004;
+    private static final String MOVEMENT_RECORDING_NAME = "dg_potshop_1";
     private static final int DROP_INITIAL_DELAY_MIN_MS = 3000;
     private static final int DROP_INITIAL_DELAY_MAX_MS = 6000;
     private static final int MEDIUM_DESPAWN_DELAY_MS = 1400;
@@ -51,6 +61,12 @@ public class DropGameBot extends BotSM {
     // --- Drop game async ---
     // drops ride self-re-arming BotTiming one-shots; dropsActive gates stragglers
     private volatile boolean dropsActive = false;
+
+    // --- Movement playback async ---
+    // `dg_potshop_1` is ~2 minutes long and BotMoveStream blocks for the full
+    // duration, so it runs on the shared virtual-thread executor; cancel(true)
+    // interrupts the stream.
+    private Future<?> movementTask;
 
     // --- Trade handshake ---
     private boolean tradeDetected = false;
@@ -482,16 +498,31 @@ public class DropGameBot extends BotSM {
     // DROP SCHEDULER (async, non-blocking)
     // =========================================================================
 
-    // gms 移植：SoloMapling 使用录制回放 dg_potshop_1 驱动 2 分钟移动；录制引擎已移植
-    // （org.gms.server.bot.replay 包），但 dg_potshop_1 录制数据未随附，此处改用 gcmove
-    // 图导航随机游走替代（原回放行为见 SoloMapling MovementCommands.BotMoveStream）。
+    // 录制引擎接线（P5-H2）：恢复 SoloMapling 的 dg_potshop_1 录制回放（约 2 分钟长，
+    // 跑在共享虚拟线程池上，stopMovementPlayback 的 cancel(true) 中断回放流）。
     private void startMovementPlayback() {
-        if (getChr().getMap() == null) return;
-        List<GCMovement.Ledge> ledges = GCMovement.walkableLedges(getChr().getMap());
-        if (!ledges.isEmpty()) {
-            GCMovement.Ledge ledge = ledges.get(Randomizer.nextInt(ledges.size()));
-            GCMovement.move(getChr(), ledge.centerX(), ledge.centerY());
-        }
+        // 释放出生/wander 链 enable 的 gcmove 会话与移动锁（SoloMapling 出生不 enable），
+        // 否则回放拿不到锁；游戏期间 bot 移动完全由录制回放接管。
+        GCMovement.disable(getChr());
+        BotExecutors.ensureStarted();
+        movementTask = ThreadManager.getInstance().submit(() -> {
+            try {
+                MovementRecording mvr = getMovementRecording(
+                        getChr().getMapId(), MOVEMENT_RECORDING_NAME);
+                if (!MovementCommands.tryAcquireMovementLock(getChr())) {
+                    log.warn(I18nUtil.getLogMessage("DropGameBot.playback.lockBusy", getChr().getId()));
+                    return;
+                }
+                try {
+                    BotMoveStream(mvr, getChr());
+                } finally {
+                    MovementCommands.releaseMovementLock(getChr());
+                }
+            } catch (Exception e) {
+                log.info(I18nUtil.getLogMessage("DropGameBot.playback.error",
+                        getChr().getId(), e.getMessage()));
+            }
+        });
     }
 
     private void startDropScheduler(int initialDelayMs) {
@@ -545,7 +576,10 @@ public class DropGameBot extends BotSM {
     }
 
     private void stopMovementPlayback() {
-        GCMovement.stop(getChr());
+        if (movementTask != null && !movementTask.isCancelled() && !movementTask.isDone()) {
+            movementTask.cancel(true); // interrupt stops BotMoveStream mid-recording
+        }
+        movementTask = null;
     }
 
     // =========================================================================

@@ -8,11 +8,11 @@ import org.gms.client.SkinColor;
 import org.gms.client.creator.MakeCharInfo;
 import org.gms.client.creator.MakeCharInfoValidator;
 import org.gms.server.bot.decorate.BotDecorate;
+import org.gms.server.bot.gcmove.GCMovement;
 import org.gms.server.bot.party.BotRecruitManager;
 import org.gms.server.maps.MapleMap;
 import org.gms.server.maps.Portal;
 import org.gms.util.I18nUtil;
-import org.gms.util.PacketCreator;
 import org.gms.util.Randomizer;
 
 import java.awt.Point;
@@ -23,15 +23,20 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BooleanSupplier;
+import java.util.function.LongSupplier;
 import java.util.function.Supplier;
+
+import static org.gms.server.bot.commands.WarpCommands.botEnterPortalDropDown;
+import static org.gms.server.bot.replay.MovementCommands.microTurnAroundToLeft;
 
 /**
  * Bot 创建/销毁生命周期（参考 SoloMapling 的 BotGeneration 移植）：
  * 基底角色 → 改 ID/IGN/Client → 注册 channel/world → 落图 → 异步出生编排。
  * <p>
  * 与参考实现的差异：BeiDou 版用 {@link Character#getDefault} 内存构造基底角色
- * （不克隆数据库 CID2、bot 不入库）；出生编排无录制回放系统，仅随机延迟后
- * 播放一个表情作为到场信号。
+ * （不克隆数据库 CID2、bot 不入库）；出生编排已恢复录制回放（传送门落下
+ * {@code botEnterPortalDropDown} + 50% 微转身向左），与源实现一致。
  */
 @Slf4j
 public final class BotGeneration {
@@ -40,10 +45,10 @@ public final class BotGeneration {
      * 出生编排的最坏时长上限。任何必须等 bot 到场完毕的动作（FSM 首 tick 等）
      * 至少应延迟这么久。
      * <p>
-     * 当前简化编排（延迟 500-1200ms 后一个表情）远小于该值；保留 2s 作缓冲与
-     * 首 tick 错峰，未来若恢复完整到场编排（传送门落下+转身）再调大。
+     * 完整到场编排（传送门落下+转身）恢复后按源实现取值：pre-drop 延迟 0.5-1.2s
+     * + 假 portal 延迟 1.5s + 落下回放 + 可选转身延迟 1.0-1.5s + 转身回放。
      */
-    public static final long SPAWN_CHOREOGRAPHY_MAX_MS = 2000;
+    public static final long SPAWN_CHOREOGRAPHY_MAX_MS = 7000;
 
     /**
      * 原子计数：bot 并行生成时防止两个线程拿到同一 ID 静默互相覆盖。
@@ -358,19 +363,47 @@ public final class BotGeneration {
     }
 
     /**
-     * 出生编排（简化版）：500-1200ms 后播放一个随机表情作为到场信号。
-     * 异步执行，调用线程不被拖住；动作前按注册表判活（销毁后 map 字段
-     * 已置 null 且移出注册表，双保险防对已销毁 bot 播放无主表情）。
+     * 出生编排（录制引擎接线 P5-H2）：恢复 SoloMapling 的完整到场动画——
+     * 500-1200ms 后播放 portal 落下回放（{@code botEnterPortalDropDown}），
+     * 之后 50% 概率补一个微转身向左（{@code microTurnAroundToLeft}）。
+     * 阻塞式编排，由 createBot 的 runAsync 包在虚拟线程上执行；两步严格串行，
+     * 转身绝不与落下回放包重叠。最坏时长由 {@link #SPAWN_CHOREOGRAPHY_MAX_MS} 界定。
      */
     private static void playSpawnChoreography(Character bot) {
-        long delayMs = ThreadLocalRandom.current().nextLong(500, 1201);
-        BotExecutors.schedule(() -> {
-            if (!BotStorage.botLoggedIn(bot.getId()) || bot.getMap() == null) {
-                return;
-            }
-            bot.getMap().broadcastMessage(PacketCreator.facialExpression(bot, Randomizer.rand(1, 7)));
-        }, delayMs);
+        long dropDelayMs = dropDelayRoller.getAsLong();
+        if (!BotHelpers.blockingSleep(dropDelayMs)) return;
+        // 动作前按注册表判活（销毁后 map 字段已置 null 且移出注册表，双保险防对已销毁 bot 播放无主动画）。
+        if (!BotStorage.botLoggedIn(bot.getId()) || bot.getMap() == null) {
+            log.info(I18nUtil.getLogMessage("BotGeneration.spawnChoreography.skipped", bot.getId()));
+            return;
+        }
+        // gms 底座差异：BotStartupManager.spawnOne 在出生后立即 enable gcmove（对齐源环境启动链），
+        // 该动态会话会占住移动锁，令落下回放拿锁失败；编排前释放会话，恢复 SoloMapling
+        // 「出生时无动态会话」的语义（后续 FSM 需要移动时会自行重新 enable）。
+        GCMovement.disable(bot);
+        botEnterPortalDropDown(bot);
+
+        // Bots spawn facing right by default, so a 50% roll to flip to left gives
+        // roughly even left/right distribution without a no-op right-turn.
+        if (turnAroundRoller.getAsBoolean()) {
+            long turnDelayMs = turnDelayRoller.getAsLong();
+            if (!BotHelpers.blockingSleep(turnDelayMs)) return;
+            microTurnAroundToLeft(bot);
+        }
     }
+
+    // ── 出生编排随机量注入点（测试接缝，与 setServerAccess/setBaseCharacterSupplier 同模式） ──
+    // 测试可整体替换这三个 supplier 以固定延迟/分支；测试结束后需恢复生产默认 lambda
+    //（勿赋 null：编排会直接 NPE）。
+
+    /** 落下动画前的随机延迟（生产默认 500-1200ms）。 */
+    static LongSupplier dropDelayRoller = () -> ThreadLocalRandom.current().nextLong(500, 1201);
+
+    /** 落下回放后的转身随机延迟（生产默认 1000-1500ms）。 */
+    static LongSupplier turnDelayRoller = () -> ThreadLocalRandom.current().nextLong(1000, 1501);
+
+    /** 是否执行微转身向左（生产默认 50%）。 */
+    static BooleanSupplier turnAroundRoller = () -> ThreadLocalRandom.current().nextBoolean();
 
     /**
      * 销毁 bot：地图 → channel/world 存储 → 注册表（与参考实现一致）的顺序清理，

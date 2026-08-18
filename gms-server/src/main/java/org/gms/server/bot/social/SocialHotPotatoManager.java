@@ -14,19 +14,23 @@ import org.gms.server.bot.dialogue.BotDialogueHandler;
 import org.gms.server.bot.dialogue.RecentLineGuard;
 import org.gms.server.bot.dialogue.ConversationManager;
 import org.gms.server.bot.gcmove.GCMovement;
+import org.gms.server.bot.replay.MovementCommands;
 import org.gms.server.bot.town.TownPresenceConfig;
 import org.gms.server.maps.MapleMap;
 import org.gms.util.PacketCreator;
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ThreadLocalRandom;
+
+import static org.gms.server.bot.commands.MegaphoneCommands.BotAvatarMegaphone;
+import static org.gms.server.bot.commands.MegaphoneCommands.BotSuperMegaphone;
+import static org.gms.server.bot.replay.MovementCommands.microTurnAround;
+import static org.gms.server.bot.replay.MovementCommands.nudgeAwayFromOverlap;
+import static org.gms.server.bot.replay.MovementCommands.nudgeSmall;
 
 /**
  * 社交叫卖管理器（对应 SoloMapling SocialHotPotatoManager 1:1 移植）。
@@ -82,9 +86,6 @@ public class SocialHotPotatoManager {
             18   // SocialMessages
     };
     private static final int MEGA_WEIGHT_TOTAL = 100;
-
-    // 等价 SoloMapling MegaphoneCommands 的头像喇叭道具池。
-    private static final List<Integer> AVATAR_MEGAPHONE_ITEMS = List.of(5390000, 5390001, 5390002, 5390005, 5390006);
 
     private SocialHotPotatoManager() {}
 
@@ -272,10 +273,12 @@ public class SocialHotPotatoManager {
         String line = getRandomLine(MEGA_DIALOGUE_PATH, MEGA_BOT_TYPE, category);
         if (line == null) return;
 
+        // 录制引擎接线（P5-H2）：复用 commands/MegaphoneCommands 已移植的喇叭实现，
+        // 删除本类内联等价（superMegaphone/avatarMegaphone 与 4 行拆行工具已移除）。
         if (random.nextInt(100) < 75) {
-            superMegaphone(bot, line);
+            BotSuperMegaphone(bot, line);
         } else {
-            avatarMegaphone(bot, line);
+            BotAvatarMegaphone(bot, line);
         }
     }
 
@@ -321,39 +324,9 @@ public class SocialHotPotatoManager {
         }
     }
 
-    // ── 等价实现（gms 无 SocialCommands / MovementCommands / MegaphoneCommands） ──
-
-    private void superMegaphone(Character bot, String msg) {
-        Server.getInstance().broadcastMessage(bot.getWorld(),
-                PacketCreator.serverNotice(3, bot.getClient().getChannel(), bot.getName() + " : " + msg, true));
-    }
-
-    private void avatarMegaphone(Character bot, String msg) {
-        int itemId = AVATAR_MEGAPHONE_ITEMS.get(random.nextInt(AVATAR_MEGAPHONE_ITEMS.size()));
-        Server.getInstance().broadcastMessage(bot.getWorld(),
-                PacketCreator.getAvatarMega(bot, "", bot.getClient().getChannel(), itemId, stringTo4LineLinkedList(msg), true));
-    }
-
-    private static LinkedList<String> stringTo4LineLinkedList(String message) {
-        return stringToLinkedList(message, 4, 13);
-    }
-
-    private static LinkedList<String> stringToLinkedList(String message, int lineCount, int charsPerLine) {
-        LinkedList<String> list = new LinkedList<>();
-        if (message == null) {
-            message = "";
-        }
-        for (int i = 0; i < lineCount; i++) {
-            int startIndex = i * charsPerLine;
-            if (startIndex >= message.length()) {
-                list.add("");
-            } else {
-                int endIndex = Math.min(startIndex + charsPerLine, message.length());
-                list.add(message.substring(startIndex, endIndex));
-            }
-        }
-        return list;
-    }
+    // ── 等价实现（gms 无 SocialCommands；喇叭/移动原语已接线到移植类） ──
+    // superMegaphone/avatarMegaphone → commands/MegaphoneCommands（BotSuperMegaphone/BotAvatarMegaphone）
+    // microTurnAround/nudgeSmall/nudgeAwayFromOverlap → replay/MovementCommands 同名原语（录制回放）
 
     private static void botSpeak(Character character, String message) {
         if (character == null || character.getMap() == null) return;
@@ -396,51 +369,8 @@ public class SocialHotPotatoManager {
         bot.sitChair(-1);
     }
 
-    /** 等价 MovementCommands.microTurnAround：翻转朝向并广播（无录制引擎时的近似）。 */
-    private static void microTurnAround(Character bot) {
-        if (bot == null) return;
-        boolean left = bot.isFacingLeft();
-        bot.broadcastStance(left ? 0 : 1);
-    }
-
-    private static final int OVERLAP_THRESHOLD_X = 40;
-    private static final int OVERLAP_THRESHOLD_Y = 30;
-    private static final int NUDGE_DISTANCE = 20;
-
-    /** 等价 MovementCommands.nudgeSmall：小步挪动（gms 无录制引擎，直接改坐标 + 广播）。 */
-    private static void nudgeSmall(Character bot) {
-        if (bot == null) return;
-        if (bot.getChair() > 0) {
-            botCancelChair(bot);
-        }
-        int direction = ThreadLocalRandom.current().nextBoolean() ? NUDGE_DISTANCE : -NUDGE_DISTANCE;
-        Point target = new Point(bot.getPosition().x + direction, bot.getPosition().y);
-        // TODO(移植): 无录制引擎时以 setPosition + broadcastStance 近似；GC 引擎落地后可换真实移动包。
-        bot.setPosition(target);
-        bot.broadcastStance();
-    }
-
-    /** 等价 MovementCommands.nudgeAwayFromOverlap：与其他 bot 重叠时挪开，返回是否发生了挪动。 */
-    private static boolean nudgeAwayFromOverlap(Character bot) {
-        if (bot == null || bot.getChair() > 0) return false;
-
-        Point pos = bot.getPosition();
-        MapleMap map = bot.getMap();
-        if (map == null) return false;
-
-        for (Character other : map.getAllPlayers()) {
-            if (other.getId() == bot.getId()) continue;
-            if (!BotHelpers.isBot(other)) continue;
-            Point otherPos = other.getPosition();
-            if (Math.abs(pos.x - otherPos.x) < OVERLAP_THRESHOLD_X
-                    && Math.abs(pos.y - otherPos.y) < OVERLAP_THRESHOLD_Y) {
-                int direction = (pos.x >= otherPos.x) ? NUDGE_DISTANCE : -NUDGE_DISTANCE;
-                Point target = new Point(pos.x + direction, pos.y);
-                bot.setPosition(target);
-                bot.broadcastStance();
-                return true;
-            }
-        }
-        return false;
-    }
+    // microTurnAround/nudgeSmall/nudgeAwayFromOverlap 已接线到 replay/MovementCommands 同名原语
+    //（static import 于类头）：microTurnAround 回放转身录制；nudgeSmall 走 BotMoveSmallDistanceX
+    //（内部拿/放移动锁，锁被 gcmove 会话占住时安全 no-op）；nudgeAwayFromOverlap 重叠检测后
+    // 同样走 BotMoveSmallDistanceX。原内联 setPosition+broadcastStance 近似已删除。
 }

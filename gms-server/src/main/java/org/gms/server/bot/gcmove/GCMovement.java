@@ -2,6 +2,7 @@ package org.gms.server.bot.gcmove;
 
 import org.gms.client.Character;
 import org.gms.server.bot.BotStorage;
+import org.gms.server.bot.replay.MovementCommands;
 import org.gms.server.bot.travel.BotScriptedWarp;
 import org.gms.server.maps.MapleMap;
 import org.gms.server.maps.Rope;
@@ -74,8 +75,10 @@ public final class GCMovement {
             GCMovementDriver.start(st);
             // Hold the shared movement lock for the whole dynamic session so the recorded-path
             // engine can't drive this bot concurrently.
-            // gms 移植：SoloMapling 的 MovementCommands.tryAcquireMovementLock 用于与 recorded-path
-            // 移动引擎互斥；gms 无该引擎（BotSM/BotTickService 为宏 FSM），故省略此锁。
+            // 录制引擎接线（P5-H2）：恢复 SoloMapling 的锁调用。锁在 disable（会话结束）时释放；
+            // 回放类消费点（JQ/掉落游戏/教程/传送落下）在回放前拿锁，拿不到即放弃本轮，
+            // 从而保证 gcmove 动态 tick 与录制回放不会并发驱动同一 Character。
+            MovementCommands.tryAcquireMovementLock(bot);
             return st;
         });
     }
@@ -91,8 +94,9 @@ public final class GCMovement {
         BotMovementState st = STATES.remove(bot.getId());
         if (st != null) {
             GCMovementDriver.stop(st);
-            // gms 移植：SoloMapling 的 MovementCommands.releaseMovementLock 已随 MovementCommands
-            // 移植（org.gms.server.bot.replay 包）；GC 路径不持有录制引擎的移动锁，故无需调用。
+            // 录制引擎接线（P5-H2）：恢复 SoloMapling 的锁释放。与 enable 的 tryAcquireMovementLock
+            // 成对；仅在确有动态会话（st != null）时释放，避免误放回放引擎持有的锁。
+            MovementCommands.releaseMovementLock(bot);
         }
         ARRIVAL_CALLBACKS.remove(bot.getId());
         ABANDON_CALLBACKS.remove(bot.getId());

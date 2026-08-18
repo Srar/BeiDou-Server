@@ -68,6 +68,7 @@ import org.gms.server.bot.gcmove.GCMovement;
 import org.gms.server.bot.itempool.DesirableEquipList;
 import org.gms.server.bot.itempool.EquipMetadataCache;
 import org.gms.server.bot.messaging.Dispatcher;
+import org.gms.server.bot.messaging.MapleMessengerConsole;
 import org.gms.server.bot.types.TrainingBot;
 import org.gms.server.expeditions.ExpeditionBossLog;
 import org.gms.server.life.PlayerNPC;
@@ -1697,6 +1698,9 @@ public class Server {
         // 审计修正：清空 Console 傀儡缓存——停机后旧角色已摘除，缓存滞留会在
         // in-place 重启后让 getConsoleBot 返回指向已销毁世界的僵尸角色。
         runShutdownHook("BotGeneration.resetConsoleBot", BotGeneration::resetConsoleBotForShutdown);
+        // 审计修正：清空 MMC 控制台连接态与日志转发集合——停机后旧世界角色 id
+        // 已失效，集合滞留会让 in-place 重启后重登的 GM 连不上控制台或收到僵尸转发。
+        runShutdownHook("MapleMessengerConsole.clearForShutdown", MapleMessengerConsole::clearForShutdown);
         runShutdownHook("Dispatcher.shutdown", () -> Dispatcher.getInstance().shutdown());
         runShutdownHook("BotDecorationQueue.stop", BotDecorationQueue::stop);
         runShutdownHook("GCMovement.shutdown", GCMovement::shutdown);

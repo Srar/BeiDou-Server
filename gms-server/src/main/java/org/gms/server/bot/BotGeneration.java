@@ -9,6 +9,7 @@ import org.gms.client.creator.MakeCharInfo;
 import org.gms.client.creator.MakeCharInfoValidator;
 import org.gms.server.bot.decorate.BotDecorate;
 import org.gms.server.bot.gcmove.GCMovement;
+import org.gms.server.bot.messaging.MapleMessengerConsole;
 import org.gms.server.bot.party.BotRecruitManager;
 import org.gms.server.maps.MapleMap;
 import org.gms.server.maps.Portal;
@@ -423,6 +424,9 @@ public final class BotGeneration {
         }
         serverAccess.removeBotFromServer(bot);
         BotStorage.removeActiveBot(bot.getId());
+        // MMC 日志转发集合按 bot 清理：bot 销毁后其 id 从 botsLogging 摘除，
+        // 防止生成/销毁风暴下集合残留死 id 无界增长（转发时按在线查找兜底，死 id 无害但应清理）。
+        MapleMessengerConsole.cleanupBot(bot.getId());
         // F8 gms 增强：销毁即释放名字（判空容忍 mock/未命名角色）。
         String botName = bot.getName();
         if (botName != null) {

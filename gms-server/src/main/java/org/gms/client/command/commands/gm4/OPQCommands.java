@@ -274,8 +274,15 @@ public class OPQCommands extends Command {
                 bot.getOPQBotState(), bot.getState(), PlatformPlacement.getCurrentPlatform(chr)));
     }
 
+    /** 单次 spawn 上限：防误操作/恶意参数瞬间铺满地图对象与线程池。 */
+    private static final int MAX_SPAWN_BOTS = 100;
+
     private void spawnBots(int n, Client c) {
         Character self = c.getPlayer();
+        if (n < 1 || n > MAX_SPAWN_BOTS) {
+            self.yellowMessage(I18nUtil.getMessage("BotCommand.opq.spawnCap", MAX_SPAWN_BOTS));
+            return;
+        }
         // bot 落在 bot 频道下 GM 当前地图的等价实例（GM 与 bot 跨频道地图错位防护）。
         MapleMap map = DefaultBotServerAccess.INSTANCE.getMap(
                 DefaultBotServerAccess.resolveBotWorld(),
@@ -299,7 +306,7 @@ public class OPQCommands extends Command {
                 spawned++;
             } catch (Exception e) {
                 self.yellowMessage(I18nUtil.getMessage("BotCommand.opq.spawnFail", i, e.getMessage()));
-                log.warn("OPQ spawn {} 失败", i, e);
+                log.warn(I18nUtil.getLogMessage("OPQCommands.spawn.failed", i), e);
             }
         }
         self.yellowMessage(I18nUtil.getMessage("BotCommand.opq.spawned", spawned, n));

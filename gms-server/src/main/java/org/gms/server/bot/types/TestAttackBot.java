@@ -21,8 +21,8 @@ public class TestAttackBot extends BotSM {
     @Override
     public void updateState() {
         super.updateState();
-        // gms 移植：SoloMapling 的 checkIfNotRunningOrPaused() 未移植；等价判定为
-        // !getRunning() || getState() == BotState.PAUSE。
+        // gms 移植：此处内联判定与基类 BotSM.checkIfNotRunningOrPaused()（BotSM.java:578）
+        // 语义等价（!getRunning() || getState() == BotState.PAUSE），保留内联形状与源一致。
         if (!getRunning() || getState() == BotState.PAUSE) {
             return;
         }

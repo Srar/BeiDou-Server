@@ -19,8 +19,11 @@ import java.util.Random;
  * 自由市场经济定价与估值工具（逐行移植自 SoloMapling FreeMarket.FMEconomyManager /
  * itemPool.ItemUtilities / itemPool.ItemInformationProviderUtilities 中商业类 Bot 用到的子集）。
  * <p>
- * gms 底座差异：无 ItemDatabase / UpgradeSimulator，物品市场价统一退化为 WZ 基准价
- * （{@link ItemInformationProvider#getWholePrice(int)}），已强化装备的估值以 TODO 保留。
+ * gms 移植现状：ItemDatabase / UpgradeSimulator 已随 itempool 组移植到
+ * org.gms.server.bot.itempool 包，但本类估值路径当前仍保留简化实现——物品市场价
+ * 用 WZ 基准价（{@link ItemInformationProvider#getWholePrice(int)}），已强化装备的
+ * 估值以 TODO 保留，可择机改调移植版 {@code ItemUtilities.getItemMarketValue} /
+ * {@code UpgradeSimulator.getEquipMarketValue}。
  */
 public final class BotEconomy {
 
@@ -35,8 +38,9 @@ public final class BotEconomy {
 
     /**
      * 源 ItemUtilities.getItemMarketValue：读 ItemDatabase 市场价（干净装备/非装备）
-     * 或 UpgradeSimulator.getEquipMarketValue（已强化装备）。gms 无这两个模块，
-     * 此处统一返回 WZ 基准价，非正时兜底 5m。
+     * 或 UpgradeSimulator.getEquipMarketValue（已强化装备）。两模块已移植到
+     * org.gms.server.bot.itempool 包，但本类当前未接入，仍统一返回 WZ 基准价，
+     * 非正时兜底 5m。
      */
     public static Integer getItemMarketValue(Item item) {
         if (item == null) {

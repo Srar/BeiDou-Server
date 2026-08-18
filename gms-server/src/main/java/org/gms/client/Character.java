@@ -73,6 +73,7 @@ import org.gms.server.ItemInformationProvider.ScriptedItem;
 import org.gms.server.bot.BotTier;
 import org.gms.server.bot.event.BotEventBus;
 import org.gms.server.bot.event.GameEvent;
+import org.gms.server.bot.messaging.MapleMessengerConsole;
 import org.gms.server.events.Events;
 import org.gms.server.events.RescueGaga;
 import org.gms.server.events.gm.Fitness;
@@ -9656,6 +9657,11 @@ public class Character extends AbstractCharacterObject {
                 .id(id)
                 .lastLogoutTime(new Timestamp(System.currentTimeMillis()))
                 .build());
+        // Bot 接线：角色真实下线时清理 MMC 控制台连接态（未连接过的普通玩家是
+        // 幂等 remove，无副作用）。logOff 只在 Client.disconnect 的非频道迁移分支
+        // 调用（换频道/进商城不走这里），因此不会误清在线的 GM；不清理的话
+        // connectedUsers 残留会让 GM 重登后 mmc:connect 静默变 no-op。
+        MapleMessengerConsole.onUserLogout(this);
     }
 
 

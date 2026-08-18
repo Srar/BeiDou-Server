@@ -104,6 +104,48 @@ class DropCommandsPermanentOwnerTest {
         assertTrue(canBePickedBy(drop, owner), "owner must pick their own fresh drop");
     }
 
+    @Test
+    void partyMemberCanPickPermanentOwnerDrop() {
+        // permanentOwner 语义与 vanilla owner 保护一致：party 成员照常可拾取，
+        // 只有陌生人在到期后仍被拒绝（见 permanentOwnerKeepsOwnershipAfterExpiry）。
+        Character owner = mockCharacter(100, 100);
+        Character partyMate = mockCharacter(300, 100); // 与 owner 同队（party 100）
+        Mockito.when(partyMate.isPartyMember(100)).thenReturn(true);
+
+        // 到期前：同队可拾（isPartyMember(ownerId) 分支置位 party_ownerid）。
+        MapItem fresh = newDrop(owner, 5_000);
+        fresh.setPermanentOwner(true);
+        assertTrue(canBePickedBy(fresh, partyMate),
+                "party member must pick a fresh permanent-owner drop");
+
+        // 到期后：同队仍可拾，且获取 clientside ownership（party 分支）。
+        MapItem expired = newDrop(owner, 20_000); // 20s > vanilla 15s 到期窗口
+        expired.setPermanentOwner(true);
+        assertTrue(canBePickedBy(expired, partyMate),
+                "party member must pick an expired permanent-owner drop");
+        assertTrue(expired.hasClientsideOwnership(partyMate),
+                "party member keeps clientside ownership on permanent-owner drop");
+    }
+
+    // ── botCanLoot permanentOwner 特判 ──────────────────────────────────────
+
+    @Test
+    void botCannotLootExpiredPermanentOwnerDrop() {
+        Character bot = mockCharacter(200);
+        Character owner = mockCharacter(100, 100);
+        MapItem drop = newDrop(owner, 20_000); // 20s > vanilla 15s 到期窗口
+        drop.setPermanentOwner(true);
+
+        // permanentOwner 掉落到期后 bot 扫掠仍不得捡走（与 canBePickedBy 一致）。
+        assertFalse(DropCommands.botCanLoot(bot, drop),
+                "expired permanent-owner drop must stay unlootable for strangers");
+
+        // 对照：同样参数的无 permanentOwner 掉落到期后 bot 可扫掠（vanilla FFA 语义不变）。
+        MapItem vanilla = newDrop(owner, 20_000);
+        assertTrue(DropCommands.botCanLoot(bot, vanilla),
+                "expired vanilla drop must be lootable by the bot sweep");
+    }
+
     // ── DropCommands 三处 owner-only 入口置位 ───────────────────────────────
 
     @Test

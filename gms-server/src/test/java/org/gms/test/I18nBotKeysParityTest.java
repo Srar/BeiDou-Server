@@ -22,7 +22,11 @@ class I18nBotKeysParityTest {
     private static final String[] BOT_KEY_PREFIXES = {
             "bot.", "BotCommand.", "BotSM.", "BotTickService.", "BotTiming.", "BotTypeManager.",
             "BotGeneration.", "BotServerAccess.", "BotMapEntryResponder.", "BotStartupManager.",
-            "ShopOfferSystem."
+            "ShopOfferSystem.", "EquipOmitList.", "GenericEquipPool.", "GachaBot.",
+            "DropGameBot.playback.", "HenesysJQBot.playback.", "TutorialBot.playback.",
+            "WarpCommands.portalDropDown.", "BotGeneration.spawnChoreography.",
+            "MovementCommands.waitGapLong", "MapleMessengerConsole.",
+            "OPQCommands.", "FMBot.", "GCMovement."
     };
 
     private static final String[][] FILE_PAIRS = {

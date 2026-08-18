@@ -20,6 +20,7 @@ import org.gms.server.maps.MapleMap;
 import org.gms.server.maps.PlayerShop;
 import org.gms.server.maps.PlayerShopItem;
 import org.gms.server.maps.Portal;
+import org.gms.util.I18nUtil;
 import org.gms.util.Randomizer;
 
 import java.awt.Point;
@@ -142,7 +143,7 @@ public class FMBot extends BotSM {
         //（地图未加载等），返回 null 时 navToFMRoom 按移植前语义直接 botEnterFMRoom。
         Point doorPt = FMMovementCommands.getDoorPoint(room);
         if (doorPt == null) {
-            log.warn("FMBot.getDoorPoint: no door point for room {}", room);
+            log.warn(I18nUtil.getLogMessage("FMBot.doorPoint.missing", room));
         }
         return doorPt;
     }

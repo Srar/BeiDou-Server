@@ -30,6 +30,8 @@ import org.gms.client.inventory.manipulator.InventoryManipulator;
 import org.gms.client.inventory.manipulator.KarmaManipulator;
 import org.gms.net.packet.Packet;
 import org.gms.server.Trade;
+import org.gms.server.bot.BotHelpers;
+import org.gms.server.bot.freemarket.shopoffer.ShopOfferWelcome;
 import org.gms.util.PacketCreator;
 import org.gms.util.Pair;
 
@@ -622,6 +624,12 @@ public class PlayerShop extends AbstractMapObject {
                 this.addVisitor(chr);
                 chr.setPlayerShop(this);
                 this.sendShop(chr.getClient());
+
+                // bot 摊主的店铺：真人玩家进店触发报价系统打招呼（对齐 SoloMapling
+                // ShopOfferWelcome.onPlayerEnterShop；bot 访客不触发，避免 bot 间对话循环）
+                if (!BotHelpers.isBot(chr) && BotHelpers.isBot(owner)) {
+                    ShopOfferWelcome.onPlayerEnterShop(this, chr);
+                }
 
                 return true;
             }

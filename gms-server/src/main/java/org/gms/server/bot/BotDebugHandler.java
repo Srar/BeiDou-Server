@@ -2,6 +2,7 @@ package org.gms.server.bot;
 
 import lombok.extern.slf4j.Slf4j;
 import org.gms.client.Character;
+import org.gms.server.bot.messaging.MapleMessengerConsole;
 import org.gms.util.PacketCreator;
 
 import java.io.BufferedWriter;
@@ -15,7 +16,8 @@ import java.util.Random;
  * 三重调试渠道的 gms 适配：
  * <ol>
  *   <li>文件日志：源 BotLogger 写 BotLog.txt，gms 等价写 {@code botlog.txt}；</li>
- *   <li>MMC 转发：gms 无 MapleMessengerConsole，原调用以 TODO 注释保留；</li>
+ *   <li>MMC 转发：经 {@link MapleMessengerConsole#isLoggingBot(int)} /
+ *       {@link MapleMessengerConsole#sendMMCLogToConnected(String)} 转发到已连接控制台；</li>
  *   <li>粉笔黑板：gms 有 {@link PacketCreator#useChalkboard}，等价替换 SocialCommands.botSetChalkboard/botClearChalkboard。</li>
  * </ol>
  */
@@ -95,11 +97,11 @@ public class BotDebugHandler {
             logToFile(botLogMessage);
         }
 
-        // 2) MMC 转发：gms 无 MapleMessengerConsole，原调用保留为 TODO（待 MMC 落地后回填）
-        // TODO(移植): MapleMessengerConsole.isLoggingBot(chr.getId()) -> sendMMCLogToConnected(botLogMessage)
-        // if (MapleMessengerConsole.isLoggingBot(chr.getId())) {
-        //     MapleMessengerConsole.sendMMCLogToConnected(botLogMessage);
-        // }
+        // 2) MMC 转发：源 MapleMessengerConsole.isLoggingBot -> sendMMCLogToConnected
+        //（MMC 控制台已落地，回填原 TODO）
+        if (chr != null && MapleMessengerConsole.isLoggingBot(chr.getId())) {
+            MapleMessengerConsole.sendMMCLogToConnected(botLogMessage);
+        }
 
         // 3) 粉笔黑板（等价 SocialCommands.botSetChalkboard）
         if (chr != null && chalkboardMessage != null && useChalkDebug) {

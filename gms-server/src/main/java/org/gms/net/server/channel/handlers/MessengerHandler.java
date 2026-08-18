@@ -34,6 +34,8 @@ import org.gms.net.server.world.MessengerCharacter;
 import org.gms.net.server.world.World;
 import org.gms.util.PacketCreator;
 
+import static org.gms.server.bot.messaging.MapleMessengerConsole.executeCommand;
+
 public final class MessengerHandler extends AbstractPacketHandler {
     @Override
     public final void handlePacket(InPacket p, Client c) {
@@ -117,6 +119,11 @@ public final class MessengerHandler extends AbstractPacketHandler {
                             MessengerCharacter messengerplayer = new MessengerCharacter(player, player.getMessengerPosition());
                             input = p.readString();
                             world.messengerChat(messenger, input, messengerplayer.getName());
+                            // MMC 控制台路由（SoloMapling MessengerHandler 同款）：GM 的信使消息
+                            // 冒号格式「命令:参数」转 MapleMessengerConsole.executeCommand。
+                            if (player.isGM()) {
+                                executeCommand(player, input);
+                            }
                         }
                         break;
                 }

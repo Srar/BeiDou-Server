@@ -71,13 +71,18 @@ public class NXMerchantBot extends BotSM {
 
     private void advertise() {
         List<String> messages = List.of(
-                "Selling 10k nx cash code, 50m TRADE ME!",
-                "S> 10k NX code 50m, no lowballs",
-                "NX CODE 10k >> 50m trade me!! legit only",
-                "10k nx cash code for 50m, Pros only",
-                "SELLING NX 10K CODE!! 50m!! no scammers",
-                "S>> 10,000 NX code, 50m, serious offers only",
-                "got nx codes, 10k for 50m, trade me fast"
+                "卖 1万点券 5000万金币 要的密我",
+                "出点券 1万点=5000万 先钱后货 爽快交易",
+                "点券现货 1万点 5000万 秒发",
+                "收金币换点券也行 1万点=5000万",
+                "点券交易 从不坑人",
+                "1万点券 5000万 长期有货",
+                "急出点券 1万点 4800万 今天有效",
+                "点券码现场给 安全靠谱",
+                "1000万金币=2000点券 只换不卖",
+                "出1万点券码 5000万 一手钱一手货",
+                "点券不多咯 1万点 5000万 手慢无",
+                "卖点券啦 1万点 5000万 交易窗见"
         );
         SocialCommands.BotSpeak(getChr(), getRandomElement(messages));
     }
@@ -88,7 +93,7 @@ public class NXMerchantBot extends BotSM {
             return;
         }
 
-        SocialCommands.BotSpeak(getChr(), "messaging you.");
+        SocialCommands.BotSpeak(getChr(), "密你了。");
         sendMessengerInviteComplete(getChr(), getLastTradedCharacter());
 
         boolean accepted = waitForCondition(
@@ -99,14 +104,14 @@ public class NXMerchantBot extends BotSM {
             String nxCode = generateGiftCardCode();
             createCompleteNXCode(nxCode);
 
-            botSendChatFull(getChr(), "here is the 10k nx code... be sure to write it down. Remember to NOT include dashes", 3000);
+            botSendChatFull(getChr(), "这是 1万点券码 记好咯 兑换时别带横杠", 3000);
             botSendChatFull(getChr(), nxCode, 7000);
-            botSendChatFull(getChr(), "enjoy it!", 2000);
+            botSendChatFull(getChr(), "玩得开心！", 2000);
 
             BotTiming.after(2000, () -> botLeaveMessenger(getChr()));
             waitFor(2500); // hold CONVERT_BACK until the messenger leave lands
         } else {
-            SocialCommands.BotSpeak(getChr(), "You didn't accept the messenger invite... too bad noob.");
+            SocialCommands.BotSpeak(getChr(), "你没收我的密语邀请... 那算了 有缘再见。");
         }
 
         resetLastTradeResult();

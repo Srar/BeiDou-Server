@@ -1561,7 +1561,7 @@ conversations:
       - {speaker: B, text: "一样，天天晒假货"}
       - {speaker: C, text: "公会永远不缺戏"}
 
-  old_maple_nostalgia:
+  old_maple_nostalgia_2:
     participants: 2
     lines:
       - {speaker: A, text: "还记得当年彩虹岛感觉特别大吗"}
@@ -1704,7 +1704,7 @@ conversations:
       - {speaker: B, text: "我参加"}
       - {speaker: C, text: "起得来的话算我一个"}
 
-  pet_talk:
+  pet_talk_2:
     participants: 3
     lines:
       - {speaker: A, text: "我家猫老踩我键盘"}
@@ -1802,7 +1802,7 @@ conversations:
       - {speaker: A, text: "我个人是薯片蘸酱派"}
       - {speaker: B, text: "心疼你的键盘……"}
 
-  guild_drama:
+  guild_drama_2:
     participants: 2
     lines:
       - {speaker: A, text: "你听说「传奇」公会的瓜了吗"}
@@ -1844,7 +1844,7 @@ conversations:
       - {speaker: B, text: "我对我的像素穿搭可是很认真的"}
       - {speaker: A, text: "佩服，我的角色穿得像个小丑"}
 
-  old_maple_nostalgia:
+  old_maple_nostalgia_3:
     participants: 3
     lines:
       - {speaker: A, text: "还记得当年彩虹岛上到处是人吗"}
@@ -1878,7 +1878,7 @@ conversations:
       - {speaker: B, text: "冒险岛烤面包机都能跑，随便买", emote: 2}
       - {speaker: A, text: "我也玩别的好吧"}
 
-  jump_quest_rage:
+  jump_quest_rage_2:
     participants: 2
     lines:
       - {speaker: A, text: "我卡在这个跳跳任务45分钟了"}
@@ -3293,3 +3293,1681 @@ conversations:
       - {speaker: A, text: "地图这事就是微妙的社会契约"}
       - {speaker: B, text: "像看不见的地盘划分"}
       - {speaker: C, text: "冒险岛文化真奇妙哈哈"}
+  ant_tunnel_training_chat:
+    participants: 2
+    lines:
+      - {speaker: A, text: "蚂蚁洞练级效率怎么样？"}
+      - {speaker: B, text: "怪刷新快，就是人多得抢"}
+      - {speaker: A, text: "半夜去应该没人吧"}
+      - {speaker: B, text: "半夜去是挺爽，就是熬人"}
+      - {speaker: A, text: "为了升级，熬就熬呗"}
+      - {speaker: B, text: "行，今晚通宵走起"}
+      - {speaker: A, text: "先补个觉，晚上见"}
+
+  ludi_tower_grind_tips:
+    participants: 2
+    lines:
+      - {speaker: A, text: "玩具城哪层练级最舒服？"}
+      - {speaker: B, text: "积木城那片，怪脆经验稳"}
+      - {speaker: A, text: "就是路有点绕，容易晕"}
+      - {speaker: B, text: "走熟就快了，闭眼都能跑"}
+      - {speaker: A, text: "你这话有点吹了吧"}
+      - {speaker: B, text: "哈哈不信你来试试", emote: 3}
+
+  temple_and_deepsea_talk:
+    participants: 2
+    lines:
+      - {speaker: A, text: "时间神殿和海底哪个经验高？"}
+      - {speaker: B, text: "神殿高，可怪太肉了"}
+      - {speaker: A, text: "海底水母倒是脆"}
+      - {speaker: B, text: "就是掉线风险大，水图卡"}
+      - {speaker: A, text: "那我还是老实刷水母"}
+      - {speaker: B, text: "也行，适合手残党", emote: 1}
+      - {speaker: A, text: "那海底水母见哈哈"}
+
+  thief_job_test_story:
+    participants: 2
+    lines:
+      - {speaker: A, text: "飞侠转职任务难不难？"}
+      - {speaker: B, text: "就潜行进屋偷个东西"}
+      - {speaker: A, text: "我手笨，老被守卫发现"}
+      - {speaker: B, text: "贴着墙走，多试几次就行"}
+      - {speaker: A, text: "好吧，晚上再战"}
+      - {speaker: B, text: "过了记得请我喝药哈哈"}
+
+  warrior_job_test_share:
+    participants: 2
+    lines:
+      - {speaker: A, text: "战士转职要打什么材料？"}
+      - {speaker: B, text: "打怪凑三十个黑珠"}
+      - {speaker: A, text: "我打了半天才十来个"}
+      - {speaker: B, text: "掉率看脸，急不来的"}
+      - {speaker: A, text: "真磨人"}
+      - {speaker: B, text: "转完就爽了，忍一忍"}
+      - {speaker: A, text: "那我继续去刷黑珠了"}
+
+  mage_job_test_chat:
+    participants: 2
+    lines:
+      - {speaker: A, text: "法师转职考试怎么过？"}
+      - {speaker: B, text: "跟着提示答几道题就行"}
+      - {speaker: A, text: "我方向感差，怕找不到NPC"}
+      - {speaker: B, text: "就在魔法图书馆里，好找"}
+      - {speaker: A, text: "那明天去把它办了"}
+      - {speaker: B, text: "加油，法师之路等着你"}
+
+  scroll_fodder_ritual:
+    participants: 2
+    lines:
+      - {speaker: A, text: "你砸卷前会垫几手吗？"}
+      - {speaker: B, text: "必垫，先砸废三张垫子"}
+      - {speaker: A, text: "然后直接上主武器？"}
+      - {speaker: B, text: "对，手热了就上，别犹豫"}
+      - {speaker: A, text: "玄学归玄学，心理踏实"}
+      - {speaker: B, text: "就是图个心安嘛哈哈"}
+      - {speaker: A, text: "下次砸卷前我也垫几手"}
+
+  scroll_lucky_map_theory:
+    participants: 2
+    lines:
+      - {speaker: A, text: "你一般去哪张图砸卷？"}
+      - {speaker: B, text: "我固定在魔法密林砸"}
+      - {speaker: A, text: "那儿有什么说法？"}
+      - {speaker: B, text: "据说爆率高，我信这个"}
+      - {speaker: A, text: "那我下次也去试试"}
+      - {speaker: B, text: "成不成都别赖我哈哈"}
+
+  scroll_time_luck_talk:
+    participants: 2
+    lines:
+      - {speaker: A, text: "你觉得几点砸卷运气好？"}
+      - {speaker: B, text: "我都是半夜十二点砸"}
+      - {speaker: A, text: "有啥讲究？"}
+      - {speaker: B, text: "服务器人少，手气顺"}
+      - {speaker: A, text: "今晚我也卡个点"}
+      - {speaker: B, text: "祝你一手上10%哈哈", emote: 2}
+      - {speaker: A, text: "借你吉言，砸成了请你"}
+
+  meso_from_junk_loot:
+    participants: 2
+    lines:
+      - {speaker: A, text: "你怎么攒金币的？"}
+      - {speaker: B, text: "打怪掉的杂物全捡去卖店"}
+      - {speaker: A, text: "那才几个钱呀"}
+      - {speaker: B, text: "积少成多，一天几十万"}
+      - {speaker: A, text: "有点道理，就是累手"}
+      - {speaker: B, text: "开个宠物捡，轻松多了"}
+
+  meso_resell_side_hustle:
+    participants: 2
+    lines:
+      - {speaker: A, text: "倒卖装备真能赚钱吗？"}
+      - {speaker: B, text: "低买高卖，看准就出手"}
+      - {speaker: A, text: "我总怕砸手里"}
+      - {speaker: B, text: "只收热门货，不怕压仓"}
+      - {speaker: A, text: "比如什么热门？"}
+      - {speaker: B, text: "工作手套、雪板，都好出"}
+      - {speaker: A, text: "那我先囤点雪板"}
+
+  meso_mining_ore_route:
+    participants: 2
+    lines:
+      - {speaker: A, text: "挖矿卖钱靠谱不？"}
+      - {speaker: B, text: "挖黑水晶，供不应求"}
+      - {speaker: A, text: "矿点好找吗？"}
+      - {speaker: B, text: "废弃都市后山就有"}
+      - {speaker: A, text: "那我去当矿工了"}
+      - {speaker: B, text: "记得带好镐子哈哈"}
+
+  zakum_station_split:
+    participants: 2
+    lines:
+      - {speaker: A, text: "扎昆本你们怎么分工？"}
+      - {speaker: B, text: "远程站边角，近战打手"}
+      - {speaker: A, text: "祭坛点都谁负责？"}
+      - {speaker: B, text: "分好点位，谁丢谁背锅"}
+      - {speaker: A, text: "背锅压力好大"}
+      - {speaker: B, text: "哈哈多打几场就熟了"}
+      - {speaker: A, text: "下次带我一个呗"}
+
+  horntail_team_run:
+    participants: 2
+    lines:
+      - {speaker: A, text: "黑龙王组队要多少人？"}
+      - {speaker: B, text: "满编六人最稳"}
+      - {speaker: A, text: "流程长不长？"}
+      - {speaker: B, text: "光打本体就快一小时"}
+      - {speaker: A, text: "那得提前上厕所"}
+      - {speaker: B, text: "哈哈是啊，憋不得"}
+
+  pink_bean_statue_talk:
+    participants: 2
+    lines:
+      - {speaker: A, text: "品克缤雕像怎么刷效率高？"}
+      - {speaker: B, text: "先把小怪雕像清完"}
+      - {speaker: A, text: "我看有人绕怪只打本体"}
+      - {speaker: B, text: "那叫跳雕像，高手玩法"}
+      - {speaker: A, text: "我这种手残还是老老实实清"}
+      - {speaker: B, text: "稳着来，别翻车就行"}
+      - {speaker: A, text: "行，晚上组个队"}
+
+  pq_door_order_memory:
+    participants: 2
+    lines:
+      - {speaker: A, text: "玩具城组队任务的机关顺序是啥？"}
+      - {speaker: B, text: "第一个房间看箱子编号"}
+      - {speaker: A, text: "我上次数错了，队友全摔"}
+      - {speaker: B, text: "都摔过，记不住就喊人带"}
+      - {speaker: A, text: "行，这周再练练"}
+      - {speaker: B, text: "多打几把就刻脑子里了"}
+
+  pq_loot_split_rule:
+    participants: 2
+    lines:
+      - {speaker: A, text: "组队任务掉的卷轴怎么分？"}
+      - {speaker: B, text: "按需求分，没有就轮流拿"}
+      - {speaker: A, text: "上次有人把好东西全抢了"}
+      - {speaker: B, text: "那种人就别组第二次"}
+      - {speaker: A, text: "说得对，人品最重要"}
+      - {speaker: B, text: "咱以后固定搭伙吧"}
+      - {speaker: A, text: "一言为定哈哈", emote: 2}
+
+  pq_speedrun_tips:
+    participants: 2
+    lines:
+      - {speaker: A, text: "组队任务能刷多快？"}
+      - {speaker: B, text: "老手配合好，十分钟一把"}
+      - {speaker: A, text: "都怎么配合的？"}
+      - {speaker: B, text: "跳关、分头点机关"}
+      - {speaker: A, text: "我得找几个熟练工练练"}
+      - {speaker: B, text: "来我们队，正缺人"}
+
+  guild_hunt_event_plan:
+    participants: 2
+    lines:
+      - {speaker: A, text: "公会周末组织狩猎活动不？"}
+      - {speaker: B, text: "报名的不少，你来不来？"}
+      - {speaker: A, text: "去呀，正好想热闹热闹"}
+      - {speaker: B, text: "那周六晚八点集合"}
+      - {speaker: A, text: "好，我调个闹钟"}
+      - {speaker: B, text: "等你，别又睡过头"}
+      - {speaker: A, text: "放心，这次一定到"}
+
+  guild_dungeon_outing:
+    participants: 2
+    lines:
+      - {speaker: A, text: "公会下周要团建刷副本？"}
+      - {speaker: B, text: "对，去打玩具城组队任务"}
+      - {speaker: A, text: "能带新手不？"}
+      - {speaker: B, text: "带，缺的就是陪练"}
+      - {speaker: A, text: "那我报个名"}
+      - {speaker: B, text: "找会长登记一下就行"}
+
+  guild_contribution_talk:
+    participants: 2
+    lines:
+      - {speaker: A, text: "公会贡献度怎么刷快？"}
+      - {speaker: B, text: "每天做满任务再加捐材料"}
+      - {speaker: A, text: "捐啥材料划算？"}
+      - {speaker: B, text: "矿石和药草都行"}
+      - {speaker: A, text: "懂了，攒起来捐"}
+      - {speaker: B, text: "贡献高了能领好东西"}
+      - {speaker: A, text: "那我今天就开始攒"}
+
+  fm_stall_location_tips:
+    participants: 2
+    lines:
+      - {speaker: A, text: "自由市场摊位摆哪最好？"}
+      - {speaker: B, text: "门口那条道，人流大"}
+      - {speaker: A, text: "那位置很难抢吧"}
+      - {speaker: B, text: "早起占位，晚了没戏"}
+      - {speaker: A, text: "明天我定个闹钟"}
+      - {speaker: B, text: "抢到好位子就赢一半"}
+
+  fm_shop_title_advice:
+    participants: 2
+    lines:
+      - {speaker: A, text: "店铺标题怎么起才吸引人？"}
+      - {speaker: B, text: "直接写清卖啥，价格标上"}
+      - {speaker: A, text: "我看有人写得花里胡哨"}
+      - {speaker: B, text: "那些都是喇叭大户哈哈"}
+      - {speaker: A, text: "我这种小贩还是实在点"}
+      - {speaker: B, text: "实在点，客人放心"}
+      - {speaker: A, text: "受教了，晚上改标题去"}
+
+  fm_undercut_strategy:
+    participants: 2
+    lines:
+      - {speaker: A, text: "同行压价怎么办？"}
+      - {speaker: B, text: "不跟，等人卖完你再出"}
+      - {speaker: A, text: "万一他货多呢？"}
+      - {speaker: B, text: "那就换线摆，别硬碰"}
+      - {speaker: A, text: "有道理，躲着点"}
+      - {speaker: B, text: "摆摊也是门学问"}
+
+  megaphone_war_witness:
+    participants: 2
+    lines:
+      - {speaker: A, text: "你看到刚才的喇叭大战没？"}
+      - {speaker: B, text: "看了半天，越吵越凶"}
+      - {speaker: A, text: "起因好像是一笔交易"}
+      - {speaker: B, text: "一条几块钱，真舍得"}
+      - {speaker: A, text: "我嗑瓜子看戏"}
+      - {speaker: B, text: "我也看入迷了"}
+      - {speaker: A, text: "我截图留个纪念"}
+
+  megaphone_counter_talk:
+    participants: 2
+    lines:
+      - {speaker: A, text: "有人喇叭骂你你会回吗？"}
+      - {speaker: B, text: "看心情，偶尔回一条"}
+      - {speaker: A, text: "回完不会越闹越大？"}
+      - {speaker: B, text: "点到为止，不恋战"}
+      - {speaker: A, text: "心态真好"}
+      - {speaker: B, text: "游戏而已，别上头"}
+
+  megaphone_money_waste:
+    participants: 2
+    lines:
+      - {speaker: A, text: "一晚上刷几百条喇叭图啥？"}
+      - {speaker: B, text: "图个面子呗"}
+      - {speaker: A, text: "那钱干点啥不好"}
+      - {speaker: B, text: "人家可能不差钱哈哈"}
+      - {speaker: A, text: "我看看就好"}
+      - {speaker: B, text: "咱赚点钱不容易，省着花"}
+      - {speaker: A, text: "说得对，我不跟风"}
+
+  pet_closeness_grind:
+    participants: 2
+    lines:
+      - {speaker: A, text: "宠物亲密度怎么刷？"}
+      - {speaker: B, text: "多喂它爱吃的，勤互动"}
+      - {speaker: A, text: "互动是啥意思？"}
+      - {speaker: B, text: "就是点点它，陪它玩"}
+      - {speaker: A, text: "比养真猫还麻烦哈哈"}
+      - {speaker: B, text: "亲密度高了捡东西可勤快了"}
+
+  pet_food_favorite:
+    participants: 2
+    lines:
+      - {speaker: A, text: "你家宠物爱吃啥？"}
+      - {speaker: B, text: "小鱼干，一口一个"}
+      - {speaker: A, text: "我那只好挑食"}
+      - {speaker: B, text: "饿它两顿就老实了"}
+      - {speaker: A, text: "真狠心哈哈"}
+      - {speaker: B, text: "开玩笑的，换着喂就行"}
+      - {speaker: A, text: "吓我一跳哈哈"}
+
+  pet_command_training:
+    participants: 2
+    lines:
+      - {speaker: A, text: "宠物能听懂几个命令？"}
+      - {speaker: B, text: "坐下、跟上、捡东西"}
+      - {speaker: A, text: "我教了好久它不学"}
+      - {speaker: B, text: "命令要放快捷栏里用"}
+      - {speaker: A, text: "原来要这样教"}
+      - {speaker: B, text: "试试看，几下就会了"}
+
+  jq_route_shortcut:
+    participants: 2
+    lines:
+      - {speaker: A, text: "跳跳任务有没有近路？"}
+      - {speaker: B, text: "有些平台能斜跳过去"}
+      - {speaker: A, text: "我试过，摔得更惨"}
+      - {speaker: B, text: "那是没掌握节奏哈哈"}
+      - {speaker: A, text: "教教我呗"}
+      - {speaker: B, text: "行，带你走一遍"}
+      - {speaker: A, text: "现在就去？"}
+
+  jq_restart_mindset:
+    participants: 2
+    lines:
+      - {speaker: A, text: "跳跳任务摔了多少次？"}
+      - {speaker: B, text: "数不清了，摔麻了"}
+      - {speaker: A, text: "你怎么坚持下来的？"}
+      - {speaker: B, text: "就想着下一把能过"}
+      - {speaker: A, text: "我也是这么骗自己哈哈"}
+      - {speaker: B, text: "骗着骗着就真过了"}
+
+  jq_reward_worth_talk:
+    participants: 2
+    lines:
+      - {speaker: A, text: "跳跳任务的奖励值不值？"}
+      - {speaker: B, text: "有几个椅子还挺好看的"}
+      - {speaker: A, text: "为了把椅子拼老命？"}
+      - {speaker: B, text: "收藏党嘛，忍了"}
+      - {speaker: A, text: "我也想要那个月亮椅"}
+      - {speaker: B, text: "那就跳吧，我陪你"}
+      - {speaker: A, text: "好呀，说定了"}
+
+  double_exp_planning:
+    participants: 2
+    lines:
+      - {speaker: A, text: "双倍经验活动怎么安排？"}
+      - {speaker: B, text: "提前存好药水，选好图"}
+      - {speaker: A, text: "倍率几点开始？"}
+      - {speaker: B, text: "公告说晚上七点到十点"}
+      - {speaker: A, text: "那我饭点提前吃"}
+      - {speaker: B, text: "哈哈够拼的"}
+
+  double_exp_stack_question:
+    participants: 2
+    lines:
+      - {speaker: A, text: "双倍活动和双倍卡能叠吗？"}
+      - {speaker: B, text: "能的，最高叠好几倍"}
+      - {speaker: A, text: "那不是起飞了？"}
+      - {speaker: B, text: "就是费钱，卡挺贵的"}
+      - {speaker: A, text: "偶尔奢侈一把"}
+      - {speaker: B, text: "升级快，值了"}
+      - {speaker: A, text: "那我也囤几张卡"}
+
+  maintenance_time_guess:
+    participants: 2
+    lines:
+      - {speaker: A, text: "你猜这次维护到几点？"}
+      - {speaker: B, text: "公告说四点，我押五点半"}
+      - {speaker: A, text: "每次都拖，习惯就好"}
+      - {speaker: B, text: "要是提前开服就赚到"}
+      - {speaker: A, text: "我等着上线做日常"}
+      - {speaker: B, text: "先挂机刷刷网页吧"}
+
+  patch_content_rumor:
+    participants: 2
+    lines:
+      - {speaker: A, text: "听说这次更新有大动作？"}
+      - {speaker: B, text: "都在传要开新地图"}
+      - {speaker: A, text: "消息靠谱吗？"}
+      - {speaker: B, text: "小道消息，听听就行"}
+      - {speaker: A, text: "万一是真的就爽了"}
+      - {speaker: B, text: "坐等公告吧"}
+      - {speaker: A, text: "出了叫我一声"}
+
+  server_restart_routine:
+    participants: 2
+    lines:
+      - {speaker: A, text: "重启前你都干点啥？"}
+      - {speaker: B, text: "把摊收了，货存仓库"}
+      - {speaker: A, text: "为啥这么紧张？"}
+      - {speaker: B, text: "怕回档，白忙一场"}
+      - {speaker: A, text: "有道理，我也收去"}
+      - {speaker: B, text: "稳一点总没错"}
+
+  orbis_boat_shortcut:
+    participants: 2
+    lines:
+      - {speaker: A, text: "去天空之城坐船要多久？"}
+      - {speaker: B, text: "正点发船，船上十分钟"}
+      - {speaker: A, text: "太慢了，有别的路吗？"}
+      - {speaker: B, text: "有张图能绕，就是怪凶"}
+      - {speaker: A, text: "那我老实坐船"}
+      - {speaker: B, text: "顺便看看风景哈哈"}
+      - {speaker: A, text: "行，就当观光了"}
+
+  boat_ticket_budget:
+    participants: 2
+    lines:
+      - {speaker: A, text: "船票多少钱一张？"}
+      - {speaker: B, text: "单程不贵，来回就有点肉疼"}
+      - {speaker: A, text: "天天坐船谁受得了"}
+      - {speaker: B, text: "囤几张，一次买便宜些"}
+      - {speaker: A, text: "还能讲价？"}
+      - {speaker: B, text: "哈哈船票不讲价"}
+
+  maker_skill_leveling:
+    participants: 2
+    lines:
+      - {speaker: A, text: "锻造技能怎么练上去？"}
+      - {speaker: B, text: "做低级装备堆熟练度"}
+      - {speaker: A, text: "材料消耗大不大？"}
+      - {speaker: B, text: "还行，就是费时间"}
+      - {speaker: A, text: "练到几级能做好东西？"}
+      - {speaker: B, text: "至少七级起步"}
+      - {speaker: A, text: "七级，路还长呀"}
+
+  synthesis_material_grind:
+    participants: 2
+    lines:
+      - {speaker: A, text: "合成装备都要些啥材料？"}
+      - {speaker: B, text: "矿石、皮革、还有结晶"}
+      - {speaker: A, text: "结晶哪来的？"}
+      - {speaker: B, text: "分解装备给的"}
+      - {speaker: A, text: "那得多攒点垃圾装备"}
+      - {speaker: B, text: "对，别急着卖店"}
+
+  craft_for_profit:
+    participants: 2
+    lines:
+      - {speaker: A, text: "自己做装备卖能赚吗？"}
+      - {speaker: B, text: "做出来属性好就抢手"}
+      - {speaker: A, text: "属性随机的吧？"}
+      - {speaker: B, text: "对，看脸，出了极品血赚"}
+      - {speaker: A, text: "我也入坑试试"}
+      - {speaker: B, text: "材料管够再来找我"}
+      - {speaker: A, text: "好嘞，我先攒材料"}
+
+  fishing_spot_share:
+    participants: 2
+    lines:
+      - {speaker: A, text: "哪儿钓鱼最舒服？"}
+      - {speaker: B, text: "江边那个点，人少安静"}
+      - {speaker: A, text: "鱼多不多？"}
+      - {speaker: B, text: "看时段，清晨最好"}
+      - {speaker: A, text: "那明早约一波"}
+      - {speaker: B, text: "行，带上鱼竿"}
+
+  herb_picking_schedule:
+    participants: 2
+    lines:
+      - {speaker: A, text: "采药有固定刷新时间吗？"}
+      - {speaker: B, text: "差不多半小时一轮"}
+      - {speaker: A, text: "那得掐着点去"}
+      - {speaker: B, text: "采药的人多，得抢"}
+      - {speaker: A, text: "跟上班似的哈哈"}
+      - {speaker: B, text: "生活玩家都这样"}
+      - {speaker: A, text: "行，当养生玩哈哈"}
+
+  nx_budget_planning:
+    participants: 2
+    lines:
+      - {speaker: A, text: "这个月点券你打算花多少？"}
+      - {speaker: B, text: "就冲个两百，买套时装"}
+      - {speaker: A, text: "我上个月超支了"}
+      - {speaker: B, text: "管住手，别看见啥都买"}
+      - {speaker: A, text: "难啊，看到好看的走不动"}
+      - {speaker: B, text: "哈哈都懂"}
+
+  nx_perm_item_debate:
+    participants: 2
+    lines:
+      - {speaker: A, text: "永久时装和时限的差多少？"}
+      - {speaker: B, text: "永久贵一大截，但省心"}
+      - {speaker: A, text: "时限到期就没了，好亏"}
+      - {speaker: B, text: "常穿的还是买永久吧"}
+      - {speaker: A, text: "有道理，攒钱上永久"}
+      - {speaker: B, text: "一步到位不后悔"}
+      - {speaker: A, text: "下个月发工资就买"}
+
+  nx_impulse_buy_regret:
+    participants: 2
+    lines:
+      - {speaker: A, text: "我昨天又冲动买了一堆"}
+      - {speaker: B, text: "买了啥？"}
+      - {speaker: A, text: "一顶帽子三张整容券"}
+      - {speaker: B, text: "整容券可以，帽子亏了"}
+      - {speaker: A, text: "越想越后悔哈哈"}
+      - {speaker: B, text: "下次先冷静半天再买"}
+
+  ap_reset_hesitation:
+    participants: 2
+    lines:
+      - {speaker: A, text: "我在纠结要不要洗点"}
+      - {speaker: B, text: "加错了几点？"}
+      - {speaker: A, text: "力量多加了好几点"}
+      - {speaker: B, text: "那洗了吧，后面难受"}
+      - {speaker: A, text: "洗点券有点贵呀"}
+      - {speaker: B, text: "长痛不如短痛"}
+      - {speaker: A, text: "好，那我洗了"}
+
+  sp_reset_after_patch:
+    participants: 2
+    lines:
+      - {speaker: A, text: "听说更新后能免费洗技能？"}
+      - {speaker: B, text: "一般大改版才给"}
+      - {speaker: A, text: "那我把号留着等一等"}
+      - {speaker: B, text: "别抱太大希望哈哈"}
+      - {speaker: A, text: "唉，能省一点是一点"}
+      - {speaker: B, text: "你算盘打得真响"}
+
+  point_trade_rate_talk:
+    participants: 2
+    lines:
+      - {speaker: A, text: "现在收点比例多少？"}
+      - {speaker: B, text: "一比三左右，上下浮动"}
+      - {speaker: A, text: "收的人多不多？"}
+      - {speaker: B, text: "多，喇叭天天有人喊"}
+      - {speaker: A, text: "我想出点，怕被骗"}
+      - {speaker: B, text: "找熟人或者老商人"}
+      - {speaker: A, text: "懂了，谢谢提醒"}
+
+  point_seller_trust:
+    participants: 2
+    lines:
+      - {speaker: A, text: "出点的话找谁稳妥？"}
+      - {speaker: B, text: "找在线时间长的老店"}
+      - {speaker: A, text: "新号我不敢交易"}
+      - {speaker: B, text: "对，宁可贵点买安心"}
+      - {speaker: A, text: "这个逻辑我懂"}
+      - {speaker: B, text: "谨慎点总没错"}
+
+  point_trade_steps:
+    participants: 2
+    lines:
+      - {speaker: A, text: "买卖点券具体怎么操作？"}
+      - {speaker: B, text: "先谈好比例，再当面交易"}
+      - {speaker: A, text: "谁先给？"}
+      - {speaker: B, text: "小额可以一方先给"}
+      - {speaker: A, text: "大额呢？"}
+      - {speaker: B, text: "找中间人担保"}
+      - {speaker: A, text: "流程明白了，安心多了"}
+
+  material_bulk_order:
+    participants: 2
+    lines:
+      - {speaker: A, text: "你在收什么材料？"}
+      - {speaker: B, text: "大量收皮革和螺丝钉"}
+      - {speaker: A, text: "收来做啥？"}
+      - {speaker: B, text: "做装备冲锻造等级"}
+      - {speaker: A, text: "价格怎么说？"}
+      - {speaker: B, text: "按组算，好商量"}
+
+  material_price_complain:
+    participants: 2
+    lines:
+      - {speaker: A, text: "最近材料怎么全涨价了？"}
+      - {speaker: B, text: "做装备的人多了呗"}
+      - {speaker: A, text: "我连铁块都快收不起"}
+      - {speaker: B, text: "自己挖点，省一半"}
+      - {speaker: A, text: "唉，只能当矿工了"}
+      - {speaker: B, text: "哈哈一起挖"}
+      - {speaker: A, text: "今晚就开镐"}
+
+  material_farm_help:
+    participants: 2
+    lines:
+      - {speaker: A, text: "能帮我刷点螺丝钉吗？"}
+      - {speaker: B, text: "给多少辛苦费？"}
+      - {speaker: A, text: "一组十万，行不？"}
+      - {speaker: B, text: "行，半小时交货"}
+      - {speaker: A, text: "痛快，就这么定了", emote: 2}
+      - {speaker: B, text: "老熟人了，好说"}
+
+  mentor_apply_question:
+    participants: 2
+    lines:
+      - {speaker: A, text: "师徒系统怎么拜师？"}
+      - {speaker: B, text: "找人组队，去NPC登记"}
+      - {speaker: A, text: "拜师有啥要求？"}
+      - {speaker: B, text: "等级差够就行"}
+      - {speaker: A, text: "那我得找个人带"}
+      - {speaker: B, text: "我正好缺徒弟哈哈"}
+      - {speaker: A, text: "那咱俩登记去？"}
+
+  disciple_daily_grind:
+    participants: 2
+    lines:
+      - {speaker: A, text: "当徒弟每天要干啥？"}
+      - {speaker: B, text: "跟着师父刷日常任务"}
+      - {speaker: A, text: "累不累？"}
+      - {speaker: B, text: "还行，有师父带轻松"}
+      - {speaker: A, text: "有师父真好啊"}
+      - {speaker: B, text: "出师了记得孝敬师父"}
+
+  mentor_reward_chat:
+    participants: 2
+    lines:
+      - {speaker: A, text: "师徒系统给啥奖励？"}
+      - {speaker: B, text: "徒弟出师给经验药水"}
+      - {speaker: A, text: "师父也有份？"}
+      - {speaker: B, text: "有，双方都有好处"}
+      - {speaker: A, text: "那这买卖划算"}
+      - {speaker: B, text: "双赢嘛"}
+      - {speaker: A, text: "那这系统还挺良心"}
+
+  family_league_quest:
+    participants: 2
+    lines:
+      - {speaker: A, text: "家族联盟任务都做吗？"}
+      - {speaker: B, text: "做呀，奖励挺实在"}
+      - {speaker: A, text: "一个人能做不？"}
+      - {speaker: B, text: "可以，就是费点时间"}
+      - {speaker: A, text: "那我也去接了"}
+      - {speaker: B, text: "记得先领增益"}
+
+  alliance_guild_buff:
+    participants: 2
+    lines:
+      - {speaker: A, text: "联盟公会加成是怎么算的？"}
+      - {speaker: B, text: "按联盟等级给全体加成"}
+      - {speaker: A, text: "我们联盟几级了？"}
+      - {speaker: B, text: "快升五级了，大家多捐"}
+      - {speaker: A, text: "那必须支持"}
+      - {speaker: B, text: "众人拾柴火焰高"}
+      - {speaker: A, text: "我回头把材料全捐了"}
+
+  outfit_set_matching:
+    participants: 2
+    lines:
+      - {speaker: A, text: "这套时装配啥帽子好？"}
+      - {speaker: B, text: "同色系的贝雷帽不错"}
+      - {speaker: A, text: "会不会太素？"}
+      - {speaker: B, text: "再搭个眼镜就亮了"}
+      - {speaker: A, text: "听你的，我试试"}
+      - {speaker: B, text: "穿好给我看看哈哈"}
+
+  outfit_color_tone:
+    participants: 2
+    lines:
+      - {speaker: A, text: "时装搭配最重要的是啥？"}
+      - {speaker: B, text: "色调统一，别超过三色"}
+      - {speaker: A, text: "我这一身五彩斑斓哈哈"}
+      - {speaker: B, text: "那确实有点花"}
+      - {speaker: A, text: "看来得大换血"}
+      - {speaker: B, text: "先从鞋子开始换"}
+      - {speaker: A, text: "成，明天逛街去"}
+
+  outfit_budget_hunt:
+    participants: 2
+    lines:
+      - {speaker: A, text: "有没有便宜的时装推荐？"}
+      - {speaker: B, text: "周末打折区蹲一蹲"}
+      - {speaker: A, text: "好看的都原价哈哈"}
+      - {speaker: B, text: "平价也有宝藏，慢慢淘"}
+      - {speaker: A, text: "行，周末去逛"}
+      - {speaker: B, text: "淘到好的发我看看"}
+
+  chatroom_gossip_new:
+    participants: 2
+    lines:
+      - {speaker: A, text: "聊天室今天有瓜吗？"}
+      - {speaker: B, text: "听说俩人因为一把椅子吵了"}
+      - {speaker: A, text: "一把椅子至于吗？"}
+      - {speaker: B, text: "搁以前不值钱，现在稀罕"}
+      - {speaker: A, text: "我错过了一场好戏哈哈"}
+      - {speaker: B, text: "晚上可能还有后续"}
+      - {speaker: A, text: "那我蹲个前排"}
+
+  chatroom_couple_drama:
+    participants: 2
+    lines:
+      - {speaker: A, text: "聊天室那对模范情侣分了？"}
+      - {speaker: B, text: "分得挺突然，都在传"}
+      - {speaker: A, text: "游戏里的感情真脆弱"}
+      - {speaker: B, text: "有走心的，也有闹着玩的"}
+      - {speaker: A, text: "我还是单着吧"}
+      - {speaker: B, text: "哈哈单身自由"}
+
+  chatroom_who_left:
+    participants: 2
+    lines:
+      - {speaker: A, text: "听说老王要退游了？"}
+      - {speaker: B, text: "工作忙，号挂市场了"}
+      - {speaker: A, text: "老玩家又少一个"}
+      - {speaker: B, text: "过阵子估计又回来"}
+      - {speaker: A, text: "为啥这么说？"}
+      - {speaker: B, text: "这游戏戒不掉的哈哈"}
+      - {speaker: A, text: "希望他早点回来"}
+
+  scam_trade_pattern:
+    participants: 2
+    lines:
+      - {speaker: A, text: "最近骗局都有啥套路？"}
+      - {speaker: B, text: "先假装高价收，再换包"}
+      - {speaker: A, text: "换包是啥？"}
+      - {speaker: B, text: "交易框里偷偷换便宜货"}
+      - {speaker: A, text: "太阴了，得盯紧"}
+      - {speaker: B, text: "慢点交易，别催"}
+
+  scam_report_advice:
+    participants: 2
+    lines:
+      - {speaker: A, text: "被骗了能找回来吗？"}
+      - {speaker: B, text: "先截图留证据再举报"}
+      - {speaker: A, text: "找GM有用不？"}
+      - {speaker: B, text: "证据全的话能封对方"}
+      - {speaker: A, text: "那我赶紧去报"}
+      - {speaker: B, text: "记住教训，别贪小便宜"}
+      - {speaker: A, text: "吃一堑长一智"}
+
+  scam_too_good_deal:
+    participants: 2
+    lines:
+      - {speaker: A, text: "有人卖的东西便宜得离谱"}
+      - {speaker: B, text: "那多半是坑"}
+      - {speaker: A, text: "万一是真急出呢？"}
+      - {speaker: B, text: "急出也会标个差不多的价"}
+      - {speaker: A, text: "有道理，我差点冲动"}
+      - {speaker: B, text: "便宜没好货，记住咯"}
+
+  leveling_service_ask:
+    participants: 2
+    lines:
+      - {speaker: A, text: "现在代练什么价？"}
+      - {speaker: B, text: "一级几十到上百不等"}
+      - {speaker: A, text: "你找过代练吗？"}
+      - {speaker: B, text: "找过一次，省事是真省事"}
+      - {speaker: A, text: "我也心动了"}
+      - {speaker: B, text: "找靠谱的，号别乱给"}
+      - {speaker: A, text: "好，我再打听打听"}
+
+  leveling_service_risk:
+    participants: 2
+    lines:
+      - {speaker: A, text: "代练会不会出事？"}
+      - {speaker: B, text: "听说有把号洗空的"}
+      - {speaker: A, text: "那也太吓人了"}
+      - {speaker: B, text: "所以密码别乱给"}
+      - {speaker: A, text: "还是自己慢慢练吧"}
+      - {speaker: B, text: "稳当，也不亏"}
+
+  old_client_ui_memory:
+    participants: 2
+    lines:
+      - {speaker: A, text: "还记得老版本的界面吗？"}
+      - {speaker: B, text: "记得，血条是圆的"}
+      - {speaker: A, text: "哈哈那时候UI可复古了"}
+      - {speaker: B, text: "技能栏也就一长条"}
+      - {speaker: A, text: "现在看回去还挺怀念"}
+      - {speaker: B, text: "青春啊"}
+      - {speaker: A, text: "一晃都这么多年了"}
+
+  old_map_layout_talk:
+    participants: 2
+    lines:
+      - {speaker: A, text: "老版本地图布局跟现在一样吗？"}
+      - {speaker: B, text: "差挺多，好多图改过"}
+      - {speaker: A, text: "比如呢？"}
+      - {speaker: B, text: "明珠港的船以前不是这个点"}
+      - {speaker: A, text: "你记性真好"}
+      - {speaker: B, text: "玩了十几年啦"}
+
+  old_sound_memory:
+    participants: 2
+    lines:
+      - {speaker: A, text: "老版本哪个音效你印象最深？"}
+      - {speaker: B, text: "升级那声叮，太经典"}
+      - {speaker: A, text: "还有打怪砰砰声哈哈"}
+      - {speaker: B, text: "一听就回不去了"}
+      - {speaker: A, text: "现在听到还会起鸡皮疙瘩"}
+      - {speaker: B, text: "满满的回忆"}
+      - {speaker: A, text: "说得我想开个小号重走一遍"}
+
+  new_job_speculation:
+    participants: 2
+    lines:
+      - {speaker: A, text: "下个版本会不会出新职业？"}
+      - {speaker: B, text: "都传要出，就是没准信"}
+      - {speaker: A, text: "你希望出啥？"}
+      - {speaker: B, text: "来个能回血的输出哈哈"}
+      - {speaker: A, text: "那也太全能了"}
+      - {speaker: B, text: "想想又不犯法"}
+
+  new_map_wishlist:
+    participants: 2
+    lines:
+      - {speaker: A, text: "你最想要张啥样的新图？"}
+      - {speaker: B, text: "怪密一点，经验高一点"}
+      - {speaker: A, text: "你要求还挺朴实哈哈"}
+      - {speaker: B, text: "练级党就这点追求"}
+      - {speaker: A, text: "我想要个风景图"}
+      - {speaker: B, text: "挂机聊天也不错"}
+      - {speaker: A, text: "最好再来条小溪哈哈"}
+
+  new_event_hope:
+    participants: 2
+    lines:
+      - {speaker: A, text: "下个月会有啥新活动？"}
+      - {speaker: B, text: "希望出个打怪掉时装"}
+      - {speaker: A, text: "那种活动可太香了"}
+      - {speaker: B, text: "就是爆率别太抠"}
+      - {speaker: A, text: "哈哈提前许愿"}
+      - {speaker: B, text: "出了叫你一起刷"}
+
+  gm_event_guess:
+    participants: 2
+    lines:
+      - {speaker: A, text: "你猜GM下次办啥活动？"}
+      - {speaker: B, text: "估计又是捉迷藏"}
+      - {speaker: A, text: "我看别人玩挺欢乐"}
+      - {speaker: B, text: "奖励还不错呢"}
+      - {speaker: A, text: "那我也报名"}
+      - {speaker: B, text: "一起蹲公告"}
+      - {speaker: A, text: "行，蹲到就约"}
+
+  gm_activity_wish:
+    participants: 2
+    lines:
+      - {speaker: A, text: "你希望GM办个啥活动？"}
+      - {speaker: B, text: "全员BOSS挑战，热闹"}
+      - {speaker: A, text: "那服务器不得卡爆哈哈"}
+      - {speaker: B, text: "人多才好玩嘛"}
+      - {speaker: A, text: "我想看GM发福利"}
+      - {speaker: B, text: "谁不想哈哈"}
+
+  # ———————————————————————————————————————
+  #  3-PERSON CONVERSATIONS (新增 80 场景)
+  # ———————————————————————————————————————
+
+  trio_train_share:
+    participants: 3
+    lines:
+      - {speaker: A, text: "这张图三个人刷刚好，别挤"}
+      - {speaker: B, text: "我占左上，你们分右边"}
+      - {speaker: C, text: "行，我守传送点，出来就接"}
+      - {speaker: A, text: "经验涨得真快，组队还是香"}
+      - {speaker: B, text: "不然谁陪你熬半夜，哈哈"}
+      - {speaker: C, text: "都别走，刷到天亮"}
+
+  trio_train_pull:
+    participants: 3
+    lines:
+      - {speaker: A, text: "引怪的交给我，我跑得快"}
+      - {speaker: B, text: "别把整图怪都拉来，顶不住"}
+      - {speaker: C, text: "没事，我群攻一下全清"}
+      - {speaker: A, text: "来了来了，接好了"}
+      - {speaker: B, text: "这波经验直接起飞哈哈"}
+      - {speaker: C, text: "再来一轮，别停"}
+      - {speaker: B, text: "我药水还够，放心引"}
+
+  trio_train_exp:
+    participants: 3
+    lines:
+      - {speaker: A, text: "这图怪密，三人分着刷效率高"}
+      - {speaker: B, text: "别抢我的怪就行哈哈"}
+      - {speaker: C, text: "谁抢谁啦，各刷各的半边"}
+      - {speaker: A, text: "行，半小时后比谁升级多"}
+      - {speaker: B, text: "输的请客买药水"}
+      - {speaker: C, text: "成交，开始计时"}
+      - {speaker: B, text: "到时候别耍赖，我盯着"}
+
+  trio_map_dispute_cc:
+    participants: 3
+    lines:
+      - {speaker: A, text: "这图我先来的，你怎么插队"}
+      - {speaker: B, text: "我来的时候一个人都没有"}
+      - {speaker: C, text: "别吵了，我刚路过，A是先到的"}
+      - {speaker: A, text: "那你换个频道呗"}
+      - {speaker: B, text: "行吧，我认栽，去别的线"}
+      - {speaker: C, text: "这就对了，和气生财"}
+
+  trio_map_share_deal:
+    participants: 3
+    lines:
+      - {speaker: A, text: "图这么大，俩人挤着刷别扭"}
+      - {speaker: B, text: "你组我得了，经验平分"}
+      - {speaker: C, text: "我加入行吗，三人正好"}
+      - {speaker: A, text: "成，反正怪多得刷不完"}
+      - {speaker: B, text: "那分下区域，别乱跑"}
+      - {speaker: C, text: "我守左边，你们守右边"}
+      - {speaker: B, text: "开工，谁也别抢谁的"}
+
+  trio_map_peace:
+    participants: 3
+    lines:
+      - {speaker: A, text: "昨天抢图那俩人今天又遇上了"}
+      - {speaker: B, text: "不会又吵起来吧"}
+      - {speaker: C, text: "没有，他们组队了，还成了好友"}
+      - {speaker: A, text: "这发展我是没想到"}
+      - {speaker: B, text: "打怪都能打出感情"}
+      - {speaker: C, text: "冒险岛真神奇"}
+      - {speaker: A, text: "咱仨可不能学他们吵架"}
+
+  trio_pq_roles:
+    participants: 3
+    lines:
+      - {speaker: A, text: "组队任务里谁当队长？"}
+      - {speaker: B, text: "我熟流程，我来指挥"}
+      - {speaker: C, text: "那我看门报数，你俩打"}
+      - {speaker: A, text: "行，我输出，B你补位"}
+      - {speaker: B, text: "记住打章鱼别乱引"}
+      - {speaker: C, text: "放心，上次团灭可不赖我"}
+      - {speaker: A, text: "这次争取一把过"}
+
+  trio_pq_leader:
+    participants: 3
+    lines:
+      - {speaker: A, text: "队长这活不好干，喊得嗓子疼"}
+      - {speaker: B, text: "所以我才不当，哈哈"}
+      - {speaker: C, text: "当队长要背锅的，掉线也怪你"}
+      - {speaker: A, text: "可不，刚才有人迷路还骂我"}
+      - {speaker: B, text: "迷路那个……是我"}
+      - {speaker: C, text: "你俩这组合绝了哈哈"}
+
+  trio_pq_slop:
+    participants: 3
+    lines:
+      - {speaker: A, text: "组队任务遇到挂机的真烦"}
+      - {speaker: B, text: "踢了呗，别惯着"}
+      - {speaker: C, text: "踢了还得等补位，麻烦"}
+      - {speaker: A, text: "忘了问，能不能自动踢人"}
+      - {speaker: B, text: "下把组固定队，省心"}
+      - {speaker: C, text: "拉上我，我绝不掉线"}
+      - {speaker: A, text: "成，那咱组固定队"}
+
+  trio_guild_event_plan:
+    participants: 3
+    lines:
+      - {speaker: A, text: "公会下周活动，你们出点主意"}
+      - {speaker: B, text: "搞个组队刷图比赛怎么样"}
+      - {speaker: C, text: "再加个竞速，奖励卷轴"}
+      - {speaker: A, text: "会长说预算不多哈哈"}
+      - {speaker: B, text: "那奖品就药水和金币"}
+      - {speaker: C, text: "行，我来写公告"}
+      - {speaker: B, text: "我再拉几个人来捧场"}
+
+  trio_guild_outing:
+    participants: 3
+    lines:
+      - {speaker: A, text: "周六公会集体去刷扎昆吧"}
+      - {speaker: B, text: "人多热闹，就怕卡"}
+      - {speaker: C, text: "分两队，一队打一队候补"}
+      - {speaker: A, text: "这个好，轮着上不掉节奏"}
+      - {speaker: B, text: "那我报名一队"}
+      - {speaker: C, text: "我候补，顺便截图"}
+
+  trio_guild_prize:
+    participants: 3
+    lines:
+      - {speaker: A, text: "公会活动奖品定下来了"}
+      - {speaker: B, text: "都有啥好东西？"}
+      - {speaker: C, text: "第一名一张10%卷轴"}
+      - {speaker: A, text: "就这？有点寒酸哈哈"}
+      - {speaker: B, text: "总比没有强，我参加"}
+      - {speaker: C, text: "我冲第二名，要瓶蓝药"}
+
+  trio_haggle_spectate:
+    participants: 3
+    lines:
+      - {speaker: A, text: "快看那边，俩人砍价呢"}
+      - {speaker: B, text: "那个手套他开价800万"}
+      - {speaker: C, text: "买家喊600万，僵住了"}
+      - {speaker: A, text: "我猜700万能成交"}
+      - {speaker: B, text: "赌一包药水，我猜650万"}
+      - {speaker: C, text: "成交了，660万，我请客哈哈"}
+
+  trio_haggle_help_bid:
+    participants: 3
+    lines:
+      - {speaker: A, text: "我卖把刀，有人压价太狠了"}
+      - {speaker: B, text: "要多少？我帮你喊价"}
+      - {speaker: C, text: "就是，喊高点，别怂"}
+      - {speaker: A, text: "底价900万，他给500万"}
+      - {speaker: B, text: "那我去喊800万帮你托"}
+      - {speaker: C, text: "别真把自己托进去了哈哈"}
+      - {speaker: A, text: "看戏的比卖货的还急"}
+
+  trio_haggle_final_price:
+    participants: 3
+    lines:
+      - {speaker: A, text: "你们说这铠甲多少收合适？"}
+      - {speaker: B, text: "我上礼拜看到420万成交过"}
+      - {speaker: C, text: "属性一般的也就400万封顶"}
+      - {speaker: A, text: "那我还价380万试试"}
+      - {speaker: B, text: "可以，不行再加点"}
+      - {speaker: C, text: "买完发属性给我看看"}
+
+  trio_loot_split_rule:
+    participants: 3
+    lines:
+      - {speaker: A, text: "打BOSS掉的卷轴怎么分？"}
+      - {speaker: B, text: "按职业需求，谁用得上给谁"}
+      - {speaker: C, text: "那没人要的卖钱平分"}
+      - {speaker: A, text: "成交，先立个规矩"}
+      - {speaker: B, text: "再记一句，掉线的不算"}
+      - {speaker: C, text: "太狠了吧……行，听你的"}
+      - {speaker: A, text: "规矩定好，出什么都按着来"}
+
+  trio_loot_need_greed:
+    participants: 3
+    lines:
+      - {speaker: A, text: "这把掉了个手套卷，我要了"}
+      - {speaker: B, text: "凭啥，我也想要"}
+      - {speaker: C, text: "别吵，扔骰子，点数大的拿"}
+      - {speaker: A, text: "行，谁怕谁"}
+      - {speaker: B, text: "我骰运一直不错，哈哈"}
+      - {speaker: C, text: "那我当裁判，你俩扔"}
+      - {speaker: B, text: "三局两胜，公平起见"}
+
+  trio_loot_reroll:
+    participants: 3
+    lines:
+      - {speaker: A, text: "上次BOSS掉的斗篷卷我roll输了"}
+      - {speaker: B, text: "这次再掉，我让给你"}
+      - {speaker: C, text: "得了吧，你想让我欠人情"}
+      - {speaker: A, text: "哈哈C这警觉性可以"}
+      - {speaker: B, text: "那还是公平扔骰子"}
+      - {speaker: C, text: "成，凭本事拿"}
+      - {speaker: A, text: "下次我手气肯定好"}
+
+  trio_jq_cheer:
+    participants: 3
+    lines:
+      - {speaker: A, text: "这跳跳任务我掉了二十次了"}
+      - {speaker: B, text: "别急，跟着我的节奏跳"}
+      - {speaker: C, text: "对，看准落点再起跳"}
+      - {speaker: A, text: "我老是手滑，最后一格摔"}
+      - {speaker: B, text: "最后一格别冲，轻点按", emote: 2}
+      - {speaker: C, text: "过了！我看到你上去了"}
+      - {speaker: A, text: "总算完了，谢谢你们", emote: 2}
+
+  trio_jq_wait_top:
+    participants: 3
+    lines:
+      - {speaker: A, text: "我在塔顶了，你们到哪了？"}
+      - {speaker: B, text: "我在中间，刚又掉回去了"}
+      - {speaker: C, text: "我更惨，还在开头哈哈"}
+      - {speaker: A, text: "慢慢来，我不走"}
+      - {speaker: B, text: "别催，这图越急越掉"}
+      - {speaker: C, text: "我数了，我掉十八次"}
+      - {speaker: A, text: "两个倒霉蛋，我等着你们"}
+
+  trio_jq_last_jump:
+    participants: 3
+    lines:
+      - {speaker: A, text: "最后一段了，我不敢跳"}
+      - {speaker: B, text: "就一步，闭眼按下去"}
+      - {speaker: C, text: "摔了也就是重来，怕啥"}
+      - {speaker: A, text: "行，我数三二一"}
+      - {speaker: B, text: "三、二、一，跳！"}
+      - {speaker: C, text: "漂亮，稳稳落地", emote: 2}
+      - {speaker: A, text: "手还在抖，总算跳完了"}
+
+  trio_event_guide:
+    participants: 3
+    lines:
+      - {speaker: A, text: "新活动怎么刷最快？"}
+      - {speaker: B, text: "先接任务，再组队刷指定怪"}
+      - {speaker: C, text: "听说组满三人掉率加成"}
+      - {speaker: A, text: "那正好，咱们仨一起"}
+      - {speaker: B, text: "行，晚饭后开刷"}
+      - {speaker: C, text: "我负责带药，管够"}
+      - {speaker: A, text: "都准备准备，别掉队"}
+
+  trio_event_shortcut:
+    participants: 3
+    lines:
+      - {speaker: A, text: "活动NPC太远了，跑得累"}
+      - {speaker: B, text: "用传送卷，别傻跑"}
+      - {speaker: C, text: "我就傻跑了一下午，哈哈"}
+      - {speaker: A, text: "C你也太实诚了"}
+      - {speaker: B, text: "这活动每天限次数，别浪费"}
+      - {speaker: C, text: "明天开始跟你们蹭车"}
+      - {speaker: A, text: "行，明晚一起跑图"}
+
+  trio_event_reward_calc:
+    participants: 3
+    lines:
+      - {speaker: A, text: "活动币我攒了三百个了"}
+      - {speaker: B, text: "换什么最划算？"}
+      - {speaker: C, text: "换卷轴呗，别的都是坑"}
+      - {speaker: A, text: "我想换个时装帽子"}
+      - {speaker: B, text: "那你得再刷二百个"}
+      - {speaker: C, text: "我帮你算着，还差八十"}
+      - {speaker: A, text: "行，今晚再肝一波"}
+
+  trio_gear_compare_weapon:
+    participants: 3
+    lines:
+      - {speaker: A, text: "我这把刀攻击88，算可以吧？"}
+      - {speaker: B, text: "平民里算不错了"}
+      - {speaker: C, text: "我的才82，羡慕了"}
+      - {speaker: A, text: "攒了两个月才买的，哈哈"}
+      - {speaker: B, text: "下一步冲九十攻"}
+      - {speaker: C, text: "冲之前先把卷砸稳"}
+
+  trio_gear_compare_def:
+    participants: 3
+    lines:
+      - {speaker: A, text: "你们防御都多少？我总被秒"}
+      - {speaker: B, text: "我打怪靠走位，护甲一般"}
+      - {speaker: C, text: "我堆防御，站撸不虚"}
+      - {speaker: A, text: "那我也换几件防具"}
+      - {speaker: B, text: "平民别死磕防御，先堆攻"}
+      - {speaker: C, text: "对，输出才是真理哈哈"}
+
+  trio_gear_compare_price:
+    participants: 3
+    lines:
+      - {speaker: A, text: "同样的手套，差5点价格翻倍"}
+      - {speaker: B, text: "面板提升都是钱堆的"}
+      - {speaker: C, text: "我收了个次一档的，够用就行"}
+      - {speaker: A, text: "性价比才是王道"}
+      - {speaker: B, text: "等我有钱了也换个好的"}
+      - {speaker: C, text: "钱都进了卷轴的坑，哈哈"}
+
+  trio_newbie_tour:
+    participants: 3
+    lines:
+      - {speaker: A, text: "这个新手连转职都不会，谁带带"}
+      - {speaker: B, text: "我带他跑一遍转职流程"}
+      - {speaker: C, text: "我出点新手装备和药水"}
+      - {speaker: A, text: "行，我再教他加技能点"}
+      - {speaker: B, text: "新手就是十年前的我们哈哈"}
+      - {speaker: C, text: "别笑，当年我也迷路过"}
+      - {speaker: A, text: "那今晚人齐就出发"}
+
+  trio_newbie_follow:
+    participants: 3
+    lines:
+      - {speaker: A, text: "跟紧我，别走散了"}
+      - {speaker: B, text: "前面怪猛，新人站我身后"}
+      - {speaker: C, text: "收到，我躲远点嘿嘿"}
+      - {speaker: A, text: "这地方以后你自己也能刷"}
+      - {speaker: B, text: "死了别乱跑，等我们来救"}
+      - {speaker: C, text: "谢谢两位大哥，太暖了"}
+
+  trio_newbie_thanks:
+    participants: 3
+    lines:
+      - {speaker: A, text: "上礼拜带的新人昨天私聊谢我"}
+      - {speaker: B, text: "他说啥了，哈哈"}
+      - {speaker: C, text: "是不是又找你带副本"}
+      - {speaker: A, text: "没有，他说他转职成功了"}
+      - {speaker: B, text: "孺子可教也"}
+      - {speaker: C, text: "下次新人我也可以带"}
+
+  trio_master_disciple:
+    participants: 3
+    lines:
+      - {speaker: A, text: "师傅，这周的任务我刷完了"}
+      - {speaker: B, text: "乖，带你去打隐藏地图"}
+      - {speaker: C, text: "师傅偏心，我也刷完了"}
+      - {speaker: A, text: "师姐吃醋了，哈哈"}
+      - {speaker: B, text: "一起一起，都来"}
+      - {speaker: C, text: "这还差不多"}
+
+  trio_disciple_quest:
+    participants: 3
+    lines:
+      - {speaker: A, text: "师傅布置的收集任务太肝了"}
+      - {speaker: B, text: "少抱怨，打满三百个再回来"}
+      - {speaker: C, text: "我当年打五百个都没吭声"}
+      - {speaker: A, text: "师姐你那时候是不是也骂街"}
+      - {speaker: B, text: "她骂得比你还凶，哈哈"}
+      - {speaker: C, text: "师傅别拆我台行吗"}
+
+  trio_master_test:
+    participants: 3
+    lines:
+      - {speaker: A, text: "今天考核，你俩单挑我看看"}
+      - {speaker: B, text: "来真的？我怕伤着师弟"}
+      - {speaker: C, text: "师姐你可别留手"}
+      - {speaker: A, text: "点到为止，我当裁判"}
+      - {speaker: B, text: "行，输的请药水"}
+      - {speaker: C, text: "来，我可不让着你"}
+      - {speaker: A, text: "开打，三局两胜"}
+
+  trio_tycoon_gossip:
+    participants: 3
+    lines:
+      - {speaker: A, text: "听说那个土豪又收了把顶级武器"}
+      - {speaker: B, text: "哪把？九十五攻的那把？"}
+      - {speaker: C, text: "对，一亿多秒的"}
+      - {speaker: A, text: "一亿……我全身不够零头"}
+      - {speaker: B, text: "人家一天刷的怪比我一年还多"}
+      - {speaker: C, text: "别比了，越比越心酸哈哈"}
+
+  trio_tycoon_smega:
+    participants: 3
+    lines:
+      - {speaker: A, text: "你们看喇叭了吗，土豪在收卷轴"}
+      - {speaker: B, text: "看到了，价格给得真高"}
+      - {speaker: C, text: "我有一张，犹豫卖不卖"}
+      - {speaker: A, text: "卖啊，过这村没这店"}
+      - {speaker: B, text: "不过他也可能随时收满"}
+      - {speaker: C, text: "行，我这就去交易"}
+      - {speaker: B, text: "卖完请我们喝药水"}
+
+  trio_tycoon_secret:
+    participants: 3
+    lines:
+      - {speaker: A, text: "听说土豪之前也是白手起家"}
+      - {speaker: B, text: "真的假的，怎么发的家"}
+      - {speaker: C, text: "倒卖卷轴，低买高卖"}
+      - {speaker: A, text: "那眼光也太准了"}
+      - {speaker: B, text: "人家还天天蹲市场记价格"}
+      - {speaker: C, text: "果然，赚钱的都勤奋"}
+
+  trio_lag_vent:
+    participants: 3
+    lines:
+      - {speaker: A, text: "卡死了，技能放了三次没出去"}
+      - {speaker: B, text: "我还以为就我卡，人都飘着走"}
+      - {speaker: C, text: "这服务器一到晚上就抽风"}
+      - {speaker: A, text: "刚被怪围殴，动都动不了"}
+      - {speaker: B, text: "我也是，白掉经验哈哈"}
+      - {speaker: C, text: "再卡我下线看电影去"}
+      - {speaker: A, text: "别啊，组队还没刷完"}
+
+  trio_lag_blame:
+    participants: 3
+    lines:
+      - {speaker: A, text: "你们说卡是因为人多吗"}
+      - {speaker: B, text: "我看是有人多开挂机"}
+      - {speaker: C, text: "别赖挂机的，服务器本来就老"}
+      - {speaker: A, text: "管他呢，反正我延迟爆红"}
+      - {speaker: B, text: "换个线试试，说不定好点"}
+      - {speaker: C, text: "我去线一看，全是人哈哈"}
+
+  trio_lag_workaround:
+    participants: 3
+    lines:
+      - {speaker: A, text: "卡的时候你们都怎么办？"}
+      - {speaker: B, text: "把音效关了，能流畅点"}
+      - {speaker: C, text: "我直接重启客户端"}
+      - {speaker: A, text: "重启没用吧，又不是我电脑卡"}
+      - {speaker: B, text: "心理安慰也是安慰哈哈"}
+      - {speaker: C, text: "等夜深人少再上线刷"}
+
+  trio_double_exp_plan:
+    participants: 3
+    lines:
+      - {speaker: A, text: "今晚八点到十点双倍经验"}
+      - {speaker: B, text: "真的假的，公告在哪"}
+      - {speaker: C, text: "喇叭刚刷的，全服都炸了"}
+      - {speaker: A, text: "那还等啥，先约好刷哪张图"}
+      - {speaker: B, text: "去蚂蚁洞，怪密升级快"}
+      - {speaker: C, text: "我准备了一背包药水"}
+      - {speaker: A, text: "今晚不睡觉了，冲", emote: 3}
+
+  trio_double_exp_burn:
+    participants: 3
+    lines:
+      - {speaker: A, text: "双倍快结束了，你们涨了多少"}
+      - {speaker: B, text: "我升了两级半，爽"}
+      - {speaker: C, text: "我才一级，中途掉线三次"}
+      - {speaker: A, text: "C这运气没谁了，哈哈"}
+      - {speaker: B, text: "还有十分钟，再冲半级"}
+      - {speaker: C, text: "冲，我能再抢救一下"}
+
+  trio_double_exp_left:
+    participants: 3
+    lines:
+      - {speaker: A, text: "双倍活动明天还有吗？"}
+      - {speaker: B, text: "说是周末连开三天"}
+      - {speaker: C, text: "那我今晚早点睡，明天满状态刷"}
+      - {speaker: A, text: "有道理，硬熬效率低"}
+      - {speaker: B, text: "明天中午组队，别忘了"}
+      - {speaker: C, text: "收到，人齐就开刷"}
+
+  trio_maint_countdown:
+    participants: 3
+    lines:
+      - {speaker: A, text: "还有半小时维护了，都干啥呢"}
+      - {speaker: B, text: "把没卖完的货收一收"}
+      - {speaker: C, text: "我抓紧做每日任务"}
+      - {speaker: A, text: "维护多久说了吗"}
+      - {speaker: B, text: "公告写两个小时"}
+      - {speaker: C, text: "正好，我洗个澡吃个饭"}
+      - {speaker: A, text: "都别走远，开服就集合"}
+
+  trio_maint_bet:
+    participants: 3
+    lines:
+      - {speaker: A, text: "你们猜这次维护会延迟吗"}
+      - {speaker: B, text: "十有八九延迟，哈哈"}
+      - {speaker: C, text: "我赌准时，上回就没拖"}
+      - {speaker: A, text: "开赌，输的带一轮副本"}
+      - {speaker: B, text: "成交，我就押延迟"}
+      - {speaker: C, text: "行，等着瞧"}
+
+  trio_maint_after:
+    participants: 3
+    lines:
+      - {speaker: A, text: "维护完了，你们进得去吗"}
+      - {speaker: B, text: "进不去，卡在登录界面"}
+      - {speaker: C, text: "我就知道要挤爆，哈哈"}
+      - {speaker: A, text: "耐心点，排队呢"}
+      - {speaker: B, text: "公告说这次修了掉线问题"}
+      - {speaker: C, text: "信公告不如信自己"}
+
+  trio_nx_views:
+    participants: 3
+    lines:
+      - {speaker: A, text: "你们每月都充点券吗"}
+      - {speaker: B, text: "我就买张双倍卡，别的免谈"}
+      - {speaker: C, text: "我全砸时装了，面板无所谓"}
+      - {speaker: A, text: "咱俩正好相反，哈哈"}
+      - {speaker: B, text: "各有各的玩法，开心就行"}
+      - {speaker: C, text: "对，钱花在喜欢的地方"}
+
+  trio_nx_save_or_buy:
+    participants: 3
+    lines:
+      - {speaker: A, text: "这期新时装上架了，冲不冲"}
+      - {speaker: B, text: "我看看钱包……还是算了"}
+      - {speaker: C, text: "买吧，错过绝版又后悔"}
+      - {speaker: A, text: "C你就是个托哈哈"}
+      - {speaker: B, text: "那我买帽子，你们别笑我"}
+      - {speaker: C, text: "买完发个图，一起欣赏"}
+      - {speaker: B, text: "明天开服我就去下单"}
+
+  trio_nx_perm:
+    participants: 3
+    lines:
+      - {speaker: A, text: "永久时装比限时的划算吧"}
+      - {speaker: B, text: "可永久的丑哈哈"}
+      - {speaker: C, text: "丑不丑看搭配，别赖衣服"}
+      - {speaker: A, text: "我就想要个耐穿的"}
+      - {speaker: B, text: "那挑经典款，永不过时"}
+      - {speaker: C, text: "对，花里胡哨的不耐看"}
+
+  trio_scroll_luck:
+    participants: 3
+    lines:
+      - {speaker: A, text: "我砸卷前必须先把背包清空"}
+      - {speaker: B, text: "我信整点砸，比如八点整"}
+      - {speaker: C, text: "你们这都算啥，我垫五张垫子"}
+      - {speaker: A, text: "上次垫了五张，主武器还是碎了"}
+      - {speaker: B, text: "玄学不保命，哈哈"}
+      - {speaker: C, text: "碎是常态，不碎是惊喜", emote: 1}
+      - {speaker: A, text: "今晚我再试一把"}
+
+  trio_scroll_rune:
+    participants: 3
+    lines:
+      - {speaker: A, text: "听说去废弃都市砸卷特别灵"}
+      - {speaker: B, text: "我都在魔法密林砸，别的地不碰"}
+      - {speaker: C, text: "我试过凌晨三点砸，成了"}
+      - {speaker: A, text: "那今晚我也熬到三点"}
+      - {speaker: B, text: "成了记得回来报喜"}
+      - {speaker: C, text: "成了请客，说好的"}
+
+  trio_scroll_share:
+    participants: 3
+    lines:
+      - {speaker: A, text: "昨天我一张10%卷一次成了"}
+      - {speaker: B, text: "真的假的，快说怎么砸的"}
+      - {speaker: C, text: "运气全用这了，哈哈"}
+      - {speaker: A, text: "就在市场门口，随手一点"}
+      - {speaker: B, text: "行，我下次也去那砸"}
+      - {speaker: C, text: "祝你好运，成了请喝药"}
+
+  trio_pet_compare:
+    participants: 3
+    lines:
+      - {speaker: A, text: "你们宠物都几级了"}
+      - {speaker: B, text: "我的小狗十八级，快满了"}
+      - {speaker: C, text: "我的是只猫，天天睡觉不捡东西"}
+      - {speaker: A, text: "猫就是懒，哈哈"}
+      - {speaker: B, text: "宠物亲密度你们怎么刷"}
+      - {speaker: C, text: "多喂零食呗，它开心就好"}
+      - {speaker: A, text: "行，学到了"}
+
+  trio_pet_luck:
+    participants: 3
+    lines:
+      - {speaker: A, text: "我宠物捡到一张卷轴，值几百万"}
+      - {speaker: B, text: "还有这好事，我怎么没有"}
+      - {speaker: C, text: "我的只会捡药水和垃圾哈哈"}
+      - {speaker: A, text: "多带它刷怪，好东西自然来"}
+      - {speaker: B, text: "行，今晚我就放它去捡"}
+      - {speaker: C, text: "捡到平分，别独吞"}
+
+  trio_pet_feed:
+    participants: 3
+    lines:
+      - {speaker: A, text: "宠物粮太贵了，一天一袋"}
+      - {speaker: B, text: "自己做呗，收集点材料"}
+      - {speaker: C, text: "我都是路边捡野果喂，哈哈"}
+      - {speaker: A, text: "还有这操作，它不嫌弃吗"}
+      - {speaker: B, text: "宠物不挑食，亲密度照涨"}
+      - {speaker: C, text: "省钱小妙招，学到了吧"}
+
+  trio_map_explore:
+    participants: 3
+    lines:
+      - {speaker: A, text: "你们去过最远的地图是哪？"}
+      - {speaker: B, text: "我跑到过海底，差点淹死"}
+      - {speaker: C, text: "我误入高级图，被怪秒回城"}
+      - {speaker: A, text: "探险就得付出代价，哈哈"}
+      - {speaker: B, text: "不过新地图音乐都好听"}
+      - {speaker: C, text: "对，边走边听，像旅行"}
+
+  trio_map_hidden:
+    participants: 3
+    lines:
+      - {speaker: A, text: "我发现一张隐藏图，怪多还没人"}
+      - {speaker: B, text: "在哪在哪，快分享"}
+      - {speaker: C, text: "小心点，别被GM抓了哈哈"}
+      - {speaker: A, text: "正经图，就是入口藏得深"}
+      - {speaker: B, text: "那今晚带我们去看看"}
+      - {speaker: C, text: "我先占个位，谁也别抢"}
+
+  trio_map_boat:
+    participants: 3
+    lines:
+      - {speaker: A, text: "坐船去玩具城要二十分钟"}
+      - {speaker: B, text: "甲板上聊聊天，时间过得快"}
+      - {speaker: C, text: "别掉下去，中途没站"}
+      - {speaker: A, text: "我就掉过一次，哈哈"}
+      - {speaker: B, text: "甲板护栏边站着挺刺激"}
+      - {speaker: C, text: "风景不错，就是风大"}
+
+  trio_first_advance:
+    participants: 3
+    lines:
+      - {speaker: A, text: "你们还记得第一次转职在哪吗"}
+      - {speaker: B, text: "记得，我那时候紧张得手抖"}
+      - {speaker: C, text: "我找不到NPC，绕了一小时"}
+      - {speaker: A, text: "我转完第一件事是放技能"}
+      - {speaker: B, text: "放完发现还没怪打，哈哈"}
+      - {speaker: C, text: "新手时期真是什么都新鲜"}
+      - {speaker: A, text: "现在想想还挺逗", emote: 2}
+
+  trio_advance_fail:
+    participants: 3
+    lines:
+      - {speaker: A, text: "我第一次转职材料打错了"}
+      - {speaker: B, text: "打错啥了，不会也是黑珠吧"}
+      - {speaker: C, text: "我多打了一倍数量，哈哈"}
+      - {speaker: A, text: "同病相怜，白刷一下午"}
+      - {speaker: B, text: "还好现在有攻略了"}
+      - {speaker: C, text: "新手没人带是真的难"}
+
+  trio_advance_pride:
+    participants: 3
+    lines:
+      - {speaker: A, text: "昨天我徒弟转职成功了"}
+      - {speaker: B, text: "你带的？可以啊"}
+      - {speaker: C, text: "想起我当年被拐到废弃都市"}
+      - {speaker: A, text: "他比你当年省心多了，哈哈"}
+      - {speaker: B, text: "转职就是迈过一道坎"}
+      - {speaker: C, text: "往后路还长着呢"}
+
+  trio_job_rant:
+    participants: 3
+    lines:
+      - {speaker: A, text: "你们觉得哪个职业现在最弱？"}
+      - {speaker: B, text: "别问，问就是我玩的这个"}
+      - {speaker: C, text: "我打BOSS被嫌弃输出低，哈哈"}
+      - {speaker: A, text: "各有各的难处，坚持住"}
+      - {speaker: B, text: "等哪天加强，我原地起飞"}
+      - {speaker: C, text: "梦里啥都有"}
+      - {speaker: A, text: "总得有点盼头嘛"}
+
+  trio_job_nerf_fear:
+    participants: 3
+    lines:
+      - {speaker: A, text: "听说下版本要调职业平衡"}
+      - {speaker: B, text: "千万别砍我大法师"}
+      - {speaker: C, text: "每次调整都有人欢喜有人愁"}
+      - {speaker: A, text: "我无所谓，反正我下水道"}
+      - {speaker: B, text: "心态好才是真的好，哈哈"}
+      - {speaker: C, text: "都看开点，图个乐"}
+      - {speaker: A, text: "对，打游戏别较真"}
+
+  trio_job_switch:
+    participants: 3
+    lines:
+      - {speaker: A, text: "玩到一半想换职业怎么办"}
+      - {speaker: B, text: "重新练一个呗，老号留着"}
+      - {speaker: C, text: "我换了三次了，现在还没定"}
+      - {speaker: A, text: "C你是职业体验师，哈哈"}
+      - {speaker: B, text: "多试试才知道哪个顺手"}
+      - {speaker: C, text: "对，总有一个适合你"}
+
+  trio_merge_rumor:
+    participants: 3
+    lines:
+      - {speaker: A, text: "听说咱们服要和隔壁服合并了"}
+      - {speaker: B, text: "真的假的，哪来的消息"}
+      - {speaker: C, text: "贴吧里传的，没个准信"}
+      - {speaker: A, text: "合服的话市场会热闹点"}
+      - {speaker: B, text: "也可能天天抢图打架"}
+      - {speaker: C, text: "先观望，别当真"}
+
+  trio_merge_worry:
+    participants: 3
+    lines:
+      - {speaker: A, text: "合服了咱们公会还在吗"}
+      - {speaker: B, text: "应该在，数据不会清"}
+      - {speaker: C, text: "就怕名字重复被强行改名"}
+      - {speaker: A, text: "那我的帅气名字不保，哈哈"}
+      - {speaker: B, text: "到时候看公告再说"}
+      - {speaker: C, text: "对，瞎操心也没用"}
+
+  trio_merge_newfriends:
+    participants: 3
+    lines:
+      - {speaker: A, text: "合服以后能认识新朋友了"}
+      - {speaker: B, text: "我想和隔壁服的大神组队"}
+      - {speaker: C, text: "我更担心抢图的人变多"}
+      - {speaker: A, text: "有人的地方就有江湖哈哈"}
+      - {speaker: B, text: "说不定还能找到老熟人"}
+      - {speaker: C, text: "那倒是，各有利弊"}
+      - {speaker: A, text: "等着看吧，别瞎传"}
+
+  trio_gm_patrol:
+    participants: 3
+    lines:
+      - {speaker: A, text: "昨天在射手村看到GM巡逻了"}
+      - {speaker: B, text: "穿时装的GM？我也看见了"}
+      - {speaker: C, text: "他走一路，玩家跟一路哈哈"}
+      - {speaker: A, text: "还有人追着要合照"}
+      - {speaker: B, text: "GM一句话都没说，酷得很"}
+      - {speaker: C, text: "当GM真风光"}
+
+  trio_gm_sight:
+    participants: 3
+    lines:
+      - {speaker: A, text: "GM突然出现在我们刷图的图里"}
+      - {speaker: B, text: "不是吧，查挂机的？"}
+      - {speaker: C, text: "我们仨吓得不敢动，哈哈"}
+      - {speaker: A, text: "他待了十秒就飞走了"}
+      - {speaker: B, text: "估计就是路过看看"}
+      - {speaker: C, text: "吓出一身冷汗"}
+
+  trio_gm_photo:
+    participants: 3
+    lines:
+      - {speaker: A, text: "我截到GM的图了，发你们看看"}
+      - {speaker: B, text: "快发快发，我还没见过活的"}
+      - {speaker: C, text: "什么叫活的，他还能是假的"}
+      - {speaker: A, text: "他还给我加了个小祝福"}
+      - {speaker: B, text: "羡慕，我也想要"}
+      - {speaker: C, text: "下次遇见记得喊我"}
+      - {speaker: B, text: "蹲了一天也没蹲到，哈哈"}
+
+  trio_family_race:
+    participants: 3
+    lines:
+      - {speaker: A, text: "家族竞赛下周开打，你们报名没"}
+      - {speaker: B, text: "报了，我们仨一组"}
+      - {speaker: C, text: "那得练练配合，别掉链子"}
+      - {speaker: A, text: "今晚先跑两遍流程"}
+      - {speaker: B, text: "我负责探路，你们跟紧"}
+      - {speaker: C, text: "行，目标前三"}
+
+  trio_family_train:
+    participants: 3
+    lines:
+      - {speaker: A, text: "竞赛的地图我研究了一下"}
+      - {speaker: B, text: "讲重点，哪个环节最难"}
+      - {speaker: C, text: "我猜是那个跳跳段"}
+      - {speaker: A, text: "对，就是那，练熟它"}
+      - {speaker: B, text: "我跳跳苦手，哈哈"}
+      - {speaker: C, text: "没事，输了也不扣钱"}
+
+  trio_family_win:
+    participants: 3
+    lines:
+      - {speaker: A, text: "咱们家族拿了第二！"}
+      - {speaker: B, text: "差点就第一了，哈哈"}
+      - {speaker: C, text: "就差三秒，可惜了"}
+      - {speaker: A, text: "没事，奖励到手就行"}
+      - {speaker: B, text: "下次再战，把第一抢回来"}
+      - {speaker: C, text: "成，明年见分晓"}
+
+  trio_title_flex:
+    participants: 3
+    lines:
+      - {speaker: A, text: "你们看我这新称号，帅不帅"}
+      - {speaker: B, text: "哪来的？隐藏任务给的？"}
+      - {speaker: C, text: "一般般，没我的亮眼，哈哈"}
+      - {speaker: A, text: "你那个是活动白送的"}
+      - {speaker: B, text: "都别争，我的最老，经典款"}
+      - {speaker: C, text: "行行行，你们都是大佬"}
+
+  trio_title_earn:
+    participants: 3
+    lines:
+      - {speaker: A, text: "称号任务好难，我卡在第三环"}
+      - {speaker: B, text: "要打什么材料，我帮你"}
+      - {speaker: C, text: "我也差最后一步"}
+      - {speaker: A, text: "那今晚一起刷，互相带"}
+      - {speaker: B, text: "成，材料掉率低，组队快"}
+      - {speaker: C, text: "集齐了记得截图留念"}
+      - {speaker: B, text: "我先去多买点药水"}
+
+  trio_drop_guess:
+    participants: 3
+    lines:
+      - {speaker: A, text: "我赌这只怪掉50金币以上"}
+      - {speaker: B, text: "就这？我赌掉药水"}
+      - {speaker: C, text: "我猜毛都不掉哈哈"}
+      - {speaker: A, text: "开了开了……掉了个头盔"}
+      - {speaker: B, text: "全输，明天请客，哈哈"}
+      - {speaker: C, text: "行，这把我认"}
+
+  trio_drop_joke:
+    participants: 3
+    lines:
+      - {speaker: A, text: "打了一小时，就掉一堆蜗牛壳"}
+      - {speaker: B, text: "蜗牛壳还能卖钱，不错了"}
+      - {speaker: C, text: "我上次捡到把雨伞，哈哈"}
+      - {speaker: A, text: "雨伞能干啥，卖店几个钱"}
+      - {speaker: B, text: "摆摊当古董卖，万一有人收"}
+      - {speaker: C, text: "有道理，回头我挂市场"}
+      - {speaker: A, text: "挂上去记得标个高价"}
+
+  trio_guild_photo:
+    participants: 3
+    lines:
+      - {speaker: A, text: "公会集体照定在周六晚上"}
+      - {speaker: B, text: "记得穿上你们最帅的时装"}
+      - {speaker: C, text: "我只有校服，行不行哈哈"}
+      - {speaker: A, text: "校服多经典，就它了"}
+      - {speaker: B, text: "站队形听会长安排"}
+      - {speaker: C, text: "收到，我提前半小时到"}
+      - {speaker: A, text: "记得别迟到，就等你了"}
+
+  trio_guild_pose:
+    participants: 3
+    lines:
+      - {speaker: A, text: "昨天集体照拍得真齐"}
+      - {speaker: B, text: "我在最后一排，就露个脑袋"}
+      - {speaker: C, text: "我还闭眼了，白摆造型哈哈"}
+      - {speaker: A, text: "会长说要重拍一张"}
+      - {speaker: B, text: "那这次我站前排"}
+      - {speaker: C, text: "先到先得，别抢位子"}
+
+  trio_voice_boss:
+    participants: 3
+    lines:
+      - {speaker: A, text: "打BOSS开语音不？报技能方便"}
+      - {speaker: B, text: "开开开，听我指挥"}
+      - {speaker: C, text: "我麦有点吵，你们多担待"}
+      - {speaker: A, text: "没事，比打字快多了"}
+      - {speaker: B, text: "上号了，频道见"}
+      - {speaker: C, text: "来了来了，带好药"}
+      - {speaker: A, text: "到齐了，先报自己状态"}
+
+  trio_voice_echo:
+    participants: 3
+    lines:
+      - {speaker: A, text: "谁语音里一直有回音啊"}
+      - {speaker: B, text: "不是我，我戴耳机呢"}
+      - {speaker: C, text: "可能是我音箱外放，哈哈"}
+      - {speaker: A, text: "C你关了吧，吵得我头晕"}
+      - {speaker: B, text: "要么改成按键说话"}
+      - {speaker: C, text: "行行，我调一下"}

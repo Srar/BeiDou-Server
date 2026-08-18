@@ -183,10 +183,10 @@ public class BotTradeSM {
 
                 if (lastTradeResult != Trade.TradeResult.SUCCESSFUL) {
                     botEmote(getChr(), 4);
-                    botSpeak(getChr(), "Why did you decline?");
+                    botSpeak(getChr(), "为啥取消交易呀？");
                 } else {
                     botEmote(getChr(), 2);
-                    botSpeak(getChr(), "Thank you!");
+                    botSpeak(getChr(), "多谢惠顾！");
                     getParent().setLastTradeResult(Trade.TradeResult.SUCCESSFUL);
                 }
                 getParent().waitFor(2000); // farewell beat before COMPLETED ticks

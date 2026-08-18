@@ -132,7 +132,7 @@ public class DropGameBot extends BotSM {
             dprint("REJECT trade from " + incoming.getName()
                     + " — already engaged with " + player.getName());
             BotTradeCommands.writeTradeChat(getChr(),
-                    "Busy with " + player.getName() + "! Try again after this game.");
+                    "正跟 " + player.getName() + " 玩着呢 这局完了再来");
             BotTiming.after(1500, () -> BotTradeCommands.cancelTrade(getChr()));
             waitFor(2000); // hold ticks until the delayed cancel lands
             cleanupTradeState();
@@ -257,15 +257,15 @@ public class DropGameBot extends BotSM {
     private void tradeWait() {
         if (!isTradeActive()) {
             dprint("TRADE_WAIT: trade no longer active, cancelling");
-            cancelAndReset("Trade cancelled.");
+            cancelAndReset("交易已取消。");
             return;
         }
         dprint("TRADE_WAIT: writing rules, starting 60s timer");
         // Show rules in trade chat
         BotTradeCommands.writeTradeChat(getChr(),
-                "Drop Game! Medium: 10m / Elite: 50m");
+                "掉落游戏！普通：1000 万 / 精英：5000 万");
         BotTradeCommands.writeTradeChat(getChr(),
-                "Put in your mesos and confirm!");
+                "放上金币再确认！");
         startTimer(60_000); // 60s trade timeout
         setDropGameState(DropGameState.TRADE_VALIDATE);
     }
@@ -274,7 +274,7 @@ public class DropGameBot extends BotSM {
     // Poll until partner locks in, then read mesos and decide tier.
     private void tradeValidate() {
         if (!isTradeActive()) {
-            cancelAndReset("Trade cancelled.");
+            cancelAndReset("交易已取消。");
             return;
         }
 
@@ -282,7 +282,7 @@ public class DropGameBot extends BotSM {
         if (!BotTradeCommands.isPartnerLocked(getChr())) {
             if (System.currentTimeMillis() > stateEndTime) {
                 dprint("TRADE_VALIDATE: partner lock timed out");
-                BotTradeCommands.writeTradeChat(getChr(), "Too slow! Trade timed out.");
+                BotTradeCommands.writeTradeChat(getChr(), "太慢了！交易超时。");
                 BotTiming.after(2000, () -> BotTradeCommands.cancelTrade(getChr()));
                 waitFor(2500); // resume after the delayed cancel lands
                 cleanupTradeAndReset();
@@ -302,7 +302,7 @@ public class DropGameBot extends BotSM {
         } else {
             // Invalid amount - reject.
             dprint("TRADE_VALIDATE: invalid meso amount, rejecting");
-            BotTradeCommands.writeTradeChat(getChr(), "Wrong amount! 10m or 50m only.");
+            BotTradeCommands.writeTradeChat(getChr(), "金额不对！只收 1000 万或 5000 万。");
             BotGameSupport.blockingSleep(2000);
             BotTradeCommands.cancelTrade(getChr());
             getDialogueHandler().executeBotFlavorDialogue("InvalidMeso", DropGameBot.this);
@@ -312,7 +312,8 @@ public class DropGameBot extends BotSM {
 
         // Valid amount - confirm trade
         dprint("TRADE_VALIDATE: tier=" + selectedTier + ", confirming trade");
-        BotTradeCommands.writeTradeChat(getChr(), selectedTier.toUpperCase() + " tier locked in!");
+        BotTradeCommands.writeTradeChat(getChr(),
+                ("elite".equals(selectedTier) ? "精英" : "普通") + " 档锁定！");
         BotTiming.after(1000, () -> BotTradeCommands.confirmTrade(getChr()));
         waitFor(3000); // confirm lands at +1s; settle ~2s after it, as before
         setDropGameState(DropGameState.TRADE_FINALIZE);
@@ -325,7 +326,7 @@ public class DropGameBot extends BotSM {
         dprint("TRADE_FINALIZE: loot pool loaded, size=" + lootPool.size());
         if (lootPool.isEmpty()) {
             dprint("TRADE_FINALIZE: loot pool empty for tier=" + selectedTier);
-            BotGameSupport.botSpeak(getChr(), "Loot pool error. Refunding and resetting.");
+            BotGameSupport.botSpeak(getChr(), "奖池出错了 退还金币并重置。");
             cleanupTradeAndReset();
             return;
         }
@@ -344,7 +345,7 @@ public class DropGameBot extends BotSM {
     private void partySetup() {
         if (!isPlayerOnMap()) {
             dprint("PARTY_SETUP: player off-map, cancelling");
-            cancelAndReset("Player left the map.");
+            cancelAndReset("玩家离开地图了。");
             return;
         }
 
@@ -353,7 +354,7 @@ public class DropGameBot extends BotSM {
         boolean invited = BotPartyCommands.botInvitePlayer(getChr(), player);
         dprint("PARTY_SETUP: botInvitePlayer -> " + invited);
         if (!invited) {
-            BotGameSupport.botSpeak(getChr(), "Couldn't send party invite. Resetting.");
+            BotGameSupport.botSpeak(getChr(), "发不了组队邀请 重置了。");
             forfeitAndReset();
             return;
         }
@@ -366,7 +367,7 @@ public class DropGameBot extends BotSM {
     // Poll for player to accept the invite. On timeout or decline, warn + forfeit.
     private void partyWait() {
         if (!isPlayerOnMap()) {
-            cancelAndReset("Player left the map.");
+            cancelAndReset("玩家离开地图了。");
             return;
         }
 
@@ -381,7 +382,7 @@ public class DropGameBot extends BotSM {
         // never joins).
         if (System.currentTimeMillis() > stateEndTime) {
             dprint("PARTY_WAIT: timed out waiting for player to accept");
-            BotGameSupport.botSpeak(getChr(), "Party invite timed out — mesos forfeited. Don't waste my time next round!");
+            BotGameSupport.botSpeak(getChr(), "组队邀请超时了 金币没收 下局别浪费我时间！");
             waitFor(2000); // let the line land before POST_GAME disbands + resets
             setDropGameState(DropGameState.POST_GAME);
         }
@@ -390,7 +391,7 @@ public class DropGameBot extends BotSM {
     // --- PRE-GAME BUFF ---
     private void preGame() {
         if (!isPlayerOnMap()) {
-            cancelAndReset("Player left the map.");
+            cancelAndReset("玩家离开地图了。");
             return;
         }
 
@@ -423,7 +424,7 @@ public class DropGameBot extends BotSM {
     // --- GAME LAUNCH ---
     private void gameLaunch() {
         if (!isPlayerOnMap()) {
-            cancelAndReset("Player left the map.");
+            cancelAndReset("玩家离开地图了。");
             return;
         }
 

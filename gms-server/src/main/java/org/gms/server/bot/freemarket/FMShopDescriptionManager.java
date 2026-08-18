@@ -144,7 +144,7 @@ public class FMShopDescriptionManager {
                 debugprint("Top only gen");
                 return topGenerated;
             } else {
-                return "NOTHING GENERATED";
+                return "小店开张 欢迎光临";
             }
         }
 
@@ -309,7 +309,7 @@ public class FMShopDescriptionManager {
                 List.of("B"),
                 List.of(13),
                 () -> {
-                    return ("Welcome to " + owner + "'s Shop!");
+                    return ("欢迎光临 " + owner + " 的小店！");
                 });
         welcomeDesc.addRoomRange(13, 22);
 

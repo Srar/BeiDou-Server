@@ -68,7 +68,7 @@ public class ConversationManager {
 
     private final Set<Integer> botsInConversation = Collections.synchronizedSet(new HashSet<>());
     private final LinkedList<String> recentScriptIds = new LinkedList<>();
-    private static final int RECENT_HISTORY_SIZE = 20;
+    private static final int RECENT_HISTORY_SIZE = 40;
 
     private List<ConversationScript> allScripts;
 
@@ -194,7 +194,7 @@ public class ConversationManager {
         int mapId = player.getMapId();
         List<Character> cluster = findClusterOnMap(mapId);
         if (cluster == null || cluster.size() < 2) {
-            player.yellowMessage("[ConversationManager] No cluster of 2+ filler bots found on this map.");
+            player.yellowMessage("[ConversationManager] 这张图没有 2 个以上的填充 bot，演不了群戏。");
             return;
         }
         startConversation(cluster, player);
@@ -249,7 +249,7 @@ public class ConversationManager {
         int clusterSize = cluster.size();
         ConversationScript script = pickScript(clusterSize);
         if (script == null) {
-            if (debugPlayer != null) debugPlayer.yellowMessage("[ConversationManager] No matching script found for cluster of " + clusterSize);
+            if (debugPlayer != null) debugPlayer.yellowMessage("[ConversationManager] 没有匹配 " + clusterSize + " 人的剧本");
             return;
         }
 
@@ -267,13 +267,13 @@ public class ConversationManager {
         log.info("Starting '{}' with {} bots.", script.getId(), participants.size());
 
         if (debugPlayer != null) {
-            debugPlayer.yellowMessage("[ConversationManager] Script: '" + script.getId() + "' | Participants: " + participants.size());
+            debugPlayer.yellowMessage("[ConversationManager] 剧本: '" + script.getId() + "' | 人数: " + participants.size());
             String[] roles = {"A", "B", "C", "D"};
             for (int i = 0; i < participants.size(); i++) {
                 Character p = participants.get(i);
-                debugPlayer.yellowMessage("  Role " + roles[i] + ": " + p.getName()
-                        + " | Pos: (" + p.getPosition().x + ", " + p.getPosition().y + ")"
-                        + " | Map: " + p.getMapId());
+                debugPlayer.yellowMessage("  角色 " + roles[i] + ": " + p.getName()
+                        + " | 坐标: (" + p.getPosition().x + ", " + p.getPosition().y + ")"
+                        + " | 地图: " + p.getMapId());
             }
         }
 

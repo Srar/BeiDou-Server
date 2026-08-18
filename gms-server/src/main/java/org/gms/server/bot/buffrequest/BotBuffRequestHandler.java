@@ -63,7 +63,9 @@ public final class BotBuffRequestHandler {
     private static final int REACT_EMOTE = 2;            // facial expression played on grant
 
     // A request must include one of these words, so normal conversation doesn't trigger it.
-    private static final Set<String> REQUEST_WORDS = Set.of("please", "pls", "plz");
+    // 英文触发词保留（老玩家习惯），扩展中文触发词。
+    private static final Set<String> REQUEST_WORDS =
+            Set.of("please", "pls", "plz", "请", "求", "来点", "给个", "求个");
 
     // botId -> epoch ms the bot may buff again. Per-bot; covers all buffs and all players.
     private static final Map<Integer, Long> cooldownUntil = new ConcurrentHashMap<>();
@@ -76,15 +78,15 @@ public final class BotBuffRequestHandler {
     private static final Map<String, BuffConcept> ALIASES = new LinkedHashMap<>();
 
     static {
-        BuffConcept holySymbol = new BuffConcept("Holy Symbol", new int[]{Priest.HOLY_SYMBOL});
-        BuffConcept hyperBody = new BuffConcept("Hyper Body", new int[]{Spearman.HYPER_BODY});
-        BuffConcept ironWill = new BuffConcept("Iron Will", new int[]{Spearman.IRON_WILL});
-        BuffConcept rage = new BuffConcept("Rage", new int[]{Fighter.RAGE});
-        BuffConcept bless = new BuffConcept("Bless", new int[]{Cleric.BLESS});
-        BuffConcept haste = new BuffConcept("Haste", new int[]{Assassin.HASTE, Bandit.HASTE});
-        BuffConcept meditation = new BuffConcept("Meditation", new int[]{FPWizard.MEDITATION, ILWizard.MEDITATION});
-        BuffConcept sharpEyes = new BuffConcept("Sharp Eyes", new int[]{Bowmaster.SHARP_EYES, Marksman.SHARP_EYES});
-        BuffConcept mapleWarrior = new BuffConcept("Maple Warrior", new int[]{
+        BuffConcept holySymbol = new BuffConcept("神圣祈祷", new int[]{Priest.HOLY_SYMBOL});
+        BuffConcept hyperBody = new BuffConcept("神圣之火", new int[]{Spearman.HYPER_BODY});
+        BuffConcept ironWill = new BuffConcept("极限防御", new int[]{Spearman.IRON_WILL});
+        BuffConcept rage = new BuffConcept("愤怒之火", new int[]{Fighter.RAGE});
+        BuffConcept bless = new BuffConcept("祝福", new int[]{Cleric.BLESS});
+        BuffConcept haste = new BuffConcept("轻功", new int[]{Assassin.HASTE, Bandit.HASTE});
+        BuffConcept meditation = new BuffConcept("精神力", new int[]{FPWizard.MEDITATION, ILWizard.MEDITATION});
+        BuffConcept sharpEyes = new BuffConcept("火眼晶晶", new int[]{Bowmaster.SHARP_EYES, Marksman.SHARP_EYES});
+        BuffConcept mapleWarrior = new BuffConcept("冒险岛勇士", new int[]{
                 Hero.MAPLE_WARRIOR, Paladin.MAPLE_WARRIOR, DarkKnight.MAPLE_WARRIOR,
                 FPArchMage.MAPLE_WARRIOR, ILArchMage.MAPLE_WARRIOR, Bishop.MAPLE_WARRIOR,
                 Bowmaster.MAPLE_WARRIOR, Marksman.MAPLE_WARRIOR, NightLord.MAPLE_WARRIOR, Shadower.MAPLE_WARRIOR});
@@ -259,9 +261,9 @@ public final class BotBuffRequestHandler {
 
     private static String reactLine(BuffConcept concept, Character player) {
         String[] lines = {
-                concept.name() + " for you!",
-                "Here's your " + concept.name() + "~",
-                concept.name() + "! Enjoy, " + player.getName() + "!"
+                concept.name() + " 给你！",
+                "接好 " + concept.name() + "~",
+                concept.name() + "来咯 " + player.getName() + "！"
         };
         return lines[ThreadLocalRandom.current().nextInt(lines.length)];
     }

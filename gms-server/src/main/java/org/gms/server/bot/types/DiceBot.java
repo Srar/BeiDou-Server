@@ -17,6 +17,8 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class DiceBot extends BotSM {
+    // 下注喊话小池（庄家轮流喊，国服赌桌口语）
+    private static final List<String> BET_PROMPTS = List.of("请下注！", "下注啦 买定离手！", "要下注的抓紧咯！");
     private DiceBotState diceBotState = DiceBotState.RESET;
     private BetType currentBet = BetType.NONE;
     int[] rolls;
@@ -117,12 +119,12 @@ public class DiceBot extends BotSM {
     }
 
     private void startGame() {
-        BotGameSupport.botChatbubble(getChr(), "Please Place your bets!");
+        BotGameSupport.botChatbubble(getChr(), BET_PROMPTS.get(Randomizer.nextInt(BET_PROMPTS.size())));
     }
 
     @Override
     public void displayCommands(Character chr) {
-        List<String> hint = List.of("Bet Cho (even)", "Bet Han (odd)");
+        List<String> hint = List.of("bet cho 押双", "bet han 押单");
         BotGameSupport.displayPlayerChatCommands(chr, hint);
     }
 
@@ -155,7 +157,7 @@ public class DiceBot extends BotSM {
     private boolean handleIfListIsEmpty(List<MapObject> items) {
         // Check if the list is empty
         if (items.isEmpty()) {
-            BotGameSupport.botSpeak(getChr(), "No Bet detected. Please Place your bets!");
+            BotGameSupport.botSpeak(getChr(), "没检测到下注，请下注！");
             startTime = System.currentTimeMillis(); // Give player more time to bet in case they mistype
             return true;
         }
@@ -189,7 +191,7 @@ public class DiceBot extends BotSM {
         // PacketCreator.EffectPacket，保留为 TODO。
         int dice1 = Randomizer.nextInt(6) + 1;
         int dice2 = Randomizer.nextInt(6) + 1;
-        BotGameSupport.botSpeak(getChr(), String.format("test %d %d", dice1, dice2));
+        BotGameSupport.botSpeak(getChr(), String.format("骰子掷出 %d %d", dice1, dice2));
         return new int[]{dice1, dice2};
     }
 
@@ -233,8 +235,8 @@ public class DiceBot extends BotSM {
 
     private void handlePlayerStealsBets() {
         getInteractors().getRespondant().setFame(getInteractors().getRespondant().getFame() - 10);
-        getInteractors().getRespondant().dropMessage(5, "[Mushroom Casino] You have stolen your bets. You have been defamed by the Mushroom Casino.");
-        BotGameSupport.botSpeak(getChr(), "Player has stolen back his bet. Ceasing Game.");
+        getInteractors().getRespondant().dropMessage(5, "[蘑菇赌场] 你偷回了自己的赌注，蘑菇赌场扣除了你的声望！");
+        BotGameSupport.botSpeak(getChr(), "玩家偷回了赌注，游戏终止。");
         state = BotState.FINISHED;
     }
 
@@ -254,7 +256,7 @@ public class DiceBot extends BotSM {
         int sum = rolls[0] + rolls[1];
         boolean isOdd = sum % 2 != 0;
         boolean playerWins = calculateIfPlayerWins(isOdd);
-        BotGameSupport.botSpeak(getChr(), "Result: [" + rolls[0] + "] [" + rolls[1] + "] - " + (isOdd ? "Han" : "Cho"));
+        BotGameSupport.botSpeak(getChr(), "结果：[" + rolls[0] + "] [" + rolls[1] + "] - " + (isOdd ? "单" : "双"));
         BotGameSupport.botEmote(getChr(), 2);
 
         if (playerWins) {
@@ -285,7 +287,7 @@ public class DiceBot extends BotSM {
             if (!diceBotState.equals(targetState) && System.currentTimeMillis() < endTime) {
                 processMessages();
             } else {
-                BotGameSupport.botSpeak(getChr(), "Please place your bets when you are ready!");
+                BotGameSupport.botSpeak(getChr(), "准备好了就请下注！");
                 state = BotState.FINISHED;
                 resetDiceBotState();
             }
@@ -313,15 +315,15 @@ public class DiceBot extends BotSM {
 
     private void processBet(BetType betType, ChatMessage message) {
         setDiceBotState(DiceBotState.BET);
-        String announcement = String.format("%s bets on %s!",
+        String announcement = String.format("%s 押了%s！",
                 message.getSender().getName(),
-                betType.name());
+                betType == BetType.HAN ? "单" : "双");
         BotGameSupport.botSpeak(getChr(), announcement);
         setBet(betType);
     }
 
     private void handleInvalidBet(ChatMessage message) {
-        BotGameSupport.botSpeak(getChr(), "Please Select Han or Cho!");
+        BotGameSupport.botSpeak(getChr(), "请说 bet han（单）或 bet cho（双）！");
         startTime = System.currentTimeMillis();
         setBet(BetType.NONE);
     }

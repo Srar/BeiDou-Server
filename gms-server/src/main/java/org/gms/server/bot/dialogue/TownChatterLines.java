@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 /**
  * 加载 TownChatterDialogue.yaml：bot 与 bot 之间的有序闲聊对白。
@@ -23,7 +22,6 @@ public final class TownChatterLines {
     private static final String YAML_PATH = "BotDialoguePack/TownChatterDialogue.yaml";
 
     private static volatile List<List<String>> cached;
-    private static final Random RANDOM = new Random();
 
     /** 解析后的 exchanges（首次加载后缓存）。任何解析/IO 失败返回空列表。 */
     public static List<List<String>> exchanges() {
@@ -41,13 +39,24 @@ public final class TownChatterLines {
         return cached;
     }
 
-    /** 一个随机的有序 exchange（>= 2 轮），没有则返回 null。 */
+    /** 每地图记忆的最近段数（池 24 段，排除 6 段后仍有 18 段可选）。 */
+    private static final int RECENT_EXCHANGES = 6;
+
+    /** 一个随机的有序 exchange（>= 2 轮），没有则返回 null（无地图命名空间，共享去重记忆）。 */
     public static List<String> randomExchange() {
+        return randomExchange(-1);
+    }
+
+    /** 每地图命名空间随机取一段，近期说过的不重复（见 {@link RecentLineGuard}）。 */
+    public static List<String> randomExchange(int mapId) {
         List<List<String>> all = exchanges();
         if (all.isEmpty()) {
             return null;
         }
-        return all.get(RANDOM.nextInt(all.size()));
+        String key = "tc:" + mapId;
+        int idx = RecentLineGuard.pickIndex(key, all.size(), RECENT_EXCHANGES, null);
+        RecentLineGuard.remember(key, idx, RECENT_EXCHANGES);
+        return all.get(idx);
     }
 
     @SuppressWarnings("unchecked")

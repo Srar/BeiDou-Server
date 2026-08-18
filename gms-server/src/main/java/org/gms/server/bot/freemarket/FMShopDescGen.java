@@ -48,20 +48,9 @@ public class FMShopDescGen {
         typeToFilePath.put("emojis", filePath_FMNameDesc + "emojiFaces.txt");
     }
 
-    protected static final Map<String, String> ITEM_ACRONYM_MAP = Map.ofEntries(
-            // Gloves
-            Map.entry("Brown Work Glove", "bwg"),
-            Map.entry("Stormcaster Gloves", "scg"),
-
-            // Accessories
-            Map.entry("Pink Adventurer Cape", "pac"),
-            Map.entry("Facestompers", "fs"),
-
-            // Consumables
-            Map.entry("Onyx Apple", "Apples")
-
-            // Armor
-    );
+    // 国服化：原英文物品名缩写映射（Brown Work Glove→bwg 等）在中文 wz 下永不命中，
+    // 且会在英文服输出英文缩写，改为空映射——物品名原样进店招描述。
+    protected static final Map<String, String> ITEM_ACRONYM_MAP = Map.of();
 
     protected static String modifyShopTypeSeperatorText(String currentStr) {
 //        trimTertiaryShopDescription(merchant);
@@ -170,10 +159,10 @@ public class FMShopDescGen {
     }
 
     protected static String getOfferableDescription() {
-        List<String> offerStrings = new ArrayList<>(List.of("L/O", "L/N/O"));
-        offerStrings.add("Offer");
-        offerStrings.add("Leave Offer");
-        offerStrings.add("Buy or Offer");
+        List<String> offerStrings = new ArrayList<>(List.of("带价", "带价来"));
+        offerStrings.add("出价");
+        offerStrings.add("留价");
+        offerStrings.add("可买可换");
         // "H/O", "C/O"
         // Add more dynamically as needed
 
@@ -199,8 +188,8 @@ public class FMShopDescGen {
     protected static String trimColorsFromEquipNames(String str) {
         // Define a list of common color names to remove
         List<String> colors = List.of(
-                "Dark", "Red", "Blue", "Green", "White", "Black",
-                "Purple", "Yellow", "Orange", "Pink", "Silver", "Gold", "Brown"
+                "深色", "红", "蓝", "绿", "白", "黑",
+                "紫", "黄", "橙", "粉", "银", "金", "棕"
         );
 
         // Iterate through the list of colors and remove them from the string
@@ -256,10 +245,10 @@ public class FMShopDescGen {
             if (writeStat) {
                 return (highestStatValue + " " + bestStatName + " " + itemName);
             } else {
-                return ("Godly" + " " + itemName);
+                return ("极品 " + itemName);
             }
         } else {
-            return ("clean " + itemName);
+            return ("干净 " + itemName);
         }
     }
 

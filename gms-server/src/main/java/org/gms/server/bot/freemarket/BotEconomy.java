@@ -161,29 +161,44 @@ public final class BotEconomy {
     }
 
     public static String formatPriceToShorthand(int price, int decimalPlaces) {
-        if (price < 1000) {
+        // 国服化：万/亿中文单位，10000 以下保持纯数字（如 5500 → "5500"）
+        if (price < 10000) {
             return String.valueOf(price);
         }
 
-        final String[] suffixes = {"", "k", "m", "b"};
-        int suffixIndex = 0;
+        String unit;
         double formattedPrice = price;
-
-        while (formattedPrice >= 1000 && suffixIndex < suffixes.length - 1) {
-            formattedPrice /= 1000;
-            suffixIndex++;
+        if (price >= 100_000_000) {
+            unit = "亿";
+            formattedPrice = price / 100_000_000.0;
+        } else {
+            unit = "万";
+            formattedPrice = price / 10000.0;
         }
 
         if (decimalPlaces <= 0) {
-            return Math.round(formattedPrice) + suffixes[suffixIndex];
+            return normalizeWanToYi(Math.round(formattedPrice), unit);
         } else {
             String formatPattern = "%." + decimalPlaces + "f";
             String formatted = String.format(formatPattern, formattedPrice);
             if (formatted.contains(".")) {
                 formatted = formatted.replaceAll("0+$", "").replaceAll("\\.$", "");
             }
-            return formatted + suffixes[suffixIndex];
+            return normalizeWanToYi(Double.parseDouble(formatted), unit);
         }
+    }
+
+    /** 万级数值 >= 10000 时进位到亿（如 9999.9 万 → "1亿"），避免出现 "10000万"。 */
+    private static String normalizeWanToYi(double value, String unit) {
+        if ("万".equals(unit) && value >= 10000.0) {
+            String formatted = String.valueOf(Math.round(value / 10000.0 * 100.0) / 100.0);
+            if (formatted.contains(".")) {
+                formatted = formatted.replaceAll("0+$", "").replaceAll("\\.$", "");
+            }
+            return formatted + "亿";
+        }
+        return (value == Math.floor(value) && !Double.isInfinite(value)
+                ? String.valueOf((long) value) : String.valueOf(value)) + unit;
     }
 
     // ── 市场波动指数（源 FMEconomyManager 的 24h/2h 正弦 + 噪声） ─────────────

@@ -119,24 +119,20 @@ public class SellingMerchantBot extends BotSM {
     }
 
     static String buildSellingMessage(String itemName) {
-        List<String> prefixes = List.of("Selling", "S>", "S>>", "SELL>", "Selling>");
-        List<String> suffixes = List.of("You Offer", "Offer", "Trade Me", "just trade me!", "PM me",
-                "no lowball", "no noobs", "no scammers", "Pros only", "hotties only", "no nx h0es",
-                "baddies only", "no weebs", "English Only", "No Spanish",
-                "serious offers only", "dont waste my time", "legit only", "no time wasters");
+        List<String> prefixes = List.of("卖", "出", "卖>", "出>", "出售", "低价出",
+                "白菜价", "甩卖", "清仓甩", "诚意出", "今天必出", "挂店出");
+        List<String> suffixes = List.of("带价M我", "不黑", "可小刀", "大刀勿扰", "记者勿扰",
+                "骗子勿扰", "先钱后货", "诚心要", "速度交易", "只换金币",
+                "小刀可谈", "压价免谈", "爽快来", "秒回在线", "不换只卖",
+                "问价带价", "别墨迹", "长期卖", "今晚必出", "急出回血",
+                "自用脱手", "东西干净", "价格公道", "先到先得", "当面交易",
+                "老顾客都知道", "自用货", "包真不包退", "可验货", "看上直接交易",
+                "喊价不回", "回血价", "一手货源", "老店放心", "痛快交易",
+                "差不多就出", "价高者得", "挂着就是卖", "好货不多", "手慢无");
 
         String msg = getRandomElement(prefixes) + " " + itemName + " " + getRandomElement(suffixes);
 
-        int fillerCount = Randomizer.nextInt(4);
-        for (int i = 0; i < fillerCount; i++) {
-            msg += " @@@@@@@@";
-        }
-
         msg = msg.replace("[", "").replace("]", "");
-
-        if (Randomizer.nextDouble() < 0.15) {
-            msg = msg.toUpperCase();
-        }
         return msg;
     }
 

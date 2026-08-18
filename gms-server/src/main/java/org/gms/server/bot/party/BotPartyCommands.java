@@ -83,7 +83,7 @@ public class BotPartyCommands {
                 Character inviter = entry.getInviter();
                 if (inviter != null) {
                     inviter.sendPacket(PacketCreator.serverNotice(5, fakechar.getName()
-                            + " couldn't join your party (it was full or disbanded) - try inviting again."));
+                            + " 没能加入你的队伍（队伍满了或已解散），再邀一次试试。"));
                 }
             }
             log.debug("botAcceptPartyInvite: joined={} partyId={}", joined, partyId);
@@ -110,7 +110,7 @@ public class BotPartyCommands {
         // would be misleading - clear the queue entry either way.
         Character inviter = entry.getInviter();
         if (inviter != null && res.result == InviteResultType.DENIED) {
-            inviter.sendPacket(PacketCreator.serverNotice(5, fakechar.getName() + " has declined your party request."));
+            inviter.sendPacket(PacketCreator.serverNotice(5, fakechar.getName() + " 拒绝了你的组队邀请。"));
         }
         log.debug("botRejectPartyInvite: result={} inviter={}", res.result, inviter == null ? "?" : inviter.getName());
         return true;

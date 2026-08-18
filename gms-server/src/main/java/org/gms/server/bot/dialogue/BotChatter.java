@@ -54,7 +54,7 @@ public final class BotChatter {
 
     /** TownChatterDialogue.yaml 无行可加载时的回退对白（闲聊绝不因坏编辑而全静默）。 */
     private static final List<String> FALLBACK_EXCHANGE = List.of(
-            "hey", "hey, how's it going?", "not bad, just hanging around");
+            "嘿", "嘿 最近咋样？", "还行 就随便逛逛", "这图人还不少", "是啊 热闹点好");
 
     // charId -> 参与期限（now + MAX_CHATTER_MS）。超过期限的条目视为陈旧。
     private static final Map<Integer, Long> ENGAGED = new ConcurrentHashMap<>();
@@ -103,7 +103,7 @@ public final class BotChatter {
             return false;
         }
 
-        List<String> exchange = pickExchange();
+        List<String> exchange = pickExchange(me.getMapId());
         if (exchange == null || exchange.size() < 2) {
             return false;
         }
@@ -128,8 +128,8 @@ public final class BotChatter {
         return n;
     }
 
-    private static List<String> pickExchange() {
-        List<String> ex = TownChatterLines.randomExchange();
+    private static List<String> pickExchange(int mapId) {
+        List<String> ex = TownChatterLines.randomExchange(mapId);
         return (ex != null && ex.size() >= 2) ? ex : FALLBACK_EXCHANGE;
     }
 

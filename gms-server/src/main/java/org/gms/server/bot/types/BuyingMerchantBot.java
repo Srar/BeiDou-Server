@@ -119,24 +119,20 @@ public class BuyingMerchantBot extends BotSM {
     }
 
     static String buildBuyingMessage(String itemName, int offerPrice) {
-        List<String> prefixes = List.of("Buying", "B>", "B>>", "BUY>", "Buying>");
-        List<String> suffixes = List.of("Trade Me", "PM me", "just trade me!", "hmu", "whisp me",
-                "no lowball", "no noobs", "no scammers", "Pros only", "hotties only", "no nx h0es",
-                "baddies only", "no weebs", "English Only", "No Spanish",
-                "serious offers only", "dont waste my time", "legit only", "fair price only");
+        List<String> prefixes = List.of("收", "收>", "收购", "长期收", "求", "高价收",
+                "急收", "大量收", "秒收", "诚收", "收收收", "无限收");
+        List<String> suffixes = List.of("带价来", "价格好说", "急收不墨迹", "长期合作", "收完即止",
+                "散人玩家", "自用不收黑货", "有货的密", "在线等", "秒回",
+                "骗子滚", "量大从优", "上门收货", "先货后钱", "价实在",
+                "别来捣乱", "多少都收", "货好加钱", "带价速密", "本人常在",
+                "长期有效", "收的快", "不挑货", "有货别藏", "收满就跑",
+                "快出手的来", "现金交易", "秒结账", "量大加价", "全服收",
+                "什么价都好谈", "货到付款", "在线收", "别囤了", "亏本也收",
+                "收到为止", "欢迎老卖主", "单件也收", "仓库清货的来", "收价美丽");
 
         String msg = getRandomElement(prefixes) + " " + itemName + " " + BotEconomy.formatPriceToShorthand(offerPrice) + " " + getRandomElement(suffixes);
 
-        int fillerCount = Randomizer.nextInt(3);
-        for (int i = 0; i < fillerCount; i++) {
-            msg += " @@@@@@@@";
-        }
-
         msg = msg.replace("[", "").replace("]", "");
-
-        if (Randomizer.nextDouble() < 0.15) {
-            msg = msg.toUpperCase();
-        }
         return msg;
     }
 

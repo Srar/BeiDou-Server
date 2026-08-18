@@ -3,6 +3,7 @@ package org.gms.server.bot.types;
 import lombok.extern.slf4j.Slf4j;
 import org.gms.client.Character;
 import org.gms.server.bot.BotSM;
+import org.gms.server.bot.dialogue.BotDialogueHandler;
 import org.gms.server.bot.event.BotEventBus;
 import org.gms.server.bot.event.EventType;
 import org.gms.server.bot.event.GameEvent;
@@ -11,6 +12,7 @@ import org.gms.server.bot.itempool.GachaFillerSystem;
 import org.gms.server.bot.messaging.ChatMessage;
 import org.gms.server.bot.messaging.MessageQueue;
 import org.gms.server.maps.ReactorDropEntry;
+import org.gms.util.Randomizer;
 
 import java.awt.Point;
 import java.util.Collections;
@@ -22,6 +24,9 @@ import java.util.concurrent.TimeUnit;
 public class GachaBot extends BotSM {
     private GachaBotState gachaBotState = GachaBotState.RESET;
     private List<String> hint = Collections.singletonList(getChr().getName());
+
+    // 摆摊位置喊话小池（国服口语，随机三选一）
+    private static final List<String> POSITION_PROMPTS = List.of("位置摆好了！", "摊子支起来咯！", "就这儿 开抽！");
 
     private long startTime;
     private long endTime;
@@ -65,7 +70,7 @@ public class GachaBot extends BotSM {
     private void setPosition() {
         // Set the bot's main position where it will operate from
         this.basePosition = getChr().getPosition();
-        BotGameSupport.botChatbubble(getChr(), "Position set!");
+        BotGameSupport.botChatbubble(getChr(), POSITION_PROMPTS.get(Randomizer.nextInt(POSITION_PROMPTS.size())));
     }
 
     private void runRoulette() {
@@ -95,11 +100,11 @@ public class GachaBot extends BotSM {
 
     private void reactToReward(String reward) {
         // React based on the reward received
-        String reaction = org.gms.server.bot.dialogue.BotDialogueHandler.getRandomResolvedLine(GachaBot.this, "RewardReaction");
+        String reaction = BotDialogueHandler.getRandomResolvedLine(GachaBot.this, "RewardReaction");
         if (reaction != null && !reaction.isEmpty()) {
             BotGameSupport.botSpeak(getChr(), reaction + " " + reward);
         } else {
-            BotGameSupport.botSpeak(getChr(), "Wow! " + reward);
+            BotGameSupport.botSpeak(getChr(), "哇！" + reward);
         }
     }
 
@@ -176,7 +181,7 @@ public class GachaBot extends BotSM {
 
         // Transition logic
         if (super.hasQueuedEvents()) {
-            System.out.println("Events queued. staying in STAND BY 3");
+            System.out.println("事件已排队，停在 STAND BY 3");
         } else {
             // Move to next appropriate state
             setGachaBotState(GachaBotState.STAND_BY_4);
@@ -202,7 +207,7 @@ public class GachaBot extends BotSM {
     private void handleLevelUpEvent(GameEvent event) {
         BotGameSupport.blockingSleep(1500);
         BotGameSupport.botEmote(getChr(), 2);
-        BotGameSupport.botChatbubble(getChr(), "Ayy Congrats " + resolvePlayerName(event.getSourceCharacterId()) + "!");
+        BotGameSupport.botChatbubble(getChr(), "恭喜 " + resolvePlayerName(event.getSourceCharacterId()) + "！");
         BotGameSupport.blockingSleep(1500);
     }
 

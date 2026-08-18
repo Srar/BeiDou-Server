@@ -11,9 +11,11 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -228,7 +230,13 @@ public class BotDialogueHandler {
 
     public static String getRandomDialogueLine(BotSM botSM, String DialogueNodeName) {
         DialogueConstructor dialog = getDialogueCon(botSM.getDialoguePath(), botSM.getBotType(), DialogueNodeName);
-        return dialog.getDialogue().get(Randomizer.nextInt(dialog.getDialogue().size()));
+        if (dialog == null || dialog.getDialogue().isEmpty()) {
+            return null;
+        }
+        List<String> lines = dialog.getDialogue();
+        int idx = RecentLineGuard.pickIndex(guardKey(botSM.getChr()), lines.size(), RecentLineGuard.DEFAULT_RECENT, null);
+        RecentLineGuard.remember(guardKey(botSM.getChr()), idx, RecentLineGuard.DEFAULT_RECENT);
+        return lines.get(idx);
     }
 
     /**
@@ -252,19 +260,26 @@ public class BotDialogueHandler {
         List<String> lines = dialog.getDialogue();
         int n = lines.size();
         int tries = Math.min(CONTEXT_REROLLS, n);
+        String key = guardKey(speaker);
+        Set<Integer> tried = new HashSet<>();
         for (int attempt = 0; attempt < tries; attempt++) {
-            String raw = lines.get(Randomizer.nextInt(n));
+            int idx = RecentLineGuard.pickIndex(key, n, RecentLineGuard.DEFAULT_RECENT, tried);
+            tried.add(idx);
+            String raw = lines.get(idx);
             if (!DialogueContextResolver.hasTokens(raw)) {
+                RecentLineGuard.remember(key, idx, RecentLineGuard.DEFAULT_RECENT);
                 return raw;
             }
             Optional<String> filled = DialogueContextResolver.fill(raw, speaker, player);
             if (filled.isPresent()) {
+                RecentLineGuard.remember(key, idx, RecentLineGuard.DEFAULT_RECENT);
                 return filled.get();
             }
         }
-        for (String line : lines) {
-            if (!DialogueContextResolver.hasTokens(line)) {
-                return line;
+        for (int i = 0; i < n; i++) {
+            if (!DialogueContextResolver.hasTokens(lines.get(i))) {
+                RecentLineGuard.remember(key, i, RecentLineGuard.DEFAULT_RECENT);
+                return lines.get(i);
             }
         }
         return null;
@@ -281,8 +296,10 @@ public class BotDialogueHandler {
         if (dialog == null || dialog.getDialogue().isEmpty()) {
             return;
         }
-        int idx = Randomizer.nextInt(dialog.getDialogue().size());
+        String key = guardKey(character);
+        int idx = RecentLineGuard.pickIndex(key, dialog.getDialogue().size(), RecentLineGuard.DEFAULT_RECENT, null);
         String randomText = dialog.getDialogue().get(idx);
+        RecentLineGuard.remember(key, idx, RecentLineGuard.DEFAULT_RECENT);
         runDialogue(character, dialog, Collections.singletonList(randomText), dialog.getEmoteForIndex(idx));
     }
 
@@ -303,21 +320,27 @@ public class BotDialogueHandler {
         List<String> lines = dialog.getDialogue();
         int n = lines.size();
         int tries = Math.min(CONTEXT_REROLLS, n);
+        String key = guardKey(character);
+        Set<Integer> tried = new HashSet<>();
         for (int attempt = 0; attempt < tries; attempt++) {
-            int idx = Randomizer.nextInt(n);
+            int idx = RecentLineGuard.pickIndex(key, n, RecentLineGuard.DEFAULT_RECENT, tried);
+            tried.add(idx);
             String raw = lines.get(idx);
             if (!DialogueContextResolver.hasTokens(raw)) {
+                RecentLineGuard.remember(key, idx, RecentLineGuard.DEFAULT_RECENT);
                 runDialogue(character, dialog, Collections.singletonList(raw), dialog.getEmoteForIndex(idx));
                 return;
             }
             Optional<String> filled = DialogueContextResolver.fill(raw, character, player);
             if (filled.isPresent()) {
+                RecentLineGuard.remember(key, idx, RecentLineGuard.DEFAULT_RECENT);
                 runDialogue(character, dialog, Collections.singletonList(filled.get()), dialog.getEmoteForIndex(idx));
                 return;
             }
         }
         for (int i = 0; i < n; i++) {
             if (!DialogueContextResolver.hasTokens(lines.get(i))) {
+                RecentLineGuard.remember(key, i, RecentLineGuard.DEFAULT_RECENT);
                 runDialogue(character, dialog, Collections.singletonList(lines.get(i)), dialog.getEmoteForIndex(i));
                 return;
             }
@@ -357,20 +380,39 @@ public class BotDialogueHandler {
             return false;
         }
         int tries = Math.min(CONTEXT_REROLLS, pool.size());
+        String key = guardKey(character);
+        Set<Integer> tried = new HashSet<>();
         for (int attempt = 0; attempt < tries; attempt++) {
-            int idx = pool.get(Randomizer.nextInt(pool.size()));
+            int localIdx = RecentLineGuard.pickIndex(key, pool.size(), RecentLineGuard.DEFAULT_RECENT, tried);
+            tried.add(localIdx);
+            int idx = pool.get(localIdx);
             String raw = lines.get(idx);
             if (!DialogueContextResolver.hasTokens(raw)) {
+                RecentLineGuard.remember(key, idx, RecentLineGuard.DEFAULT_RECENT);
                 runDialogue(character, dialog, Collections.singletonList(raw), dialog.getEmoteForIndex(idx));
                 return true;
             }
             Optional<String> filled = DialogueContextResolver.fill(raw, character, player);
             if (filled.isPresent()) {
+                RecentLineGuard.remember(key, idx, RecentLineGuard.DEFAULT_RECENT);
                 runDialogue(character, dialog, Collections.singletonList(filled.get()), dialog.getEmoteForIndex(idx));
                 return true;
             }
         }
+        for (int i = 0; i < pool.size(); i++) {
+            int idx = pool.get(i);
+            if (!DialogueContextResolver.hasTokens(lines.get(idx))) {
+                RecentLineGuard.remember(key, idx, RecentLineGuard.DEFAULT_RECENT);
+                runDialogue(character, dialog, Collections.singletonList(lines.get(idx)), dialog.getEmoteForIndex(idx));
+                return true;
+            }
+        }
         return false;
+    }
+
+    /** RecentLineGuard 记忆 key：每 bot 一个命名空间（跨节点不重复）。 */
+    private static String guardKey(Character chr) {
+        return "bh:" + (chr != null ? chr.getId() : -1);
     }
 
     /** 刻意的同步编排（标准情形）：按 YAML 配置的时长阻塞，使 executeBotDialogue* 调用方保持顺序。 */

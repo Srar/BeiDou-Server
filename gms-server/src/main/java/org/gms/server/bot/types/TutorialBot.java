@@ -273,16 +273,28 @@ public class TutorialBot extends BotSM {
         }
     }
 
+    /** 中文否定词组识别：只匹配完整否定词，避免「不错」「不好意思」误命中。 */
+    private static boolean containsNegation(String content) {
+        String[] negations = {"不想", "不用", "不要", "不了", "不去", "不玩", "不买", "不需要", "算了吧"};
+        for (String n : negations) {
+            if (content.contains(n)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void handleInquiryResponse(String content) {
-        if (content.contains("yes")) {
-            runTutorial = true;
-        } else if (content.contains("no")) {
+        // 触发词识别：保留英文 yes/no 兼容老玩家，扩展中文；先判否定（词组级，避免「不错」误命中）
+        if (content.contains("no") || content.contains("否") || containsNegation(content)) {
             runTutorial = false;
+        } else if (content.contains("yes") || content.contains("是")) {
+            runTutorial = true;
         }
     }
 
     private void handleSelectedHat(String itemName, Integer itemIdSelected) {
-        BotSpeak(getChr(), String.format("You've selected %s! Enjoy it!", itemName));
+        BotSpeak(getChr(), String.format("你选的是 %s！收好咯！", itemName));
         tutPicked = true;
         int[] leftoverHats = Arrays.stream(items).filter(item -> item != itemIdSelected).toArray();
         BotTiming.after(2500, () -> lootLeftoverHats(leftoverHats));
@@ -300,7 +312,7 @@ public class TutorialBot extends BotSM {
             }
         }
         // If no matching item is found
-        BotSpeak(getChr(), "Did you type the name in correctly?");
+        BotSpeak(getChr(), "名字打对了吗？再检查一下");
         BotEmote(getChr(), 6);
     }
 
@@ -323,16 +335,17 @@ public class TutorialBot extends BotSM {
     }
 
     private void handleAdminResponse(String content) {
-        if (content.contains("yes")) {
-            wantsAdmin = true;
-        } else if (content.contains("no")) {
+        // 触发词识别：保留英文 yes/no 兼容老玩家，扩展中文；先判否定（词组级，避免「不错」误命中）
+        if (content.contains("no") || content.contains("否") || containsNegation(content)) {
             wantsAdmin = false;
+        } else if (content.contains("yes") || content.contains("是")) {
+            wantsAdmin = true;
         }
     }
 
     private void askAdmin() {
         getDialogueHandler().executeBotDialogue("AskAdmin", TutorialBot.this);
-        hint = List.of("Yes", "No");
+        hint = List.of("是", "否");
         displayCommands(getInteractors().getRespondant());
         startTime = System.currentTimeMillis();
         endTime = startTime + (30 * 1000);
@@ -387,7 +400,7 @@ public class TutorialBot extends BotSM {
         }
         if (System.currentTimeMillis() > endTime) {
             BotTradeCommands.cancelTrade(getChr());
-            BotSpeak(getChr(), "No worries, the gifts will be waiting for you next time.");
+            BotSpeak(getChr(), "没事 礼物下次还在 随时来找我");
             setTutorialBotState(TutorialBotState.TUTORIAL_1);
             return false;
         }
@@ -402,7 +415,7 @@ public class TutorialBot extends BotSM {
         BotTiming.chain()
                 .stopUnless(() -> getChr().getTrade() != null)
                 .pause(1000)
-                .run(() -> BotTradeCommands.writeTradeChat(getChr(), "Here are some goodies to get you started!"))
+                .run(() -> BotTradeCommands.writeTradeChat(getChr(), "一点新手礼 拿去起步用！"))
                 .pause(1500)
                 .run(() -> BotTradeCommands.setMeso(getChr(), TRADE_MESOS))
                 .pause(500)
@@ -418,7 +431,7 @@ public class TutorialBot extends BotSM {
                 .pause(300)
                 .run(() -> BotTradeCommands.addCleanEquipToTrade(getChr(), robeId, 6))
                 .pause(500)
-                .run(() -> BotTradeCommands.writeTradeChat(getChr(), "1B mesos, potions, scrolls, stars, and gear. All yours!"))
+                .run(() -> BotTradeCommands.writeTradeChat(getChr(), "10亿金币 药水 卷轴 飞镖和装备 都是你的！"))
                 .pause(1000)
                 .run(() -> BotTradeCommands.confirmTrade(getChr()))
                 .start();
@@ -440,7 +453,7 @@ public class TutorialBot extends BotSM {
 
     private void inquirePlayer() {
         getDialogueHandler().executeBotDialogue("Inquiry", TutorialBot.this);
-        hint = List.of("Yes", "No");
+        hint = List.of("是", "否");
         displayCommands(getInteractors().getRespondant());
         startTime = System.currentTimeMillis();
         endTime = startTime + (20 * 1000);
@@ -450,7 +463,7 @@ public class TutorialBot extends BotSM {
         if (System.currentTimeMillis() < endTime) {
             processMessages();
         } else {
-            BotSpeak(getChr(), "Talk to me again if you're ready.");
+            BotSpeak(getChr(), "准备好了再来跟我说一声");
             state = BotState.FINISHED;
             resetTutorialBotState();
         }

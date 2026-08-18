@@ -215,7 +215,7 @@ public final class BotGeneration {
 
         bot.setClient(BotClientHolder.getBotClient(world, channel));
         bot.setId(botId);
-        bot.setName("Console");
+        bot.setName("控制台");
         bot.setLevel(69);
         bot.setJob(Job.getById(420));
         bot.setFame(999); // 调试标记：对齐源的 fame=botId(999)

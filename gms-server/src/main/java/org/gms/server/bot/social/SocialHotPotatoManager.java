@@ -11,6 +11,7 @@ import org.gms.server.bot.BotSM;
 import org.gms.server.bot.BotStorage;
 import org.gms.server.bot.BotTiming;
 import org.gms.server.bot.dialogue.BotDialogueHandler;
+import org.gms.server.bot.dialogue.RecentLineGuard;
 import org.gms.server.bot.dialogue.ConversationManager;
 import org.gms.server.bot.gcmove.GCMovement;
 import org.gms.server.bot.town.TownPresenceConfig;
@@ -300,13 +301,20 @@ public class SocialHotPotatoManager {
 
     // --- Dialogue loading ---
 
+    /** 每对话包+分类记忆的最近条数（分类池 67-124 行，排除 10 条后仍充足）。 */
+    private static final int RECENT_LINES = 10;
+
     private String getRandomLine(String dialoguePath, String botType, String category) {
         try {
             BotDialogueHandler.DialogueConstructor dialog =
                     BotDialogueHandler.getDialogueCon(dialoguePath, botType, category);
             if (dialog == null || dialog.getDialogue().isEmpty()) return null;
             List<String> lines = dialog.getDialogue();
-            return lines.get(random.nextInt(lines.size()));
+            String key = "hp:" + dialoguePath + ":" + category;
+            int idx = RecentLineGuard.pickIndex(key, lines.size(), RECENT_LINES, null);
+            String line = lines.get(idx);
+            RecentLineGuard.remember(key, idx, RECENT_LINES);
+            return line;
         } catch (Exception e) {
             log.debug("SocialHotPotatoManager failed to load dialogue '{}'", dialoguePath, e);
             return null;

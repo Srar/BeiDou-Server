@@ -108,18 +108,18 @@ public class BlackjackRules {
 
         switch (outcome) {
             case LOSE:
-                if (playerValue > 21) return playerName + ": Busted.";
-                if (isBlackjack(dealerHand)) return playerName + ": Lose. Dealer Blackjack.";
-                return playerName + ": Lose. Dealer wins.";
+                if (playerValue > 21) return playerName + ": 爆牌了。";
+                if (isBlackjack(dealerHand)) return playerName + ": 输了。庄家 21 点。";
+                return playerName + ": 输了。庄家胜。";
             case WIN:
-                if (dealerValue > 21) return playerName + ": Win! Dealer busts.";
-                return playerName + ": Win!";
+                if (dealerValue > 21) return playerName + ": 赢啦！庄家爆了。";
+                return playerName + ": 赢啦！";
             case BLACKJACK_WIN:
-                return playerName + ": Blackjack!";
+                return playerName + ": 21 点！";
             case PUSH:
-                return playerName + ": Push.";
+                return playerName + ": 平局。";
             default:
-                return playerName + ": Unexpected result.";
+                return playerName + ": 意外结果。";
         }
     }
 }

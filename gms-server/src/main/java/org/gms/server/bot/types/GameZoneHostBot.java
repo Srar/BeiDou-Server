@@ -28,9 +28,13 @@ public class GameZoneHostBot extends BotSM {
     private static final int DRINK_COKE = 2020031;
     private static final int DRINK_WATER = 2022000;
     private static final int DRINK_ELIXIR = 2000012;
+    private static final int DRINK_SODA = 2001001;   // 棒棒冰
+    private static final int DRINK_PEACH = 2022146;  // 蟠桃汁
+    private static final int DRINK_ENERGY = 2022195; // 枫糖水
 
-    private static final String[] DRINK_NAMES = {"Coke", "Water", "Elixir"};
-    private static final int[] DRINK_IDS = {DRINK_COKE, DRINK_WATER, DRINK_ELIXIR};
+    // 国服饮品名（与 wz 实际道具名一致，与 DRINK_IDS 一一对应）
+    private static final String[] DRINK_NAMES = {"可口可乐", "矿泉水", "特殊药水", "棒棒冰", "蟠桃汁", "枫糖水"};
+    private static final int[] DRINK_IDS = {DRINK_COKE, DRINK_WATER, DRINK_ELIXIR, DRINK_SODA, DRINK_PEACH, DRINK_ENERGY};
 
     private List<String> hint;
 
@@ -192,7 +196,7 @@ public class GameZoneHostBot extends BotSM {
 
     private void offerDrink() {
         getDialogueHandler().executeBotDialogue("DrinkOffer", GameZoneHostBot.this);
-        hint = List.of("Yes", "No");
+        hint = List.of("是", "否");
         displayCommands(getInteractors().getRespondant());
         startTimer(20_000);
     }
@@ -240,7 +244,7 @@ public class GameZoneHostBot extends BotSM {
         if (System.currentTimeMillis() < endTime) {
             processMessages();
         } else {
-            BotGameSupport.botSpeak(getChr(), "Talk to me again if you're ready.");
+            BotGameSupport.botSpeak(getChr(), "准备好了再跟我说一声！");
             state = BotState.FINISHED;
             resetHostBotState();
         }
@@ -277,27 +281,27 @@ public class GameZoneHostBot extends BotSM {
     }
 
     private void handleDrinkOfferResponse(String content) {
-        if (content.contains("yes")) {
+        if (content.contains("yes") || content.contains("是")) {
             drinkAccepted = true;
-        } else if (content.contains("no")) {
+        } else if (content.contains("no") || content.contains("否")) {
             drinkAccepted = false;
         }
     }
 
     private void handleDrinkPickResponse(String content) {
         // Ignore stale yes/no from the previous drink offer phase
-        if (content.contains("yes") || content.contains("no")) {
+        if (content.contains("yes") || content.contains("no") || content.contains("是") || content.contains("否")) {
             return;
         }
         for (int i = 0; i < DRINK_NAMES.length; i++) {
             if (content.contains(DRINK_NAMES[i].toLowerCase())) {
                 selectedDrink = DRINK_IDS[i];
-                BotGameSupport.botSpeak(getChr(), String.format("One %s, coming right up!", DRINK_NAMES[i]));
+                BotGameSupport.botSpeak(getChr(), String.format("来啦！一杯%s，马上就来！", DRINK_NAMES[i]));
                 waitFor(2000); // beat before SERVE_DRINK ticks
                 return;
             }
         }
-        BotGameSupport.botSpeak(getChr(), "Hmm, I don't have that. Try again!");
+        BotGameSupport.botSpeak(getChr(), "嗯……这个咱没有，换一个试试！");
         BotGameSupport.botEmote(getChr(), 6);
     }
 }

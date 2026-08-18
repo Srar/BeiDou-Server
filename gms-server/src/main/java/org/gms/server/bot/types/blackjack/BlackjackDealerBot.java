@@ -8,6 +8,7 @@ import org.gms.server.bot.BotHelpers;
 import org.gms.server.bot.BotLogic;
 import org.gms.server.bot.BotSM;
 import org.gms.server.bot.BotTiming;
+import org.gms.util.Randomizer;
 import org.gms.server.bot.dialogue.BotDialogueHandler;
 import org.gms.server.bot.gcmove.GCMovement;
 import org.gms.server.bot.messaging.ChatMessage;
@@ -44,6 +45,9 @@ public class BlackjackDealerBot extends BotSM {
     private static final int AI_BET_QTY = 5;
 
     private static final int[] DEALER_OUTFIT = {1042129, 1060001, 1072010, 1702099};
+
+    // 下注喊话小池（庄家轮流喊，国服赌桌口语）
+    private static final List<String> BET_PROMPTS = List.of("请下注！", "下注啦 买定离手！", "要下注的抓紧咯！");
 
     public BlackjackDealerBot(Character character) {
         super(character);
@@ -138,7 +142,7 @@ public class BlackjackDealerBot extends BotSM {
         if (firstTick) {
             table.resetForNewRound();
             if (!table.hasEnoughPlayers()) {
-                BotGameSupport.botChatbubble(getChr(), "Waiting for Players to join table..");
+                BotGameSupport.botChatbubble(getChr(), "等人上桌…");
             }
         }
         if (table.hasEnoughPlayers()) {
@@ -151,7 +155,7 @@ public class BlackjackDealerBot extends BotSM {
     private void handleBetting() {
         if (bettingDeadline == 0) {
             dprint("BETTING: requesting bets from " + (table.getPlayerCount() - 1) + " player(s)");
-            BotGameSupport.botChatbubble(getChr(), "Please Place your Bets!");
+            BotGameSupport.botChatbubble(getChr(), BET_PROMPTS.get(Randomizer.nextInt(BET_PROMPTS.size())));
             triggerArtificialPlayerBets();
             bettingDeadline = System.currentTimeMillis() + 10_000;
             return;
@@ -176,7 +180,7 @@ public class BlackjackDealerBot extends BotSM {
         }
 
         if (table.hasAtLeastOneBet() && table.getWaitCount() > 1) {
-            BotGameSupport.botChatbubble(getChr(), "All bets are closed. Let's Begin.");
+            BotGameSupport.botChatbubble(getChr(), "下注结束 开局！");
             table.setPhase(BlackjackTable.Phase.DEALING);
         } else {
             table.setPhase(BlackjackTable.Phase.BETTING);
@@ -186,7 +190,7 @@ public class BlackjackDealerBot extends BotSM {
     private void handleDealing() {
         dprint("DEALING: dealing initial cards");
         dealCardsToAllPlayers();
-        BotGameSupport.botSpeak(getChr(), "My card: " + table.getDealer().getHandValue() + ".");
+        BotGameSupport.botSpeak(getChr(), "我的牌：" + table.getDealer().getHandValue() + "。");
         table.setPhase(BlackjackTable.Phase.PLAYER_TURNS);
     }
 
@@ -226,7 +230,7 @@ public class BlackjackDealerBot extends BotSM {
         }
 
         faceTowards(currentPlayer.getCharacter());
-        BotGameSupport.botSpeak(getChr(), playerName + ": " + handValue + ". What will you do?");
+        BotGameSupport.botSpeak(getChr(), playerName + "：" + handValue + " 要牌还是停牌？");
         if (!BotHelpers.isBot(currentPlayer.getCharacter())) {
             showPlayerActionHint(currentPlayer.getCharacter());
         }
@@ -238,7 +242,7 @@ public class BlackjackDealerBot extends BotSM {
         dprint("BUST: " + name + " handValue=" + handValue + " hand=" + player.getHand());
         player.setResponseStatus("RESPONDED");
         player.setStatus(BlackjackPlayer.PlayerStatus.BUST);
-        BotGameSupport.botSpeak(getChr(), name + ": " + handValue + " Too Many.");
+        BotGameSupport.botSpeak(getChr(), name + "：" + handValue + " 爆啦。");
         triggerAIPlayerReaction(player, "PlayerBust");
 
         Character kicked = lootLoserBets(player);
@@ -321,7 +325,7 @@ public class BlackjackDealerBot extends BotSM {
     // (each card changes the next decision), so the dealing rhythm blocks this
     // bot's own tick - a chain can't express it and nothing else is held up.
     private void handleDealerTurn() {
-        BotGameSupport.botSpeak(getChr(), "My Turn.");
+        BotGameSupport.botSpeak(getChr(), "轮到我了。");
         BlackjackPlayer dealer = table.getDealer();
 
         int handValue = dealer.getHandValue();
@@ -336,10 +340,10 @@ public class BlackjackDealerBot extends BotSM {
 
         BotGameSupport.botSpeak(getChr(), handValue + ".");
         if (handValue > 21) {
-            BotGameSupport.botSpeak(getChr(), "Too many. I Bust.");
+            BotGameSupport.botSpeak(getChr(), "爆了 我爆了。");
             triggerDealerReaction("DealerLoss");
         } else if (handValue == 21) {
-            BotGameSupport.botSpeak(getChr(), "21 for me :P");
+            BotGameSupport.botSpeak(getChr(), "我也是 21 哈哈");
             BotGameSupport.botEmote(getChr(), 3);
         }
 
@@ -406,7 +410,7 @@ public class BlackjackDealerBot extends BotSM {
                         int delay = staggerDelay;
                         boolean blackjackBonus = player.getResult() == BlackjackPlayer.HandResult.BLACKJACK_WIN;
                         BotTiming.after(delay, () -> payWinner(player, blackjackBonus));
-                        staggerDelay += 2000 + org.gms.util.Randomizer.nextInt(1500);
+                        staggerDelay += 2000 + Randomizer.nextInt(1500);
                     } else {
                         Character kicked = payoutOrCollect(player);
                         if (kicked != null) toKick.add(kicked);
@@ -433,7 +437,7 @@ public class BlackjackDealerBot extends BotSM {
 
         // All payouts settled — now safe to clean up cards and start the next round.
         cleanupAllCards();
-        BotGameSupport.botChatbubble(getChr(), "Let's go again.");
+        BotGameSupport.botChatbubble(getChr(), "再来一局。");
         payoutsIssued = false;
         table.setPhase(BlackjackTable.Phase.WAITING);
     }
@@ -508,7 +512,7 @@ public class BlackjackDealerBot extends BotSM {
             }
             Character chr = player.getCharacter();
             if (chr.getMapId() != getChr().getMapId()) {
-                BotGameSupport.botSpeak(getChr(), chr.getName() + " has left the map.");
+                BotGameSupport.botSpeak(getChr(), chr.getName() + " 离开地图了。");
                 toKick.add(chr);
                 continue;
             }
@@ -519,7 +523,7 @@ public class BlackjackDealerBot extends BotSM {
                     + " found " + items.size() + " stamp item(s)");
 
             if (items.isEmpty()) {
-                BotGameSupport.botChatbubble(getChr(), "No Bet detected for: " + chr.getName());
+                BotGameSupport.botChatbubble(getChr(), "没看到下注：" + chr.getName());
                 if (player.skipHand()) {
                     dprint("BET_SCAN: kicking " + chr.getName() + " (3 skips)");
                     toKick.add(chr);
@@ -577,20 +581,20 @@ public class BlackjackDealerBot extends BotSM {
                     Point center = new Point(player.getOriginLocation());
                     center = BotGameSupport.adjustCenterPositionXAxis(center, i, 2, 4, 20);
                     BotGameSupport.botThrowItemToOwner(getChr(), mapItem.getItemId(), center, player.getCharacter());
-                    BotGameSupport.blockingSleep(100 + org.gms.util.Randomizer.nextInt(75));
+                    BotGameSupport.blockingSleep(100 + Randomizer.nextInt(75));
                 }
             }
             player.setBetsProcessed(true);
 
             if (isAI) {
-                BotGameSupport.blockingSleep(2000 + org.gms.util.Randomizer.nextInt(1500));
+                BotGameSupport.blockingSleep(2000 + Randomizer.nextInt(1500));
                 double lootRadius = 1500;
                 List<MapObject> betsOnFloor = BotLogic.readPlayersBetsStamps(
                         player.getCharacter(), player.getOriginLocation(), lootRadius);
                 if (!betsOnFloor.isEmpty()) {
                     for (MapObject lootItem : betsOnFloor) {
                         BotGameSupport.lootItemListOnFloor(player.getCharacter(), List.of(lootItem));
-                        BotGameSupport.blockingSleep(200 + org.gms.util.Randomizer.nextInt(300));
+                        BotGameSupport.blockingSleep(200 + Randomizer.nextInt(300));
                     }
                 }
             }
@@ -614,8 +618,8 @@ public class BlackjackDealerBot extends BotSM {
 
         // Fame penalty for stealing bets
         chr.setFame(chr.getFame() - 10);
-        chr.dropMessage(5, "[Mushroom Casino] You have stolen your bets. You have been defamed by the Mushroom Casino.");
-        BotGameSupport.botSpeak(getChr(), "Player has stolen back his bet.");
+        chr.dropMessage(5, "[蘑菇赌场] 你偷回了自己的赌注 已被本赌场降低名誉！");
+        BotGameSupport.botSpeak(getChr(), "有人把赌注偷回去了。");
         lootPlayerCards(player);
         return chr;
     }
@@ -651,7 +655,7 @@ public class BlackjackDealerBot extends BotSM {
             int delay = 1250 + stagger;
             BotTiming.after(delay, () ->
                 BotGameSupport.botDropItemQtyOwnerOnly(botChr, AI_BET_ITEM, AI_BET_QTY));
-            stagger += 1500 + org.gms.util.Randomizer.nextInt(2000);
+            stagger += 1500 + Randomizer.nextInt(2000);
         }
     }
 
@@ -671,8 +675,8 @@ public class BlackjackDealerBot extends BotSM {
                 BotDialogueHandler.getDialogueCon(dialoguePath, botType, dialogueNode);
         if (dialog == null) return;
         BotGameSupport.botEmote(player.getCharacter(), dialog.getEmote());
-        if (org.gms.util.Randomizer.nextDouble() < 0.30) {
-            String line = dialog.getDialogue(org.gms.util.Randomizer.nextInt(dialog.getDialogue().size()));
+        if (Randomizer.nextDouble() < 0.30) {
+            String line = dialog.getDialogue(Randomizer.nextInt(dialog.getDialogue().size()));
             BotGameSupport.botSpeak(player.getCharacter(), line);
         }
     }
@@ -682,8 +686,8 @@ public class BlackjackDealerBot extends BotSM {
                 BotDialogueHandler.getDialogueCon(dialoguePath, botType, dialogueNode);
         if (dialog == null) return;
         BotGameSupport.botEmote(getChr(), dialog.getEmote());
-        if (org.gms.util.Randomizer.nextDouble() < 0.55) {
-            String line = dialog.getDialogue(org.gms.util.Randomizer.nextInt(dialog.getDialogue().size()));
+        if (Randomizer.nextDouble() < 0.55) {
+            String line = dialog.getDialogue(Randomizer.nextInt(dialog.getDialogue().size()));
             BotGameSupport.botSpeak(getChr(), line);
         }
     }
@@ -694,7 +698,7 @@ public class BlackjackDealerBot extends BotSM {
         if (BotHelpers.isBot(player.getCharacter())) {
             Character botChr = player.getCharacter();
             int handValue = player.getHandValue();
-            BotTiming.after(1250 + org.gms.util.Randomizer.nextInt(1500), () -> {
+            BotTiming.after(1250 + Randomizer.nextInt(1500), () -> {
                 String decision = BlackjackAI.hitOrStand(handValue);
                 dprint("AI_DECISION " + botChr.getName() + " handValue="
                         + handValue + " -> " + decision);
@@ -705,7 +709,7 @@ public class BlackjackDealerBot extends BotSM {
 
                 String spokenLine = decision;
                 if (dialog != null && !dialog.getDialogue().isEmpty()) {
-                    spokenLine = dialog.getDialogue(org.gms.util.Randomizer.nextInt(dialog.getDialogue().size()));
+                    spokenLine = dialog.getDialogue(Randomizer.nextInt(dialog.getDialogue().size()));
                     int emote = dialog.getEmote();
                     if (emote > 0) {
                         BotGameSupport.botEmote(botChr, emote);
@@ -730,7 +734,7 @@ public class BlackjackDealerBot extends BotSM {
 
     private void waitForResponse(BlackjackPlayer player) {
         if (!BotHelpers.isBot(player.getCharacter()) && player.getCharacter().getMapId() != getChr().getMapId()) {
-            BotGameSupport.botSpeak(getChr(), player.getName() + " has left. Automatic Stand.");
+            BotGameSupport.botSpeak(getChr(), player.getName() + " 离开了 自动停牌。");
             player.setResponseStatus("RESPONDED");
             player.setStatus(BlackjackPlayer.PlayerStatus.STAND);
             return;
@@ -740,12 +744,12 @@ public class BlackjackDealerBot extends BotSM {
 
         if (System.currentTimeMillis() >= endTime) {
             if (finalDecision) {
-                BotGameSupport.botSpeak(getChr(), "No response from " + player.getName() + ". Automatic Stand.");
+                BotGameSupport.botSpeak(getChr(), player.getName() + " 没回应 自动停牌。");
                 player.setResponseStatus("RESPONDED");
                 player.setStatus(BlackjackPlayer.PlayerStatus.STAND);
                 finalDecision = false;
             } else {
-                BotGameSupport.botSpeak(getChr(), "Please Make a decision " + player.getName());
+                BotGameSupport.botSpeak(getChr(), "快做决定 " + player.getName());
                 if (!BotHelpers.isBot(player.getCharacter())) {
                     showPlayerActionHint(player.getCharacter());
                 }
@@ -802,7 +806,7 @@ public class BlackjackDealerBot extends BotSM {
                 Character sender = message.getSender();
 
                 if (isAlreadyAtTable(sender)) {
-                    sender.yellowMessage("You are already at the table.");
+                    sender.yellowMessage("你已经上桌了。");
                     return;
                 }
 
@@ -813,10 +817,10 @@ public class BlackjackDealerBot extends BotSM {
                 if (added) {
                     getInteractors().removeInquirer(sender);
                     getInteractors().setRespondant(sender);
-                    BotGameSupport.botChatbubble(getChr(), sender.getName() + " has joined the table.");
-                    sender.yellowMessage("You have joined " + getChr().getName() + "'s Blackjack table. You will be in the next round.");
+                    BotGameSupport.botChatbubble(getChr(), sender.getName() + " 上桌了。");
+                    sender.yellowMessage("你加入了 " + getChr().getName() + " 的 21 点牌桌 下一局开始。");
                 } else {
-                    sender.yellowMessage("Table is full.");
+                    sender.yellowMessage("桌子满了。");
                 }
             }
         } catch (Exception e) {

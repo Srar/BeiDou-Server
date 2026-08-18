@@ -455,7 +455,7 @@ public class OPQBot extends BotSM {
         if (!found.isEmpty()) {
             BotGameSupport.lootItemListOnFloor(getChr(), found);
             cloudPiecesLooted += 1;
-            BotGameSupport.botChatbubble(getChr(), "Cloud Pieces: " + cloudPiecesLooted);
+            BotGameSupport.botChatbubble(getChr(), "云朵碎片：" + cloudPiecesLooted);
         }
         waitFor(800); // loot beat before NAVIGATE ticks
 
@@ -476,7 +476,7 @@ public class OPQBot extends BotSM {
         int cloudCount = cloudPiecesLooted;
         debugLogf("handleStage1DropItems: cloudCount=" + cloudCount + " pos=" + getChr().getPosition());
         if (cloudCount > 0) {
-            BotGameSupport.botSpeak(getChr(), "Dropping " + cloudCount + " cloud" + (cloudCount == 1 ? "" : "s") + "!");
+            BotGameSupport.botSpeak(getChr(), "扔 " + cloudCount + " 朵云！");
             BotTiming.after(400, () ->
                     BotGameSupport.botThrowItemQty(getChr(), OPQConstants.CLOUD_PIECE, cloudCount, getChr().getPosition()));
             waitFor(800); // hold WAIT until the throw lands
@@ -570,7 +570,7 @@ public class OPQBot extends BotSM {
 
         // Chat which box we're going for (ordinal based on sorted position right-to-left)
         String ordinal = orchestrator.getBoxOrdinal(reactorOid);
-        BotGameSupport.botSpeak(getChr(), "I'll get the " + ordinal + " box!");
+        BotGameSupport.botSpeak(getChr(), "我去拿 " + boxOrdinalZh(ordinal) + " 号箱子！");
 
         Point reactorPos = reactor.getPosition();
         double dx = Math.abs(getChr().getPosition().getX() - reactorPos.getX());
@@ -664,7 +664,7 @@ public class OPQBot extends BotSM {
         debugLogf("handleStage2Loot: lootedRecordItemId=" + lootedRecordItemId
                 + " floorHits=" + found.size());
         if (lootedRecordItemId > 0) {
-            BotGameSupport.botChatbubble(getChr(), "Got a record!");
+            BotGameSupport.botChatbubble(getChr(), "破纪录啦！");
         }
         waitFor(800); // loot beat before RETURN ticks
 
@@ -683,7 +683,7 @@ public class OPQBot extends BotSM {
 
     private void handleStage2DropItems() {
         if (lootedRecordItemId > 0) {
-            BotGameSupport.botSpeak(getChr(), "Dropping my record!");
+            BotGameSupport.botSpeak(getChr(), "扔出我的唱片！");
             int recordId = lootedRecordItemId;
             BotTiming.after(400, () ->
                     BotGameSupport.botThrowItem(getChr(), recordId, getChr().getPosition()));
@@ -938,6 +938,18 @@ public class OPQBot extends BotSM {
             return;
         }
         log.info("[OPQBot " + getChr().getName() + " " + opqBotState + "] " + msg);
+    }
+
+    /**
+     * 把箱子序数标签转成中文数字表达（OPQConstants 里存的是 "1st"~"7th" 英文序数）。
+     */
+    private String boxOrdinalZh(String ordinal) {
+        return switch (ordinal) {
+            case "1st" -> "1";
+            case "2nd" -> "2";
+            case "3rd" -> "3";
+            default -> ordinal.replaceFirst("th$", "");
+        };
     }
 
     // =========================================================================

@@ -18,6 +18,7 @@ import java.util.concurrent.ScheduledFuture;
 import static org.gms.server.bot.BotStorage.checkIfInquirer;
 import static org.gms.server.bot.BotStorage.checkIfRespondant;
 import static org.gms.server.bot.BotStorage.getBotById;
+import static org.gms.server.bot.commands.SocialCommands.expirePlayerChatCommands;
 
 @Slf4j
 public class Dispatcher implements Runnable {
@@ -195,8 +196,9 @@ public class Dispatcher implements Runnable {
         // message does not contain any info w/ bot names.
         Character respondant = message.getSender();
         if (checkIfRespondant(respondant)) { // Check if message contains a respondant
-            // TODO(P5-D 对话体系)：SoloMapling 原实现先 expirePlayerChatCommands(respondant) 清除气泡，
-            // 再入默认 secondary 队列；expirePlayerChatCommands 属对话命令，尚未移植。
+            // SoloMapling 顺序：先清除 respondant 的编号菜单气泡（catch all），再入 secondary 队列，
+            // 否则新会话开始前旧气泡会一直挂屏。
+            expirePlayerChatCommands(respondant);
             messageQueue.addMessage(message); // Put into 2nd queue
         } else if (checkIfInquirer(respondant)) {
             messageQueue.addMessage("tertiary", message);

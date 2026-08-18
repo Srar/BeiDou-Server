@@ -26,9 +26,17 @@ import org.gms.net.packet.InPacket;
 import org.gms.util.PacketCreator;
 import org.gms.exception.EmptyMovementException;
 
+import static org.gms.server.bot.replay.InPacketReader.getMoveDataRecording;
+import static org.gms.server.bot.replay.InPacketReader.recordMovementInPacketToBinaryAndCSV;
+
 public final class MovePlayerHandler extends AbstractMovementPacketHandler {
     @Override
     public final void handlePacket(InPacket p, Client c) {
+        // 移动录制钩子：boolRecordMovementData 默认 false，此分支为一次静态布尔读取（零开销）；
+        // 录制须在 p.skip(9) 之前（与 SoloMapling 顺序一致），recordMovement* 内部 copy 不消费包。
+        if (getMoveDataRecording()) {
+            recordMovementInPacketToBinaryAndCSV(p);
+        }
         p.skip(9);
         try {   // thanks Sa for noticing empty movement sequences crashing players
             int movementDataStart = p.getPosition();

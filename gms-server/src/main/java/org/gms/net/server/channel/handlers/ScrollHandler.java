@@ -37,6 +37,8 @@ import org.gms.constants.inventory.ItemConstants;
 import org.gms.net.AbstractPacketHandler;
 import org.gms.net.packet.InPacket;
 import org.gms.server.ItemInformationProvider;
+import org.gms.server.bot.event.BotEventBus;
+import org.gms.server.bot.event.GameEvent;
 import org.gms.util.PacketCreator;
 
 import java.util.ArrayList;
@@ -171,6 +173,8 @@ public final class ScrollHandler extends AbstractPacketHandler {
                 }
                 c.sendPacket(PacketCreator.modifyInventory(true, mods)); // 发送修改库存的封包
                 chr.getMap().broadcastMessage(PacketCreator.getScrollEffect(chr.getId(), scrollSuccess, legendarySpirit, whiteScroll)); // 广播卷轴效果
+                // 发布卷轴结果事件（bot 事件总线）：同图 GachaBot 订阅 SCROLLING 做成功/失败反应
+                BotEventBus.getInstance().publish(GameEvent.scrolling(chr.getWorld(), c.getChannel(), chr.getMapId(), chr.getId(), scrollSuccess == Equip.ScrollResult.SUCCESS));
                 if (equipSlot < 0 && (scrollSuccess == Equip.ScrollResult.SUCCESS || scrollSuccess == Equip.ScrollResult.CURSE)) {
                     chr.equipChanged(); // 通知客户端装备发生变化
                 }

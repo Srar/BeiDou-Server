@@ -11,7 +11,9 @@ import org.gms.server.bot.gacha.CustomReactor;
 import org.gms.server.bot.itempool.GachaFillerSystem;
 import org.gms.server.bot.messaging.ChatMessage;
 import org.gms.server.bot.messaging.MessageQueue;
+import org.gms.server.bot.replay.MovementRecording;
 import org.gms.server.maps.ReactorDropEntry;
+import org.gms.util.I18nUtil;
 import org.gms.util.Randomizer;
 
 import java.awt.Point;
@@ -19,6 +21,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.TimeUnit;
+
+import static org.gms.server.bot.replay.InPacketReader.getMovementRecording;
+import static org.gms.server.bot.replay.MovementCommands.BotMoveStreamOffset;
 
 @Slf4j
 public class GachaBot extends BotSM {
@@ -43,8 +48,9 @@ public class GachaBot extends BotSM {
     @Override
     protected void onScheduledStart() {
         // stopScheduledTask 会退订全部事件；每轮启动时幂等重订阅。
-        // gms 未落地 SCROLLING / GACHAPON_REWARD 事件类型，仅订阅 LEVEL_UP。
         BotEventBus.getInstance().subscribe(EventType.LEVEL_UP, this);
+        BotEventBus.getInstance().subscribe(EventType.SCROLLING, this);
+        BotEventBus.getInstance().subscribe(EventType.GACHAPON_REWARD, this);
     }
 
     private void setGachaBotState(GachaBotState state) {
@@ -181,7 +187,7 @@ public class GachaBot extends BotSM {
 
         // Transition logic
         if (super.hasQueuedEvents()) {
-            System.out.println("事件已排队，停在 STAND BY 3");
+            log.debug(I18nUtil.getLogMessage("GachaBot.event.queue.pending"));
         } else {
             // Move to next appropriate state
             setGachaBotState(GachaBotState.STAND_BY_4);
@@ -191,24 +197,58 @@ public class GachaBot extends BotSM {
     @Override
     public void handleEvent(GameEvent event) {
         switch (event.getType()) {
+            case GACHAPON_REWARD:
+                handleGachaponEvent(event);
+                break;
+            case SCROLLING:
+                handleScrollingEvent(event);
+                break;
             case LEVEL_UP:
                 handleLevelUpEvent(event);
                 break;
             default:
-                // gms EventType 未落地 SCROLLING / GACHAPON_REWARD，保持空操作
+                // 未订阅的事件类型（bot 只订阅三种），保持空操作
                 break;
         }
     }
 
-    // 源使用同步录制回放编排：getMovementRecording(0, "rightleft45") + BotMoveStreamOffset，
-    // 然后 getMovementRecording(0, "leftright70") + BotMoveStreamOffset（见 SoloMapling GachaBot.handleLevelUpEvent）。
-    // gms 的 org.gms.server.bot.replay 已落地这两个入口（InPacketReader.getMovementRecording /
-    // MovementCommands.BotMoveStreamOffset），此处暂以表情+气泡祝贺替代原始回放，后续可按源恢复。
+    // 扭蛋开奖反应：表情 + 对开奖玩家的祝贺气泡。
+    private void handleGachaponEvent(GameEvent event) {
+        BotGameSupport.botEmote(getChr(), 2);
+        BotGameSupport.botChatbubble(getChr(), "运气爆棚 " + resolvePlayerName(event.getSourceCharacterId()) + "！");
+    }
+
+    // 卷轴结果反应：成功/失败分别用不同表情 + 台词祝贺/安慰。
+    private void handleScrollingEvent(GameEvent event) {
+        if (Boolean.TRUE.equals(event.getPass())) {
+            BotGameSupport.botEmote(getChr(), 3);
+            BotGameSupport.botChatbubble(getChr(), "卷轴成了 " + resolvePlayerName(event.getSourceCharacterId()) + "，好手气！");
+        } else {
+            BotGameSupport.botEmote(getChr(), 4);
+            BotGameSupport.botChatbubble(getChr(), "哎呀 " + resolvePlayerName(event.getSourceCharacterId()) + "，卷轴炸了…");
+        }
+    }
+
+    // 升级庆祝：刻意同步编排——两段录制回放按其数据时长阻塞，中间夹表情+祝贺气泡
+    //（见 SoloMapling GachaBot.handleLevelUpEvent：rightleft45 → emote+气泡 → leftright70）。
+    // 录制品缺失/回放异常时保留表情+气泡兜底，不中断庆祝流程。
     private void handleLevelUpEvent(GameEvent event) {
+        playCelebrationRecording("rightleft45");
         BotGameSupport.blockingSleep(1500);
         BotGameSupport.botEmote(getChr(), 2);
         BotGameSupport.botChatbubble(getChr(), "恭喜 " + resolvePlayerName(event.getSourceCharacterId()) + "！");
         BotGameSupport.blockingSleep(1500);
+        playCelebrationRecording("leftright70");
+    }
+
+    /** 播放 map0 下的升级庆祝录制（带偏移回放）；失败仅告警，由调用方兜底。 */
+    private void playCelebrationRecording(String recordingName) {
+        try {
+            MovementRecording mvr = getMovementRecording(0, recordingName);
+            BotMoveStreamOffset(mvr, getChr());
+        } catch (Exception e) {
+            log.warn(I18nUtil.getLogMessage("GachaBot.recording.missing", recordingName, getChr().getName()), e);
+        }
     }
 
     private String resolvePlayerName(int characterId) {

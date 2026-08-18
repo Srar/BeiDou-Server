@@ -21,7 +21,8 @@ class I18nBotKeysParityTest {
 
     private static final String[] BOT_KEY_PREFIXES = {
             "bot.", "BotCommand.", "BotSM.", "BotTickService.", "BotTiming.", "BotTypeManager.",
-            "BotGeneration.", "BotServerAccess.", "BotMapEntryResponder.", "BotStartupManager."
+            "BotGeneration.", "BotServerAccess.", "BotMapEntryResponder.", "BotStartupManager.",
+            "ShopOfferSystem."
     };
 
     private static final String[][] FILE_PAIRS = {

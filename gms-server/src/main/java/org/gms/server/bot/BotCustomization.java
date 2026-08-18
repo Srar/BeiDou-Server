@@ -135,6 +135,9 @@ public class BotCustomization {
     /**
      * 换装广播节流入口（装备已落库，仅决定广播侧行为）：
      * <ol>
+     *   <li>bot 尚未落图（装饰阶段先于 spawn，fakechar 虽已指向目标图但图上查不到该角色）：
+     *       跳过广播且不调度补发——spawn 包自带完整外观，此时广播 look 只会向客户端发送
+     *       尚未 spawn 的 cid 的外观更新包（冗余且有崩溃风险，2026-08-18 事故实测 224 条）；</li>
      *   <li>无人观察（无真实玩家）的图：跳过广播且不记录时间——bot 换装状态会在后续
      *       spawn/进图广播中自然同步，无需补发；</li>
      *   <li>距上次广播未满 {@link #MIN_LOOK_BROADCAST_INTERVAL_MS}：标记 dirty 并调度
@@ -147,6 +150,12 @@ public class BotCustomization {
     static void scheduleLookBroadcast(Character fakechar) {
         int botId = fakechar.getId();
         MapleMap map = fakechar.getMap();
+        if (map == null || map.getCharacterById(botId) != fakechar) {
+            // bot 尚未落图（装饰先于 spawn）：spawn 包自带完整外观，无需广播 look。
+            // 清掉此前遗留的 dirty——若已有补发任务，其执行时会发现 dirty 已清空而直接放弃。
+            DIRTY_LOOK_BOTS.remove(botId);
+            return;
+        }
         if (!BotHelpers.hasRealPlayerObserver(map)) {
             // 无人图：跳过广播（含清掉此前遗留的 dirty——若已有补发任务，其执行时会发现 dirty
             // 已清空而直接放弃，不产生广播）。

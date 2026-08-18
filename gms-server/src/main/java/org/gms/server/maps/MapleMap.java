@@ -113,6 +113,12 @@ public class MapleMap {
     private static final List<MapObjectType> rangedMapobjectTypes = Arrays.asList(MapObjectType.SHOP, MapObjectType.ITEM, MapObjectType.NPC, MapObjectType.MONSTER, MapObjectType.DOOR, MapObjectType.SUMMON, MapObjectType.REACTOR);
     private static final Map<Integer, Pair<Integer, Integer>> dropBoundsCache = new HashMap<>(100);
 
+    // 2026-08-18 换图 spawn 风暴事故预防：玩家换图瞬间会集中收到数百条 bot SPAWN_PLAYER
+    // 包（实测 266 条/秒），客户端数秒后周期性任务崩溃（已发生 4 次）。bot 角色进图 spawn
+    // 改为分批错峰：每批 BOT_SPAWN_BATCH_SIZE 个、批间隔 BOT_SPAWN_BATCH_INTERVAL_MS 毫秒。
+    private static final int BOT_SPAWN_BATCH_SIZE = 30;
+    private static final int BOT_SPAWN_BATCH_INTERVAL_MS = 120;
+
     private final Map<Integer, MapObject> mapobjects = new LinkedHashMap<>();
     private final Set<Integer> selfDestructives = new LinkedHashSet<>();
     private final Collection<SpawnPoint> monsterSpawn = Collections.synchronizedList(new LinkedList<>());
@@ -3238,9 +3244,16 @@ public class MapleMap {
             objectRLock.unlock();
         }
 
+        // bot 角色不随本循环立即发送（避免数百条 SPAWN_PLAYER 同帧涌入），
+        // 收集后按批错峰发送；其余 non-ranged 对象（NPC、真人等）保持现状立即发送。
+        List<Character> botChars = new ArrayList<>();
         for (MapObject o : objects) {
             if (isNonRangedType(o.getType())) {
-                o.sendSpawnData(c);
+                if (o.getType() == MapObjectType.PLAYER && BotHelpers.isBot((Character) o)) {
+                    botChars.add((Character) o);
+                } else {
+                    o.sendSpawnData(c);
+                }
             } else if (o.getType() == MapObjectType.SUMMON) {
                 Summon summon = (Summon) o;
                 if (summon.getOwner() == chr) {
@@ -3256,6 +3269,22 @@ public class MapleMap {
                     }
                 }
             }
+        }
+
+        // bot 角色 spawn 分批错峰（常量见类头注释）：换图瞬间一次涌入数百条 SPAWN_PLAYER
+        // 是客户端崩溃的直接诱因，按批 + 间隔发送削平包洪峰。发送前校验双方仍在原图且
+        // bot 未销毁：玩家已离图/换图、bot 已离图/销毁则跳过，防止向已离开的玩家继续
+        // 发包（脏包）与滞留任务泄漏。副作用与上方立即发送分支保持一致（仅 sendSpawnData，
+        // 不登记 visibleMapObjects——non-ranged 对象现状即如此，移动广播不走可见性集合）。
+        int mapId = this.mapid;
+        for (int i = 0; i < botChars.size(); i++) {
+            Character bot = botChars.get(i);
+            long delay = (long) (i / BOT_SPAWN_BATCH_SIZE) * BOT_SPAWN_BATCH_INTERVAL_MS;
+            TimerManager.getInstance().schedule(() -> {
+                if (bot.getMapId() == mapId && chr.getMapId() == mapId && bot.getMap() != null) {
+                    bot.sendSpawnData(chr.getClient());
+                }
+            }, delay);
         }
 
         if (chr != null) {

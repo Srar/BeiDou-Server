@@ -25,6 +25,8 @@ import static org.mockito.ArgumentMatchers.anyLong;
  *   <li>时间窗口纯逻辑：每 bot 换装广播最小间隔 {@link BotCustomization#MIN_LOOK_BROADCAST_INTERVAL_MS}，
  *       窗口内多次换装只产生 1 次广播，窗口结束后补发 1 次最终状态；</li>
  *   <li>观察门控：无真实玩家观察的图跳过广播（且不调度补发）；</li>
+ *   <li>落图门控：bot 尚未落图（装饰先于 spawn）时跳过广播且不调度补发——spawn 包自带
+ *       完整外观，look 广播只会把尚未 spawn 的 cid 外观包发给客户端；</li>
  *   <li>补发防泄漏：补发任务执行时 bot 已销毁/换图/真人已离开则不广播，只清 dirty。</li>
  * </ul>
  * 断言面为 {@link BotCustomization#scheduleLookBroadcast}（等价于「装备落库后的一次换装广播
@@ -139,6 +141,41 @@ class BotCustomizationTest {
     }
 
     @Test
+    void equipItemSkipsBroadcastWhenBotNotPlacedOnMap() {
+        MapleMap map = observedMap(MAP_ID);
+        // 装饰阶段先于 spawn：fakechar 已指向目标图，但图上还查不到该 bot
+        // （getCharacterById 返回 null，即列表不含该 bot）
+        Character bot = Mockito.mock(Character.class);
+        Mockito.when(bot.getId()).thenReturn(BOT_ID);
+        Mockito.when(bot.getMap()).thenReturn(map);
+        Mockito.when(map.getCharacterById(BOT_ID)).thenReturn(null);
+
+        BotCustomization.scheduleLookBroadcast(bot);
+        BotCustomization.scheduleLookBroadcast(bot);
+
+        // 未落图：不广播、不调度补发（spawn 包自带完整外观，look 广播是冗余+风险包）
+        Mockito.verify(bot, Mockito.never()).equipChanged();
+        executorsStatic.verify(
+                () -> BotExecutors.schedule(any(Runnable.class), anyLong()),
+                Mockito.never());
+    }
+
+    @Test
+    void equipItemSkipsBroadcastWhenBotMapIsNull() {
+        // bot 已销毁/尚未关联任何地图：getMap() 为 null
+        Character bot = Mockito.mock(Character.class);
+        Mockito.when(bot.getId()).thenReturn(BOT_ID);
+        Mockito.when(bot.getMap()).thenReturn(null);
+
+        BotCustomization.scheduleLookBroadcast(bot);
+
+        Mockito.verify(bot, Mockito.never()).equipChanged();
+        executorsStatic.verify(
+                () -> BotExecutors.schedule(any(Runnable.class), anyLong()),
+                Mockito.never());
+    }
+
+    @Test
     void flushSkipsWhenBotLeftOrChangedMap() {
         MapleMap map = observedMap(MAP_ID);
         // 目标图 mock 提前创建：不能在 thenReturn(...) 实参里构造 mock（嵌套 stubbing 会被 mockito 拒绝）
@@ -204,11 +241,12 @@ class BotCustomizationTest {
         return map;
     }
 
-    /** 站在指定图上的 bot mock（仅广播侧依赖的 id/getMap/equipChanged）。 */
+    /** 站在指定图上的 bot mock（仅广播侧依赖的 id/getMap/equipChanged）；同时登记为已落图。 */
     private Character botOnMap(MapleMap map) {
         Character bot = Mockito.mock(Character.class);
         Mockito.when(bot.getId()).thenReturn(BOT_ID);
         Mockito.when(bot.getMap()).thenReturn(map);
+        Mockito.when(map.getCharacterById(BOT_ID)).thenReturn(bot);
         return bot;
     }
 }

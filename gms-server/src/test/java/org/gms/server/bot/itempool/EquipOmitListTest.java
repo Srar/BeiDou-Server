@@ -1,6 +1,10 @@
 package org.gms.server.bot.itempool;
 
+import org.gms.client.Character;
+import org.gms.client.Job;
+import org.gms.constants.inventory.EquipType;
 import org.gms.manager.ServerManager;
+import org.gms.server.ItemInformationProvider;
 import org.gms.server.bot.decorate.GenericEquipPool;
 import org.gms.test.BotTestSupport;
 import org.junit.jupiter.api.BeforeAll;
@@ -104,6 +108,48 @@ class EquipOmitListTest {
                     "generic pool draw #" + i + " returned omitted item " + id);
         }
         assertEquals(300, draws);
+        assertTrue(nonNullDraws > 100,
+                "expected most draws to yield an item, got " + nonNullDraws + "/300");
+    }
+
+    /**
+     * {@link ItemInformationProvider#getRandomEquipForWearing} 抽取回归：
+     * 构造让黑名单弓（1452049 Singapore Flag Bow，reqLevel 30 / reqJob 4 / gender 2）
+     * 必然落入候选窗口的角色参数（35 级弓箭手），N 轮抽取结果不得出现黑名单条目。
+     * 复用 @BeforeAll 已预热的 {@link EquipMetadataCache}，不再触发 wz 重建。
+     */
+    @Test
+    void randomEquipForWearingNeverReturnsOmittedIds() {
+        EquipOmitList.load();
+        int level = 35;
+        // 与 ItemInformationProvider.getRandomEquipForStyle 相同的窗口下界公式：
+        // maxLevel - max(25% of maxLevel, 10)。
+        int minLevel = level - Math.max((int) (level * 0.25), 10);
+
+        // 抽取前断言：候选池（缓存元数据推导的窗口）中确实含黑名单条目——
+        // 否则本测试对过滤分支无覆盖意义。
+        boolean poolContainsOmitted = EquipMetadataCache.get().nonCash(EquipType.BOW).stream()
+                .anyMatch(e -> e.id == 1452049
+                        && e.reqLevel >= minLevel && e.reqLevel <= level
+                        && e.reqJob == 4 && e.gender == 2);
+        assertTrue(poolContainsOmitted,
+                "candidate window [level 35 bowman] must contain omitted id 1452049");
+
+        Character chr = Mockito.mock(Character.class);
+        Mockito.when(chr.getLevel()).thenReturn(level);
+        Mockito.when(chr.getJobStyle()).thenReturn(Job.BOWMAN);
+        Mockito.when(chr.getGender()).thenReturn(2);
+
+        int nonNullDraws = 0;
+        for (int i = 0; i < 300; i++) {
+            int id = ItemInformationProvider.getInstance().getRandomEquipForWearing(EquipType.BOW, chr);
+            if (id == 0) {
+                continue; // 候选被过滤空时返回 0（防御性跳过，正常不会发生）
+            }
+            nonNullDraws++;
+            assertFalse(EquipOmitList.isOmitted(id),
+                    "wearing draw #" + i + " returned omitted item " + id);
+        }
         assertTrue(nonNullDraws > 100,
                 "expected most draws to yield an item, got " + nonNullDraws + "/300");
     }

@@ -1792,7 +1792,9 @@ public class PacketCreator {
         p.writeBool(drop.getMeso() > 0);
         p.writeInt(drop.getItemId());
         p.writeInt(giveOwnership ? 0 : -1);
-        p.writeByte(drop.hasExpiredOwnershipTime() ? 2 : drop.getDropType());
+        // permanentOwner 掉落 15s 后不得按 FFA 显示：服务端仍拒绝陌生人拾取，
+        // 客户端若显示 FFA 会造成「能看不能捡」的视觉/交互不一致。
+        p.writeByte((!drop.isPermanentOwner() && drop.hasExpiredOwnershipTime()) ? 2 : drop.getDropType());
         p.writePos(drop.getPosition());
         p.writeInt(giveOwnership ? 0 : -1);
 

@@ -264,8 +264,12 @@ public class DropCommands {
         if (mapItem.getOwnerId() == fakechar.getId()) {
             return true; // the bot's own drop
         }
+        // permanentOwner 掉落永不转 FFA（与 MapItem.canBePickedBy/isFFADrop 一致）：
+        // 不加特判的话，bot 扫掠会在 15s 后把 owner-only 掉落（黑杰克发牌等）当
+        // 公共掉落捡走，而服务端拾取判定仍拒绝——既偷拿又产生客户端/服务端不一致。
         return mapItem.getDropType() == 2
-                || System.currentTimeMillis() - mapItem.getDropTime() >= FFA_OWNER_PROTECT_MS;
+                || (!mapItem.isPermanentOwner()
+                    && System.currentTimeMillis() - mapItem.getDropTime() >= FFA_OWNER_PROTECT_MS);
     }
 
     // Pick up one specific drop (organic single-item loot, paced by the caller for a natural look).

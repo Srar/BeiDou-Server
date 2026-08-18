@@ -5,6 +5,7 @@ import org.gms.client.Client;
 import org.gms.net.server.PlayerStorage;
 import org.gms.net.server.Server;
 import org.gms.net.server.channel.Channel;
+import org.gms.net.server.world.World;
 import org.gms.server.bot.BotDebugHandler;
 import org.gms.server.bot.BotGeneration;
 import org.gms.server.bot.BotStorage;
@@ -63,10 +64,15 @@ class MapleMessengerConsoleTest {
         serverMock = Mockito.mockStatic(Server.class);
         Server server = Mockito.mock(Server.class);
         Channel channel = Mockito.mock(Channel.class);
+        World world = Mockito.mock(World.class);
         PlayerStorage storage = new PlayerStorage();
         Mockito.when(Server.getInstance()).thenReturn(server);
         Mockito.when(server.getChannel(0, 1)).thenReturn(channel);
         Mockito.when(channel.getPlayerStorage()).thenReturn(storage);
+        // MMC 日志转发经 world 级玩家存储查找 GM（跨频道可见）；bot 频道解析仍走 channel。
+        // 测试环境以同一 storage 代表该 world 的全部频道。
+        Mockito.when(server.getWorlds()).thenReturn(List.of(world));
+        Mockito.when(world.getPlayerStorage()).thenReturn(storage);
 
         // 单元测试环境不创建真实 Console 傀儡（装饰/频道注册依赖过重）。
         botGenerationMock = Mockito.mockStatic(BotGeneration.class);

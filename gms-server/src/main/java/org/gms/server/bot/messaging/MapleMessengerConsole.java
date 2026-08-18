@@ -6,6 +6,7 @@ import org.gms.client.command.CommandsExecutor;
 import org.gms.constants.inventory.EquipType;
 import org.gms.net.server.Server;
 import org.gms.net.server.channel.Channel;
+import org.gms.net.server.world.World;
 import org.gms.server.bot.BotDebugHandler;
 import org.gms.server.bot.BotGeneration;
 import org.gms.server.bot.BotHelpers;
@@ -20,6 +21,7 @@ import org.gms.server.bot.itempool.EquipMetadataCache;
 import org.gms.util.I18nUtil;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -85,6 +87,36 @@ public class MapleMessengerConsole {
             MapleMessengerCommands.sendConsoleMessage(chr,
                     I18nUtil.getMessage("BotCommand.mmc.disconnected", chr.getName()));
         }
+    }
+
+    /**
+     * GM 下线清理钩子（{@code Character.logOff} 调用，仅真实登出触发）：
+     * 只摘除连接态集合条目，不发回显也不动信使（登出链路上 messenger 已被
+     * closePlayerMessenger 关闭、客户端会话即将断开，发消息既无意义也可能失败）。
+     * 不清理则 GM 重登后 mmc:connect 的 add 返回 false 变 no-op。
+     */
+    public static void onUserLogout(Character chr) {
+        if (chr != null) {
+            connectedUsers.remove(chr.getId());
+        }
+    }
+
+    /**
+     * bot 销毁清理钩子（{@code BotGeneration.removeBotFromServer} 调用）：
+     * 把已销毁 bot 从日志转发集合摘除，防止 botsLogging 随 bot 生成/销毁风暴
+     * 积累死 id（死 id 本身无害——转发按在线查找兜底，但会让集合无界增长）。
+     */
+    public static void cleanupBot(int botId) {
+        botsLogging.remove(botId);
+    }
+
+    /**
+     * 服务停机清理（Server 停机钩子序列调用）：清空连接态与日志转发集合，
+     * 保证 in-place 重启后旧世界的角色 id 不会污染新会话。
+     */
+    public static void clearForShutdown() {
+        connectedUsers.clear();
+        botsLogging.clear();
     }
 
     public static boolean isLoggingBot(int userId) {
@@ -383,11 +415,31 @@ public class MapleMessengerConsole {
             return;
         }
         for (Integer connectedUserId : connectedUsers) {
-            Character chr = DefaultBotServerAccess.INSTANCE.getCharacterById(connectedUserId);
+            // GM 可在任意世界/频道登录（不只 bot 频道），按 world 级玩家存储查找；
+            // 只查 bot 频道会在多频道部署下让 GM 静默收不到日志。
+            Character chr = findOnlineCharacter(connectedUserId);
             if (chr != null) {
                 MapleMessengerCommands.sendColoredConsoleMessage(chr, textLog);
+            } else {
+                // 转发目标不在线：GM 已下线但未走 logOff 清理，或正处频道迁移窗口。
+                log.warn(I18nUtil.getLogMessage("MapleMessengerConsole.log.forwardMiss", connectedUserId));
             }
         }
+    }
+
+    /** 经全 world 玩家存储查找在线角色（跨频道可见，与 botlog 转发语义一致）。 */
+    private static Character findOnlineCharacter(int characterId) {
+        List<World> worlds = Server.getInstance().getWorlds();
+        if (worlds == null) { // 世界未初始化（启动早期/停机中）
+            return null;
+        }
+        for (World w : worlds) {
+            Character chr = w.getPlayerStorage().getCharacterById(characterId);
+            if (chr != null) {
+                return chr;
+            }
+        }
+        return null;
     }
 
     private static void chatCommandViaMMC(Character player, String[] args) {

@@ -6,6 +6,7 @@ import org.gms.server.bot.replay.MovementCommands;
 import org.gms.server.bot.travel.BotScriptedWarp;
 import org.gms.server.maps.MapleMap;
 import org.gms.server.maps.Rope;
+import org.gms.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -894,7 +895,7 @@ public final class GCMovement {
                 cb.run();
             } catch (Throwable ignored) {
                 // callback errors must not kill the tick
-                log.debug("GCMovement abandon callback failed for bot {}", entry.bot.getId(), ignored);
+                log.debug(I18nUtil.getLogMessage("GCMovement.abandonCallback.failed", entry.bot.getId()), ignored);
             }
         }
     }
@@ -909,7 +910,8 @@ public final class GCMovement {
                 cb.run();
             } catch (Throwable ignored) {
                 // callback errors must not kill the tick
-                log.debug("GCMovement arrival callback failed for bot {}", entry.bot != null ? entry.bot.getId() : "null", ignored);
+                log.debug(I18nUtil.getLogMessage("GCMovement.arrivalCallback.failed",
+                        entry.bot != null ? entry.bot.getId() : "null"), ignored);
             }
         }
     }

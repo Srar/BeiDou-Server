@@ -13,13 +13,19 @@ import org.gms.server.bot.replay.MovementRecordingRaw;
 import static org.gms.server.bot.replay.DebugUtilities.debugprint;
 
 import java.io.BufferedReader;
+import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -49,7 +55,7 @@ public class InPacketReader {
 
     public static List<MovementPacket> readPacketsFromFile(String binaryFileName) {
         List<MovementPacket> packets = new ArrayList<>();
-        try (DataInputStream dis = new DataInputStream(new FileInputStream(binaryFileName))) {
+        try (DataInputStream dis = openBinaryStream(binaryFileName)) {
             while (dis.available() > 0) {
                 packets.add(readSinglePacket(dis));
             }
@@ -62,7 +68,7 @@ public class InPacketReader {
     public static List<MovementPacketRaw> readRawPacketsFromFile(String csvFileName) {
         List<MovementPacketRaw> packetList = new LinkedList<>();
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(csvFileName))) {
+        try (BufferedReader reader = new BufferedReader(openTextStream(csvFileName))) {
             LineReader lineReader = new LineReader(reader);
             String line;
 
@@ -82,6 +88,35 @@ public class InPacketReader {
         }
 
         return packetList;
+    }
+
+    /**
+     * 录制品读取的路径解析：先文件系统（工作目录相对，支持运行时录制的新文件与外部覆盖），
+     * 文件不存在时回退 classpath（jar 内打包的 movementDataPackets 资源）——
+     * 避免服务从仓库根等非 gms-server 目录启动时全部录制回放静默降级。
+     */
+    private static DataInputStream openBinaryStream(String fileName) throws IOException {
+        File f = new File(fileName);
+        if (f.isFile()) {
+            return new DataInputStream(new BufferedInputStream(new FileInputStream(f)));
+        }
+        InputStream in = InPacketReader.class.getResourceAsStream("/" + fileName);
+        if (in == null) {
+            throw new FileNotFoundException("Recording not found on filesystem or classpath: " + fileName);
+        }
+        return new DataInputStream(new BufferedInputStream(in));
+    }
+
+    private static InputStreamReader openTextStream(String fileName) throws IOException {
+        File f = new File(fileName);
+        if (f.isFile()) {
+            return new InputStreamReader(new FileInputStream(f), StandardCharsets.UTF_8);
+        }
+        InputStream in = InPacketReader.class.getResourceAsStream("/" + fileName);
+        if (in == null) {
+            throw new FileNotFoundException("Recording not found on filesystem or classpath: " + fileName);
+        }
+        return new InputStreamReader(in, StandardCharsets.UTF_8);
     }
 
     private static long parseTimestamp(String line) {

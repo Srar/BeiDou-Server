@@ -347,7 +347,8 @@ public final class DialogueContextResolver {
     /**
      * 等价 SoloMapling ItemInformationProviderUtilities.getReqJobViaJobStyle：
      * jobStyle -> reqJob 位（1=Warrior 2=Mage 4=Bowman 8=Thief 16=Pirate），
-     * 十字弓手归一到弓手（reqJob 4）。gms 未移植该工具类，按源内联。
+     * 十字弓手归一到弓手（reqJob 4）。该工具类已移植（org.gms.server.bot.itempool
+     * .ItemInformationProviderUtilities），此处保留内联版本，可择机改调。
      */
     private static int getReqJobViaJobStyle(Job jobStyle) {
         if (jobStyle == Job.CROSSBOWMAN) {

@@ -482,8 +482,9 @@ public class DropGameBot extends BotSM {
     // DROP SCHEDULER (async, non-blocking)
     // =========================================================================
 
-    // gms 移植：SoloMapling 使用录制回放 dg_potshop_1 驱动 2 分钟移动；gms 未移植录制
-    // 引擎，改用 gcmove 图导航随机游走替代（原回放行为见 SoloMapling MovementCommands.BotMoveStream）。
+    // gms 移植：SoloMapling 使用录制回放 dg_potshop_1 驱动 2 分钟移动；录制引擎已移植
+    // （org.gms.server.bot.replay 包），但 dg_potshop_1 录制数据未随附，此处改用 gcmove
+    // 图导航随机游走替代（原回放行为见 SoloMapling MovementCommands.BotMoveStream）。
     private void startMovementPlayback() {
         if (getChr().getMap() == null) return;
         List<GCMovement.Ledge> ledges = GCMovement.walkableLedges(getChr().getMap());

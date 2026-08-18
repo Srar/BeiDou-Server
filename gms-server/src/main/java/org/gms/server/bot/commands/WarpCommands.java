@@ -184,9 +184,10 @@ public class WarpCommands {
     // Deliberate synchronous choreography: fake portal lag, then a blocking
     // recording replay. Part of the spawn/warp arrival scripts that hold their thread.
     public static void botEnterPortalDropDown(Character fakechar, int variablePortalLag) {
-        // TODO(录制引擎缺口): SoloMapling 原行为为「假 portal 延迟 variablePortalLag 后回放
+        // TODO(录制回放缺口): SoloMapling 原行为为「假 portal 延迟 variablePortalLag 后回放
         // "portalenterdrop" 录制（getMovementRecording(0, "portalenterdrop") + BotMoveStreamOffset），
-        // 以模拟角色从 portal 落下动画。gms 未移植录制引擎，此处仅保留假 portal 延迟；
+        // 以模拟角色从 portal 落下动画。录制引擎已移植（org.gms.server.bot.replay 包），
+        // 但 portalenterdrop 录制数据未随附，此处仅保留假 portal 延迟；
         // 落地定位已由调用方 changeMap 完成（简化落地等价）。
         BotHelpers.blockingSleep(variablePortalLag);
     }

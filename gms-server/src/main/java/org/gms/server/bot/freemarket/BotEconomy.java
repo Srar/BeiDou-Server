@@ -51,8 +51,9 @@ public final class BotEconomy {
     }
 
     /**
-     * 源 UpgradeSimulator.getEquipMarketValue：基于强化属性估值。gms 未移植，
-     * 简化为 WZ 基准价 + 每层强化（getLevel）加成。
+     * 源 UpgradeSimulator.getEquipMarketValue：基于强化属性估值。该方法已随
+     * UpgradeSimulator 移植（org.gms.server.bot.itempool 包）；此处保留简化估值
+     * （WZ 基准价 + 每层强化（getLevel）加成），可择机改调 UpgradeSimulator 版本。
      */
     public static int getEquipMarketValue(Equip equip) {
         int base = ItemInformationProvider.getInstance().getWholePrice(equip.getItemId());

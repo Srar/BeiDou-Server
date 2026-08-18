@@ -16,11 +16,11 @@ import java.util.List;
 // and search range, so camp sweeps its spot, roam sweeps a box around the bot, and later styles
 // bring their own bounds. Extracted verbatim from the pre-split GrindBrain. Ours (SoloMapling).
 //
-// gms 移植：SoloMapling 的 DropCommands.botCanLoot / botLootSingleDrop 尚未整体移植（P5-I 回填），
-// 此处按语义 1:1 内联等价实现：
-//   - botCanLoot  → collectable(chr, mi)：own drop / FFA（dropType==2 或掉落后 ≥ FFA_OWNER_PROTECT_MS）
-//   - botLootSingleDrop → pickUp(chr, mi)：PacketCreator.removeItemFromMap + MapleMap.pickItemDrop
-// 常量 FFA_OWNER_PROTECT_MS=15000 / LOOT_PICKUP_PX=60 语义保持一致。
+// gms 移植：SoloMapling 的 DropCommands.botCanLoot / botLootSingleDrop 已移植（见
+// org.gms.server.bot.commands.DropCommands），此处为语义 1:1 的内联等价实现，属冗余：
+//   - collectable(chr, mi) == DropCommands.botCanLoot（own drop / FFA：dropType==2 或掉落后 ≥ FFA_OWNER_PROTECT_MS）
+//   - pickUp(chr, mi)     == DropCommands.botLootSingleDrop（PacketCreator.removeItemFromMap + MapleMap.pickItemDrop）
+// 常量 FFA_OWNER_PROTECT_MS=15000 语义保持一致。可择机改调 DropCommands 以消除重复。
 final class GrindLoot {
 
     private static final int LOOT_PICKUP_PX = 60;            // close enough to grab

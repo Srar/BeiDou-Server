@@ -470,7 +470,8 @@ public class MovementPacketConstructor {
         return copy;
     }
 
-    // ── MovementCommands 依赖（源内 findFootHoldId/getFootHoldObject 属于未移植的 MovementCommands，本地等价实现） ──
+    // ── MovementCommands 依赖（源内 findFootHoldId/getFootHoldObject 随 MovementCommands 一并移植，
+    //    此处为其本地等价实现，可择机改调 MovementCommands 同名方法） ──
 
     private static Foothold getFootHoldObject(Character fakechar) {
         Point pos = fakechar.getPosition();

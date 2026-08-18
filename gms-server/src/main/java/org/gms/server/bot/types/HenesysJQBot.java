@@ -145,7 +145,8 @@ public class HenesysJQBot extends BotSM {
 
         try {
             // TODO(P5-H2): 源播放跳跳场录像 TIER_RECORDINGS[selectedTier-1]（getMovementRecording +
-            // BotMoveStream）；gms 未移植录制引擎，改用 gcmove 图导航做一次近似攀爬替代。
+            // BotMoveStream）；录制引擎已移植（org.gms.server.bot.replay 包），此处未接入回放，
+            // 改用 gcmove 图导航做一次近似攀爬替代。
             wanderOnPetPark();
         } catch (Exception e) {
             log.warn("[HenesysJQBot] Recording playback error: " + e.getMessage());

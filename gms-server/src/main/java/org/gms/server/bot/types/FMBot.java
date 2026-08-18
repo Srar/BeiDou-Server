@@ -44,11 +44,13 @@ import static org.gms.server.bot.freemarket.BotRand.generateRandomNumber;
  * 自由市场逛店 Bot（逐行移植自 SoloMapling FMBot，500 行）。
  * BASE_WALK_CHANCE=0.40 / WALK_CHANCE_INCREMENT=0.10 / 购买阈值 {0.7..1.2}→概率 {1.0..0.05} /
  * ratio&gt;1.2 不买 / MAX_DOOR_WALK_ATTEMPTS=3。
- * gms 底座差异：FM 门导航（FMMovementCommands，录制引擎）未移植，getDoorPoint 退化占位。
+ * gms 底座差异：FM 门导航已随 replay/navigation.FMMovementCommands 移植（getDoorPoint 基于
+ * 门户坐标可用），但本类的门导航仍保持退化占位（见 getDoorPoint 的 TODO，待接 gcmove 图导航）。
  */
 @Slf4j
 public class FMBot extends BotSM {
-    // 源自 SoloMapling MovementStructures.MovementEnums.FreeMarketValues.FM_ENTRANCE（录制引擎未移植）。
+    // 源自 SoloMapling MovementStructures.MovementEnums.FreeMarketValues.FM_ENTRANCE
+    // （MovementEnums 已移植，见 org.gms.server.bot.replay.MovementEnums；此处保留本地常量）。
     private static final int FM_ENTRANCE = 910000000;
 
     private FMBotState fmBotState = FMBotState.RESET;
@@ -118,8 +120,8 @@ public class FMBot extends BotSM {
             return;
         }
         Point doorPt = getDoorPoint(this.fmRoom);
-        // gms 移植：FMMovementCommands.getDoorPoint（录制引擎）未移植，退化返回 null，
-        // 故直接进入房间而不再走到门点。
+        // gms 移植：源 FMMovementCommands.getDoorPoint(room)（已随 replay/navigation 包移植，
+        // 基于 FM 入口图门户坐标）在此处未接入，退化返回 null，故直接进入房间而不再走到门点。
         if (doorPt == null || isPointNear(this.getChr().getPosition(), doorPt, 20) || doorWalkAttempts >= MAX_DOOR_WALK_ATTEMPTS) {
             doorWalkAttempts = 0;
             botEnterFMRoom(this.getChr(), this.fmRoom);
@@ -134,9 +136,10 @@ public class FMBot extends BotSM {
     }
 
     private Point getDoorPoint(int room) {
-        // gms 移植：源 FMMovementCommands.getDoorPoint(room) 返回 FM 入口图上房间门的坐标，
-        // 依赖录制引擎（BotMovementSystem.NavigationSystem），未移植。
-        // TODO(FM门导航)：用 gcmove 图导航替换；退化返回 null，直接 botEnterFMRoom。
+        // gms 移植：源 FMMovementCommands.getDoorPoint(room) 返回 FM 入口图上房间门的坐标；
+        // FMMovementCommands 已移植（replay/navigation 包），但本类未接入，保持退化占位。
+        // TODO(FM门导航)：用 gcmove 图导航替换（或改调 FMMovementCommands.getDoorPoint）；
+        // 退化返回 null，直接 botEnterFMRoom。
         return null;
     }
 

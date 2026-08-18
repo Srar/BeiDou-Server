@@ -445,8 +445,8 @@ public class TutorialBot extends BotSM {
     }
 
     private void faceTowardsPoint(Point target) {
-        // gms 移植：源 MovementCommands.botFaceTowardsPoint（录制引擎）未移植；
-        // 等价：按目标点方向广播站立朝向。
+        // gms 移植：源 MovementCommands.botFaceTowardsPoint 已随 MovementCommands 移植
+        // （org.gms.server.bot.replay 包）；此处保留等价内联：按目标点方向广播站立朝向。
         boolean left = target.x < getChr().getPosition().x;
         getChr().broadcastStance(left ? CharacterStance.STAND_LEFT_STANCE : CharacterStance.STAND_RIGHT_STANCE);
     }
@@ -612,7 +612,8 @@ public class TutorialBot extends BotSM {
 
     private void returnToWaitingSpot() {
         // gms 移植：源读录制路径（getMovementRecording("tutorial2") + BotMoveStream）回等待点；
-        // 录制引擎未移植。TODO(录制引擎)：落地后恢复。此处广播站立帧并等待一拍。
+        // 录制引擎已移植（org.gms.server.bot.replay 包 + movementDataPackets/map10000/tutorial2.*），
+        // 但此处未接入录制回放，TODO(录制回放)：待接入后恢复。当前广播站立帧并等待一拍。
         getChr().broadcastStance();
         waitFor(1000); // settle beat before RESET ticks
     }

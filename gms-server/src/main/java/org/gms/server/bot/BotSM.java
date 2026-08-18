@@ -246,9 +246,10 @@ public abstract class BotSM implements EventSubscriber {
                     log.info(I18nUtil.getLogMessage("BotSM.state.finished", getChr().getName()));
                     break;
                 }
-                // 空闲站立刷新（等价 SoloMapling MovementCommands.BotIdleStandingUpdate）：
-                // gms 未移植录制引擎，用 Character.broadcastStance() 广播一次站立包，
-                // 让同图玩家看到的 bot 保持站立帧不僵死。
+                // 空闲站立刷新（等价 SoloMapling MovementCommands.BotIdleStandingUpdate，
+                // 已随 MovementCommands 移植，见 org.gms.server.bot.replay.MovementCommands；
+                // 此处保留状态机内联版，用 Character.broadcastStance() 广播一次站立包，
+                // 让同图玩家看到的 bot 保持站立帧不僵死）。
                 // gms 增强（F3）：
                 //   1) 观察门控——源 BotIdleStandingUpdate 同样带 LOD 观察门控
                 //      （trackerRunning && !isMapActive 直接 return）；此处复用本类

@@ -27,13 +27,15 @@ import java.util.stream.Collectors;
 /**
  * Bot 游戏逻辑工具（参考 SoloMapling 的 BotLogic 1:1 移植）。
  * <p>
- * 底座差异：无 MovementStructures 录制引擎，自由市场房间区间改用本地常量；
- * 无 DebugUtilities，改用 slf4j；装备槽位经 {@link BodyPart} 映射到 gms 负槽位。
+ * 底座差异：MovementStructures.MovementEnums 已移植（org.gms.server.bot.replay.MovementEnums），
+ * 自由市场房间区间此处保留本地常量；无 DebugUtilities，改用 slf4j；装备槽位经
+ * {@link BodyPart} 映射到 gms 负槽位。
  */
 @Slf4j
 public final class BotLogic {
 
-    // 源自 SoloMapling MovementStructures.MovementEnums.FreeMarketValues（gms 未移植该录制引擎）。
+    // 源自 SoloMapling MovementStructures.MovementEnums.FreeMarketValues（MovementEnums 已移植，
+    // 见 org.gms.server.bot.replay.MovementEnums；此处保留本地常量）。
     private static final int FM_ENTRANCE = 910000000;
     private static final int FM_ROOM_1 = 910000001;
     private static final int FM_ROOM_22 = 910000022;

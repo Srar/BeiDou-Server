@@ -17,9 +17,9 @@ import java.util.List;
 /**
  * 小游戏/场景类 bot 共用的社交与掉落原语。
  *
- * <p>gms 未移植 SoloMapling 的 SocialCommands / DropCommands / WarpCommands，本类按
- * 源实现语义内联等价实现（PacketCreator + MapleMap 底层掉落 API）。这些是 P5-H2 的
- * 框架适配件，待后续 wave 落地正式的 Social/Drop 命令包后可替换。</p>
+ * <p>SoloMapling 的 SocialCommands / DropCommands / WarpCommands 已随 commands 包
+ * 一并移植（org.gms.server.bot.commands）；本类按源实现语义内联等价实现
+ * （PacketCreator + MapleMap 底层掉落 API），可择机改调 commands 包以消除重复。</p>
  */
 public final class BotGameSupport {
 

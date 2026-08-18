@@ -11,6 +11,7 @@ import org.gms.server.bot.gacha.CustomReactor;
 import org.gms.server.bot.itempool.GachaFillerSystem;
 import org.gms.server.bot.messaging.ChatMessage;
 import org.gms.server.bot.messaging.MessageQueue;
+import org.gms.server.bot.replay.MovementCommands;
 import org.gms.server.bot.replay.MovementRecording;
 import org.gms.server.maps.ReactorDropEntry;
 import org.gms.util.I18nUtil;
@@ -241,13 +242,24 @@ public class GachaBot extends BotSM {
         playCelebrationRecording("leftright70");
     }
 
-    /** 播放 map0 下的升级庆祝录制（带偏移回放）；失败仅告警，由调用方兜底。 */
+    /**
+     * 播放 map0 下的升级庆祝录制（带偏移回放）；失败仅告警，由调用方兜底。
+     * 锁协议修复（MAJOR-1-R5）：回放前先拿移动锁——GachaBot 摆摊期由 gcmove 会话持锁时，
+     * 直接回放会与动态 tick 并发驱动同一角色；拿不到锁跳过回放（仅表情+气泡兜底），
+     * 拿到锁回放完成后 finally 释放。
+     */
     private void playCelebrationRecording(String recordingName) {
+        if (!MovementCommands.tryAcquireMovementLock(getChr())) {
+            log.warn(I18nUtil.getLogMessage("GachaBot.recording.lockBusy", getChr().getName()));
+            return;
+        }
         try {
             MovementRecording mvr = getMovementRecording(0, recordingName);
             BotMoveStreamOffset(mvr, getChr());
         } catch (Exception e) {
             log.warn(I18nUtil.getLogMessage("GachaBot.recording.missing", recordingName, getChr().getName()), e);
+        } finally {
+            MovementCommands.releaseMovementLock(getChr());
         }
     }
 

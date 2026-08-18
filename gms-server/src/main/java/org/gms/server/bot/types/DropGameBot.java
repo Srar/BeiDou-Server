@@ -17,6 +17,7 @@ import org.gms.server.bot.replay.MovementRecording;
 import org.gms.server.bot.trade.BotTradeCommands;
 import org.gms.server.bot.trade.BotTradeQueue;
 import org.gms.server.bot.trade.BotTradeSM;
+import org.gms.server.maps.MapleMap;
 import org.gms.util.I18nUtil;
 import org.gms.util.Randomizer;
 
@@ -498,8 +499,9 @@ public class DropGameBot extends BotSM {
     // DROP SCHEDULER (async, non-blocking)
     // =========================================================================
 
-    // 录制引擎接线（P5-H2）：恢复 SoloMapling 的 dg_potshop_1 录制回放（约 2 分钟长，
-    // 跑在共享虚拟线程池上，stopMovementPlayback 的 cancel(true) 中断回放流）。
+    // 录制品未随附（dg_potshop_1 全局不存在），回放失败降级 gcmove 随机游走（M1-R7）：
+    // 游戏期间 bot 仍保底移动，不再因回放失败完全静止。gcmove 会话由 stopMovementPlayback
+    // 的 GCMovement.disable 在游戏结束时清理（释放锁）。
     private void startMovementPlayback() {
         // 释放出生/wander 链 enable 的 gcmove 会话与移动锁（SoloMapling 出生不 enable），
         // 否则回放拿不到锁；游戏期间 bot 移动完全由录制回放接管。
@@ -519,10 +521,24 @@ public class DropGameBot extends BotSM {
                     MovementCommands.releaseMovementLock(getChr());
                 }
             } catch (Exception e) {
-                log.info(I18nUtil.getLogMessage("DropGameBot.playback.error",
-                        getChr().getId(), e.getMessage()));
+                log.info(I18nUtil.getLogMessage("DropGameBot.playback.fallbackWander",
+                        MOVEMENT_RECORDING_NAME, getChr().getId()), e);
+                wanderOnCurrentMapRandomLedge();
             }
         });
+    }
+
+    /**
+     * 回放失败降级（M1-R7）：gcmove 图导航随机游走——走到本图一个随机可走 ledge，
+     * 游戏期间给 bot 保底移动（合并冲突时被误删的 fallback 恢复）。
+     */
+    private void wanderOnCurrentMapRandomLedge() {
+        MapleMap map = getChr().getMap();
+        if (map == null) return;
+        List<GCMovement.Ledge> ledges = GCMovement.walkableLedges(map);
+        if (ledges.isEmpty()) return;
+        GCMovement.Ledge ledge = ledges.get(Randomizer.nextInt(ledges.size()));
+        GCMovement.move(getChr(), ledge.centerX(), ledge.centerY());
     }
 
     private void startDropScheduler(int initialDelayMs) {
@@ -580,6 +596,10 @@ public class DropGameBot extends BotSM {
             movementTask.cancel(true); // interrupt stops BotMoveStream mid-recording
         }
         movementTask = null;
+        // 锁协议修复（M1-R7）：清理回放失败降级 gcmove 随机游走遗留的动态会话与锁。
+        // 正常回放路径无 gcmove 会话，disable 幂等；回放引擎持有的锁由 owner 断言保护，
+        // 不会被这里的 disable 误放。
+        GCMovement.disable(getChr());
     }
 
     // =========================================================================

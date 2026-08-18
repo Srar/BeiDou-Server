@@ -1,6 +1,7 @@
 package org.gms.server.bot.replay.navigation;
 
 import org.gms.client.Character;
+import org.gms.server.maps.Portal;
 
 import java.awt.*;
 import java.util.List;
@@ -42,7 +43,11 @@ public class FMMovementCommands {
 //        if (door < 0) {
 //            return getFMEUpArrows(negDoorNumToArrowNum(door)).getPosition();
 //        }
-        return getFMEntrancePortal(door).getPosition();
+        // 判空兜底（M4-R2）：portal 缺失（FM 入口图未加载/频道不可用/门 portal 不存在）时
+        // getFMEntrancePortal 返回 null，直接 getPosition() 会 NPE。返回 null 由
+        // FMBot.getDoorPoint 注释承诺的「退化返回 null → 直接进房间」路径接管。
+        Portal portal = getFMEntrancePortal(door);
+        return portal == null ? null : portal.getPosition();
     }
 //
 //    private static int getClosestDoor(Point pos) {

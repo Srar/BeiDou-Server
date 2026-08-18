@@ -551,18 +551,25 @@ public class MovementCommands {
         }
     }
 
-    public static void BotMoveSmallDistanceX(Character fakechar, Point endpos) {
+    /**
+     * 小步横移（录制回放）：返回是否真的发起了挪动。
+     * <p>
+     * 挪动失败（锁被 gcmove 会话占用、目标距离为 0 等）返回 false，让调用方
+     * （如 nudgeAwayFromOverlap）区分「已挪动」与「未挪动」，避免重叠永久保持。
+     */
+    public static boolean BotMoveSmallDistanceX(Character fakechar, Point endpos) {
         if (fakechar == null || endpos == null) {
-            return;
+            return false;
         }
         int currPosX = (int) fakechar.getPosition().getX();
         double distance = Math.abs(currPosX - endpos.getX());
         if (distance <= 0) {
-            return;
+            return false;
         }
-        if (!tryAcquireMovementLock(fakechar)) return;
+        if (!tryAcquireMovementLock(fakechar)) return false;
         try {
             smallMoveUnlocked(fakechar, endpos);
+            return true;
         } finally {
             releaseMovementLock(fakechar);
         }
@@ -657,15 +664,58 @@ public class MovementCommands {
 
     // ── Movement Lock ──────────────────────────────────────────────────
     private static final ConcurrentHashMap<Integer, AtomicBoolean> movementLocks = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Integer, String> movementLockOwners = new ConcurrentHashMap<>();
+
+    /** 锁持有方标签：gcmove 动态会话（enable 时持有，disable 时按 owner 校验释放）。 */
+    public static final String LOCK_OWNER_GCMOVE = "gcmove";
+    /** 锁持有方标签：录制回放引擎（默认 owner）。 */
+    public static final String LOCK_OWNER_REPLAY = "replay";
 
     public static boolean tryAcquireMovementLock(Character fakechar) {
-        AtomicBoolean lock = movementLocks.computeIfAbsent(fakechar.getId(), k -> new AtomicBoolean(false));
-        return lock.compareAndSet(false, true);
+        return tryAcquireMovementLock(fakechar, LOCK_OWNER_REPLAY);
     }
 
+    /**
+     * 带持有方标记的拿锁（锁协议加固）：CAS 成功后记录 owner，供带 owner 断言的
+     * {@link #releaseMovementLock(Character, Object)} 校验。
+     */
+    public static boolean tryAcquireMovementLock(Character fakechar, Object ownerTag) {
+        AtomicBoolean lock = movementLocks.computeIfAbsent(fakechar.getId(), k -> new AtomicBoolean(false));
+        if (lock.compareAndSet(false, true)) {
+            movementLockOwners.put(fakechar.getId(), String.valueOf(ownerTag));
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 无 owner 断言释放（录制回放引擎语义）：与 {@link #tryAcquireMovementLock(Character)}
+     * 成对使用（try/finally），拿锁成功才释放，不会误放其他引擎持有的锁。
+     */
     public static void releaseMovementLock(Character fakechar) {
+        releaseMovementLock(fakechar, null);
+    }
+
+    /**
+     * 带 owner 断言释放（锁协议加固）：仅当锁确由 {@code ownerTag} 标识的持有方持有时才释放；
+     * owner 不匹配（如锁被回放引擎持有、或已被并发释放转交他人）时静默返回，防止
+     * gcmove disable 误放回放引擎的锁。release 先移除 owner 再复位锁，避免与 acquire
+     * 的「CAS 成功后写 owner」交错导致 owner 表被错删。
+     */
+    public static void releaseMovementLock(Character fakechar, Object ownerTag) {
         AtomicBoolean lock = movementLocks.get(fakechar.getId());
-        if (lock != null) lock.set(false);
+        if (lock == null) {
+            return;
+        }
+        if (ownerTag != null) {
+            String currentOwner = movementLockOwners.get(fakechar.getId());
+            if (!String.valueOf(ownerTag).equals(currentOwner)) {
+                // owner 不匹配：锁不归本调用方，禁止释放
+                return;
+            }
+        }
+        movementLockOwners.remove(fakechar.getId());
+        lock.set(false);
     }
 
     public static boolean isBotMoving(Character fakechar) {
@@ -702,8 +752,9 @@ public class MovementCommands {
                     && Math.abs(pos.y - otherPos.y) < OVERLAP_THRESHOLD_Y) {
                 int direction = (pos.x >= otherPos.x) ? NUDGE_DISTANCE : -NUDGE_DISTANCE;
                 Point target = new Point(pos.x + direction, pos.y);
-                BotMoveSmallDistanceX(bot, target);
-                return true;
+                // 挪动失败（锁被 gcmove 会话占用等）返回 false：调用方不得把本轮视为
+                // 「已处理」，否则重叠会永久保持。
+                return BotMoveSmallDistanceX(bot, target);
             }
         }
         return false;

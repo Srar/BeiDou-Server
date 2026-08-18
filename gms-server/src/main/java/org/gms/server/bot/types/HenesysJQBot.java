@@ -142,7 +142,9 @@ public class HenesysJQBot extends BotSM {
         int selectedTier = rollNextTier();
         String[] variants = TIER_RECORDINGS[selectedTier - 1];
         String recordingName = variants[random.nextInt(variants.length)];
-        lastAttemptSuccess = selectedTier == 7;
+        // 锁协议修复（m2-R2）：成功判定不得在回放前宣告——tier7 回放被锁占放弃/异常时
+        // 必须保持 false。回放成功后再按 selectedTier == 7 赋值。
+        lastAttemptSuccess = false;
 
         // 每 tick 高频日志降级 debug：转换风暴时大量 bot 交错换型，info 会在
         // log4j2 同步 Appender 锁上排队 pin 住虚拟线程 carrier。
@@ -179,18 +181,26 @@ public class HenesysJQBot extends BotSM {
             return;
         }
 
+        // 回放成功才宣告本轮结果（m2-R2）
+        lastAttemptSuccess = selectedTier == 7;
         highestCompletedTier = selectedTier;
         waitForRandom(500, 1500); // settle beat before RECOVER ticks
     }
 
     private void wanderOnPetPark() {
         // 兜底攀爬（仅录制品缺失/损坏时使用）：随机 ledge gcmove 图导航。
+        // 锁协议修复（M2-R2）：gcmove 会话 enable 后永久持锁，会令后续 ATTEMPT_JQ 回放
+        // 永久 lockBusy——先 disable 清理残留会话（防御），移动到达/放弃回调里再 disable，
+        // 恢复「JQ bot 全程录制引擎」不变量。
+        GCMovement.disable(getChr());
         MapleMap map = getChr().getMap();
         if (map == null) return;
         List<GCMovement.Ledge> ledges = GCMovement.walkableLedges(map);
         if (ledges.isEmpty()) return;
         GCMovement.Ledge ledge = ledges.get(random.nextInt(ledges.size()));
-        GCMovement.move(getChr(), ledge.centerX(), ledge.centerY());
+        GCMovement.move(getChr(), ledge.centerX(), ledge.centerY(),
+                () -> GCMovement.disable(getChr()),
+                () -> GCMovement.disable(getChr()));
     }
 
     private boolean recover() {

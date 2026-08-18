@@ -44,10 +44,15 @@ class FMBotDoorPointTest {
 
     private FMBot newFMBotWithDoorPortal(Point doorPosition, String portalName) {
         // mock 链路：Server.getInstance().getChannel(any, any).getMapFactory().getMap(910000000).getPortal(name)
+        // doorPosition == null 表示「门 portal 缺失」场景（getPortal 返回 null）。
         MapleMap fmEntranceMap = Mockito.mock(MapleMap.class);
-        Portal doorPortal = Mockito.mock(Portal.class);
-        Mockito.when(doorPortal.getPosition()).thenReturn(doorPosition);
-        Mockito.when(fmEntranceMap.getPortal(portalName)).thenReturn(doorPortal);
+        if (doorPosition != null) {
+            Portal doorPortal = Mockito.mock(Portal.class);
+            Mockito.when(doorPortal.getPosition()).thenReturn(doorPosition);
+            Mockito.when(fmEntranceMap.getPortal(portalName)).thenReturn(doorPortal);
+        } else {
+            Mockito.when(fmEntranceMap.getPortal(portalName)).thenReturn(null);
+        }
 
         MapManager mapFactory = Mockito.mock(MapManager.class);
         Mockito.when(mapFactory.getMap(FM_ENTRANCE)).thenReturn(fmEntranceMap);
@@ -101,5 +106,16 @@ class FMBotDoorPointTest {
         assertNotNull(doorPoint);
         assertEquals(expected.x, doorPoint.x);
         assertEquals(expected.y, doorPoint.y);
+    }
+
+    @Test
+    void doorPointReturnsNullWhenPortalMissing() throws Exception {
+        // 门 portal 缺失（FM 入口图未加载/门不存在）：getDoorPosition 判空返回 null 兜底
+        //（FMBot.getDoorPoint 注释承诺的语义），不得抛 NPE。
+        FMBot fmBot = newFMBotWithDoorPortal(null, "in01");
+
+        Point doorPoint = invokeGetDoorPoint(fmBot, 1);
+
+        org.junit.jupiter.api.Assertions.assertNull(doorPoint, "portal 缺失时门点必须返回 null（不抛 NPE）");
     }
 }

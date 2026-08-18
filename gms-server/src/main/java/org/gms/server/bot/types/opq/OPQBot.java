@@ -8,7 +8,6 @@ import org.gms.server.bot.BotSM;
 import org.gms.server.bot.BotTiming;
 import org.gms.server.bot.commands.BotAttack;
 import org.gms.server.bot.environment.platform.PlatformPlacement;
-import org.gms.server.bot.gcmove.GCMovement;
 import org.gms.server.bot.messaging.ChatMessage;
 import org.gms.server.bot.messaging.MessageQueue;
 import org.gms.server.bot.party.BotPartyLogic;
@@ -17,7 +16,6 @@ import org.gms.server.bot.types.BotGameSupport;
 import org.gms.server.bot.types.opq.OPQSharedContext.OPQPhase;
 import org.gms.server.maps.MapObject;
 import org.gms.server.maps.MapleMap;
-import org.gms.server.maps.Portal;
 import org.gms.server.maps.Reactor;
 import org.gms.util.PacketCreator;
 
@@ -475,7 +473,9 @@ public class OPQBot extends BotSM {
     }
 
     private void handleStage1Return() {
-        GCMovement.move(getChr(), 497, 143);
+        // 锁协议修复（C1）：对齐 SoloMapling 全录制引擎——pathFinderBeta 调用级拿锁，
+        // 不再走 gcmove 动态会话（会话级永久持锁会让 Stage2 的 pathFinderBetaAerial 拿锁失败）。
+        MovementCommands.pathFinderBeta(getChr(), new Point(497, 143));
         waitFor(OPQConstants.NAVIGATE_SETTLE_MS); // settle before DROP_ITEMS ticks
         transitionTo(OPQBotState.STAGE_1_DROP_ITEMS, "return state done.");
     }
@@ -499,8 +499,8 @@ public class OPQBot extends BotSM {
     private void handleStage1Wait() {
         if (sharedContext.isStage1Complete() && orchestrator.isChamberlainSpawned()) {
             OPQOrchestrator.getInstance().followLeaderWarp(getChr(), STAGE_1_COMPLETE_TP);
-            // Walk to Portal
-            moveToPortal(4);
+            // Walk to Portal（C1：恢复 SoloMapling 的录制引擎 moveToPortal，全录制引擎不变量）
+            MovementCommands.moveToPortal(getChr(), 4);
             transitionTo(OPQBotState.STAGE_1_TRANSITION, "stage1Complete flag flipped by orchestrator");
             return;
         }
@@ -515,7 +515,8 @@ public class OPQBot extends BotSM {
             BotGameSupport.blockingSleep(1000);
             OPQOrchestrator.getInstance().followLeaderWarp(getChr(), new Point(-260,-32)); // Spawn point for OPQ tower [x=-260,y=-32]
             BotGameSupport.blockingSleep(1000);
-            GCMovement.move(getChr(), 159, -32); // Walk to Portal [x=159,y=-32]
+            // C1：tower 步行恢复 SoloMapling 的录制引擎 pathFinderBeta（动态会话会永久持锁）
+            MovementCommands.pathFinderBeta(getChr(), new Point(159, -32)); // Walk to Portal [x=159,y=-32]
             transitionTo(OPQBotState.STAGE_1_TRANSITION_PT_2, "Waiting for leader to enter stage 2");
         }
     }
@@ -595,13 +596,18 @@ public class OPQBot extends BotSM {
     }
 
     private void hitBox4Times() {
-        // Face toward the box reactor before swinging
+        // Face toward the box reactor before swinging（C1：恢复 SoloMapling 的录制引擎转身原语，
+        // 不再启用 gcmove 动态会话——会话级永久持锁会让后续 pathFinderBetaAerial 静默失败）
         Integer reactorOid = sharedContext.getMyBoxAssignment(getChr().getId());
         if (reactorOid != null) {
             Reactor reactor = getChr().getMap().getReactorByOid(reactorOid);
             if (reactor != null) {
-                GCMovement.enable(getChr());
-                GCMovement.face(getChr(), reactor.getPosition().x < getChr().getPosition().x);
+                boolean boxIsLeft = reactor.getPosition().x < getChr().getPosition().x;
+                if (boxIsLeft && !MovementCommands.facingLeft(getChr())) {
+                    MovementCommands.microTurnAroundToLeft(getChr());
+                } else if (!boxIsLeft && MovementCommands.facingLeft(getChr())) {
+                    MovementCommands.microTurnAroundToRight(getChr());
+                }
             }
         }
 
@@ -684,7 +690,10 @@ public class OPQBot extends BotSM {
     }
 
     private void handleStage2Return() {
-        GCMovement.move(getChr(), -1588, -127);
+        // 锁协议修复（C1）：对齐 SoloMapling 全录制引擎——pathFinderBeta 调用级拿锁。
+        // gcmove 动态会话的 enable 永久持锁是 Stage2 永久死锁（pathFinderBetaAerial 静默
+        // 返回 null）与第二轮起 Stage1 死锁的根源。
+        MovementCommands.pathFinderBeta(getChr(), new Point(-1588, -127));
         waitFor(OPQConstants.NAVIGATE_SETTLE_MS); // settle before DROP_ITEMS ticks
         transitionTo(OPQBotState.STAGE_2_DROP_ITEMS,
                 "arrived at music box drop zone");
@@ -964,19 +973,6 @@ public class OPQBot extends BotSM {
             case "3rd" -> "3";
             default -> ordinal.replaceFirst("th$", "");
         };
-    }
-
-    // =========================================================================
-    // gcmove 适配辅助
-    // =========================================================================
-
-    /** 走到本图指定 portal（替代 SoloMapling MovementCommands.moveToPortal）。 */
-    private void moveToPortal(int portalId) {
-        MapleMap map = getChr().getMap();
-        if (map == null) return;
-        Portal portal = map.getPortal(portalId);
-        if (portal == null || portal.getPosition() == null) return;
-        GCMovement.move(getChr(), portal.getPosition().x, portal.getPosition().y);
     }
 
     // =========================================================================

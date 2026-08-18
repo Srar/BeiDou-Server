@@ -169,9 +169,46 @@ public class SocialHotPotatoManager {
         Character bot = selectRandomFillerBot(true);
         if (bot == null) return;
 
-        if (nudgeAwayFromOverlap(bot)) return;
+        // 锁协议修复（M1-R2）：filler bot 出生即 GCMovement.enable 全程持锁，录制引擎 nudge
+        // 拿锁失败永久 no-op。nudge 前释放会话与锁、完成后恢复；仅当重叠真的被推开（true）
+        // 才结束本轮，挪动失败（false）继续随机动作——避免 tick 直接返回导致重叠永久保持。
+        if (nudgeAwayFromOverlapWithLockRelease(bot)) return;
 
         executeRandomAction(bot);
+    }
+
+    /**
+     * 释放 gcmove 锁后执行重叠推开，完成/失败后恢复会话（M1-R2）。
+     */
+    private static boolean nudgeAwayFromOverlapWithLockRelease(Character bot) {
+        boolean wasEnabled = GCMovement.isEnabled(bot);
+        if (wasEnabled) {
+            GCMovement.disable(bot); // 释放 filler bot 的动态会话与移动锁，让录制引擎拿锁
+        }
+        try {
+            return nudgeAwayFromOverlap(bot);
+        } finally {
+            if (wasEnabled) {
+                GCMovement.enable(bot); // nudge 完成（或失败）后恢复动态会话
+            }
+        }
+    }
+
+    /**
+     * 释放 gcmove 锁后执行随机小步 nudge，完成后恢复会话（M1-R2）。
+     */
+    private static void nudgeSmallWithLockRelease(Character bot) {
+        boolean wasEnabled = GCMovement.isEnabled(bot);
+        if (wasEnabled) {
+            GCMovement.disable(bot);
+        }
+        try {
+            nudgeSmall(bot);
+        } finally {
+            if (wasEnabled) {
+                GCMovement.enable(bot);
+            }
+        }
     }
 
     private Character selectRandomFillerBot(boolean requireObserved) {
@@ -246,7 +283,7 @@ public class SocialHotPotatoManager {
                 botIdleStandingUpdate(bot);
                 break;
             case 3:
-                nudgeSmall(bot);
+                nudgeSmallWithLockRelease(bot);
                 break;
         }
     }
@@ -295,11 +332,11 @@ public class SocialHotPotatoManager {
     }
 
     public void testNudge(Character bot) {
-        nudgeSmall(bot);
+        nudgeSmallWithLockRelease(bot);
     }
 
     public boolean testNudgeOverlap(Character bot) {
-        return nudgeAwayFromOverlap(bot);
+        return nudgeAwayFromOverlapWithLockRelease(bot);
     }
 
     // --- Dialogue loading ---

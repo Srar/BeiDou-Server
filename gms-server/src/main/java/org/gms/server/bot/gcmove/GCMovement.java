@@ -6,6 +6,7 @@ import org.gms.server.bot.replay.MovementCommands;
 import org.gms.server.bot.travel.BotScriptedWarp;
 import org.gms.server.maps.MapleMap;
 import org.gms.server.maps.Rope;
+import org.gms.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,30 +58,47 @@ public final class GCMovement {
         if (!BotStorage.botLoggedIn(bot.getId()) && bot.getMap() == null) {
             return;
         }
+        if (STATES.containsKey(bot.getId())) {
+            return; // 已有动态会话（锁已由本会话持有），幂等
+        }
         ObserverTracker.ensureStarted(); // LOD observability poll (idempotent)
-        STATES.computeIfAbsent(bot.getId(), id -> {
-            // owner == null by default (no follow anchor, and avoids the nav warmup notice trying to
-            // dropMessage through the shared BotClient). GCFollow sets owner to the followed character.
-            BotMovementState st = new BotMovementState(bot, null);
-            st.movementProfile = BotMovementProfile.fromCharacter(bot);
-            if (bot.getMap() != null) {
-                st.lastMapId = bot.getMapId();
-                st.fhIndex = BotMovementManager.buildFhIndex(bot.getMap());
-                Point cur = bot.getPosition();
-                Point ground = BotPhysicsEngine.findGroundPoint(bot.getMap(), new Point(cur.x, cur.y - 1));
-                BotPhysicsEngine.teleportTo(st, bot, ground != null ? ground : cur);
-                BotMovementManager.resetEntryStateAfterTeleport(st);
-                BotNavigationGraphProvider.warmGraphAsync(bot.getMap(), st.movementProfile);
+        // 锁协议（M3）：先拿锁、成功后才建会话。拿锁失败说明录制回放引擎正在驱动该 bot——
+        // 记 warn 且不创建状态、不 Driver.start，避免双引擎并发驱动同一 Character。
+        if (!MovementCommands.tryAcquireMovementLock(bot, MovementCommands.LOCK_OWNER_GCMOVE)) {
+            if (STATES.containsKey(bot.getId())) {
+                return; // 并发 enable：另一线程刚建好会话并持锁，本线程不算失败
             }
-            GCMovementDriver.start(st);
-            // Hold the shared movement lock for the whole dynamic session so the recorded-path
-            // engine can't drive this bot concurrently.
-            // 录制引擎接线（P5-H2）：恢复 SoloMapling 的锁调用。锁在 disable（会话结束）时释放；
-            // 回放类消费点（JQ/掉落游戏/教程/传送落下）在回放前拿锁，拿不到即放弃本轮，
-            // 从而保证 gcmove 动态 tick 与录制回放不会并发驱动同一 Character。
-            MovementCommands.tryAcquireMovementLock(bot);
-            return st;
-        });
+            log.warn(I18nUtil.getLogMessage("GCMovement.enable.lockBusy", bot.getId()));
+            return;
+        }
+        try {
+            STATES.computeIfAbsent(bot.getId(), id -> {
+                // owner == null by default (no follow anchor, and avoids the nav warmup notice trying to
+                // dropMessage through the shared BotClient). GCFollow sets owner to the followed character.
+                BotMovementState st = new BotMovementState(bot, null);
+                st.movementProfile = BotMovementProfile.fromCharacter(bot);
+                if (bot.getMap() != null) {
+                    st.lastMapId = bot.getMapId();
+                    st.fhIndex = BotMovementManager.buildFhIndex(bot.getMap());
+                    Point cur = bot.getPosition();
+                    Point ground = BotPhysicsEngine.findGroundPoint(bot.getMap(), new Point(cur.x, cur.y - 1));
+                    BotPhysicsEngine.teleportTo(st, bot, ground != null ? ground : cur);
+                    BotMovementManager.resetEntryStateAfterTeleport(st);
+                    BotNavigationGraphProvider.warmGraphAsync(bot.getMap(), st.movementProfile);
+                }
+                GCMovementDriver.start(st);
+                // Hold the shared movement lock for the whole dynamic session so the recorded-path
+                // engine can't drive this bot concurrently.
+                // 锁在 disable（会话结束）时按 owner 校验释放；
+                // 回放类消费点（JQ/掉落游戏/教程/传送落下）在回放前拿锁，拿不到即放弃本轮，
+                // 从而保证 gcmove 动态 tick 与录制回放不会并发驱动同一 Character。
+                return st;
+            });
+        } catch (Throwable t) {
+            // 建会话失败不得遗留锁（拿锁成功但状态未建立）
+            MovementCommands.releaseMovementLock(bot, MovementCommands.LOCK_OWNER_GCMOVE);
+            throw t;
+        }
     }
 
     /* Remove a bot from dynamic control and release the shared movement lock. */
@@ -94,9 +112,9 @@ public final class GCMovement {
         BotMovementState st = STATES.remove(bot.getId());
         if (st != null) {
             GCMovementDriver.stop(st);
-            // 录制引擎接线（P5-H2）：恢复 SoloMapling 的锁释放。与 enable 的 tryAcquireMovementLock
-            // 成对；仅在确有动态会话（st != null）时释放，避免误放回放引擎持有的锁。
-            MovementCommands.releaseMovementLock(bot);
+            // 锁协议（M3）：带 owner 断言释放——仅当锁由本 gcmove 会话持有时才释放，
+            // 避免误放录制回放引擎持有的锁（如回放进行中误触 disable）。
+            MovementCommands.releaseMovementLock(bot, MovementCommands.LOCK_OWNER_GCMOVE);
         }
         ARRIVAL_CALLBACKS.remove(bot.getId());
         ABANDON_CALLBACKS.remove(bot.getId());
@@ -116,6 +134,8 @@ public final class GCMovement {
     public static void shutdown() {
         for (BotMovementState st : STATES.values()) {
             GCMovementDriver.stop(st);
+            // 锁协议加固：停机同样按 owner 校验释放（防止 in-place 重启后残留锁导致永久 lockBusy）
+            MovementCommands.releaseMovementLock(st.bot, MovementCommands.LOCK_OWNER_GCMOVE);
         }
         STATES.clear();
         ARRIVAL_CALLBACKS.clear();

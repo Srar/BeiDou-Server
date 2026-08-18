@@ -2,6 +2,7 @@ package org.gms.server.bot.types;
 
 import lombok.extern.slf4j.Slf4j;
 import org.gms.client.Character;
+import org.gms.server.bot.BotExecutors;
 import org.gms.server.bot.BotSM;
 import org.gms.server.bot.BotTypeManager;
 import org.gms.server.bot.dialogue.BotDialogueHandler;
@@ -113,7 +114,8 @@ public class HenesysBot extends BotSM {
                 changeMap();
                 lastMapChangeTime = System.currentTimeMillis();
                 doRandomEmote();
-                wanderToMainPlatform();
+                // 落地游走移至 travel 到达回调（onMapChangeArrival → wanderToMainPlatform），
+                // 否则此刻 travel 的 gcmove 会话已持锁且 bot 尚未换图，游走必然 no-op（M1-R3）。
                 setHenesysBotState(HenesysBotState.IDLE);
                 break;
             default:
@@ -209,6 +211,10 @@ public class HenesysBot extends BotSM {
     }
 
     // gcmove 图导航跨图：从 HENESYS_MAPS 里挑最不拥挤的一张，交由 GCTravel 走世界图。
+    // 锁协议修复（M1-R3）：travel 的 gcmove 会话会 enable 永久持锁，落地后游走
+    // （botMoveToPlatformAnyUnoccupiedSpotAware → pathFinderAware）拿锁失败全部 no-op。
+    // 改为在 travel 到达/放弃回调里先 GCMovement.disable 释放会话与锁，再转录制引擎游走，
+    // 对齐 SoloMapling 换图后 wanderToMainPlatform 立即生效的同步语义。
     private void changeMap() {
         List<Integer> options = new ArrayList<>();
         for (int mapId : HENESYS_MAPS) {
@@ -220,12 +226,29 @@ public class HenesysBot extends BotSM {
 
         int chosen = pickLeastCrowdedMap(options);
         try {
-            GCMovement.travel(getChr(), chosen);
+            GCMovement.travel(getChr(), chosen, ok -> onMapChangeArrival(chosen, ok));
             checkPrioritySpeed();
             log.info(getChr().getName() + " changing map to " + chosen);
         } catch (Exception e) {
             log.warn("HenesysBot map change failed: " + e.getMessage());
         }
+    }
+
+    /**
+     * travel 到达/放弃回调（gctravel poll 线程）：释放 gcmove 会话与移动锁，再异步走
+     * 录制引擎游走（pathFinderAware 同步阻塞，不得占用 poll 线程）。无论成功失败都游走，
+     * 对齐 SoloMapling CHANGE_MAP 分支「changeMap 后无条件 wanderToMainPlatform」语义。
+     */
+    private void onMapChangeArrival(int destMapId, boolean ok) {
+        GCMovement.disable(getChr()); // 释放 travel 的 gcmove 会话与锁，让录制引擎重新拿锁
+        log.debug(I18nUtil.getLogMessage("HenesysBot.mapChange.done", getChr().getId(), destMapId, ok));
+        BotExecutors.runAsync(() -> {
+            try {
+                wanderToMainPlatform();
+            } catch (Exception e) {
+                log.warn("HenesysBot post-map-change wander failed: " + e.getMessage());
+            }
+        });
     }
 
     private int pickLeastCrowdedMap(List<Integer> mapIds) {

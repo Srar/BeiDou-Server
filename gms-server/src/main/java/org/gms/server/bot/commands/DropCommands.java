@@ -21,9 +21,10 @@ import static org.gms.server.bot.BotLogic.checkForItemsOnFloor;
 /**
  * 掉落命令（SoloMapling BotCommandsPack.DropCommands 逐行移植）。
  * <p>
- * 底座差异：gms MapItem 无 {@code permanentOwner} 标志，{@code spawnItemDropNoExpire}
- * 已注册为不过期掉落，因此原 {@code setPermanentOwner(true)} 退化为 no-op（物品不消失，
- * 但所有权保护仍按 vanilla 15s 后转为 FFA）。
+ * 底座差异：gms MapItem 已补齐 {@code permanentOwner} 标志，owner-only 掉落
+ * （{@code botThrowItemNoExpireOwnerOnly} / {@code botDropItemQtyOwnerOnly} /
+ * {@code botThrowItemToOwner}）在 {@code spawnItemDropNoExpire} 返回后置位，
+ * 所有权保护不再受 vanilla 15s 到期转 FFA 影响。
  */
 public class DropCommands {
 
@@ -125,17 +126,17 @@ public class DropCommands {
         Item itemToDrop = BotLogic.generateCleanItem(itemId);
         MapItem drop = fakechar.getMap().spawnItemDropNoExpire(fakechar, fakechar, itemToDrop,
                 throwPos, false, false);
-        // TODO(permanentOwner 缺口): SoloMapling 此处 drop.setPermanentOwner(true) 使掉落物所有权永不过期
-        // （仅 owner/party 可拾取）。gms MapItem 无 permanentOwner 标志；spawnItemDropNoExpire 已保证
-        // 物品本身不消失，但所有权仍按 vanilla 15s 后转为 FFA。
+        // 永久所有权:仅 owner/party 可拾取,15s 到期不转 FFA(源 SoloMapling DropCommands 同)。
+        if (drop != null) drop.setPermanentOwner(true);
         return drop;
     }
 
     public static void botDropItemQtyOwnerOnly(Character fakechar, int itemId, int qty) {
         Item itemToDrop = BotLogic.generateCleanItemWithQty(itemId, qty);
-        fakechar.getMap().spawnItemDropNoExpire(fakechar, fakechar, itemToDrop,
+        MapItem drop = fakechar.getMap().spawnItemDropNoExpire(fakechar, fakechar, itemToDrop,
                 fakechar.getPosition(), false, false);
-        // TODO(permanentOwner 缺口): 原实现 drop.setPermanentOwner(true)，见 botThrowItemNoExpireOwnerOnly 注释。
+        // 永久所有权,见 botThrowItemNoExpireOwnerOnly 注释。
+        if (drop != null) drop.setPermanentOwner(true);
     }
 
     public static void botThrowItemQty(Character fakechar, int itemId, int qty, Point throwPos) {
@@ -146,9 +147,10 @@ public class DropCommands {
 
     public static void botThrowItemToOwner(Character dropper, int itemId, Point throwPos, Character owner) {
         Item itemToDrop = BotLogic.generateCleanItem(itemId);
-        dropper.getMap().spawnItemDropNoExpire(dropper, owner, itemToDrop,
+        MapItem drop = dropper.getMap().spawnItemDropNoExpire(dropper, owner, itemToDrop,
                 throwPos, false, false);
-        // TODO(permanentOwner 缺口): 原实现 drop.setPermanentOwner(true)，见 botThrowItemNoExpireOwnerOnly 注释。
+        // 永久所有权,见 botThrowItemNoExpireOwnerOnly 注释。
+        if (drop != null) drop.setPermanentOwner(true);
     }
 
     // Meso, Equip, Item, Item Qty - Throw to Owner - Owner only can loot

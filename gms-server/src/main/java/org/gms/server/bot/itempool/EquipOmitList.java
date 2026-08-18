@@ -1,5 +1,7 @@
 package org.gms.server.bot.itempool;
 
+import lombok.extern.slf4j.Slf4j;
+import org.gms.util.I18nUtil;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.InputStream;
@@ -32,6 +34,7 @@ import java.util.Set;
  * （{@code EquipOmitList.yaml} 相对本类包，位于
  * {@code resources/org/gms/server/bot/itempool/}，jar 部署安全）；解析/容错语义与源一致。
  */
+@Slf4j
 public class EquipOmitList {
 
     private static final String YAML_PATH =
@@ -54,7 +57,7 @@ public class EquipOmitList {
             InputStream in = EquipOmitList.class.getResourceAsStream(YAML_PATH);
             if (in == null) {
                 loaded = true;
-                System.err.println("[EquipOmitList] YAML resource not found: " + YAML_PATH);
+                log.warn(I18nUtil.getLogMessage("EquipOmitList.resource.missing", YAML_PATH));
                 return;
             }
             Map<String, Object> root;
@@ -86,14 +89,12 @@ public class EquipOmitList {
             }
 
             loaded = true;
-            System.out.println("[EquipOmitList] Loaded " + omittedIds.size()
-                    + " omitted ids and " + omittedRanges.size()
-                    + " ranges (enabled=" + enabled + ")");
+            log.info(I18nUtil.getLogMessage("EquipOmitList.loaded",
+                    String.valueOf(omittedIds.size()), String.valueOf(omittedRanges.size()), String.valueOf(enabled)));
         } catch (Exception e) {
             // Fail open: keep the list empty so bot spawn still works.
             loaded = true;
-            System.err.println("[EquipOmitList] Failed to load YAML, omit list disabled: "
-                    + e.getMessage());
+            log.error(I18nUtil.getLogMessage("EquipOmitList.load.fail"), e);
         }
     }
 

@@ -38,6 +38,12 @@ public class MapItem extends AbstractMapObject {
     protected int character_ownerid, party_ownerid, meso, questid = -1;
     protected byte type;
     protected boolean pickedUp = false, playerDrop, partyDrop;
+    // 永久所有权标志(移植自 SoloMapling MapItem):置位后 15s 所有权到期不再把
+    // 掉落转为 FFA,非 owner/party 永远不能拾取(黑杰克发牌、drop game 赌注等
+    // owner-only 掉落使用)。仅 bot 掉落路径在 spawn 后 set,真实玩家掉落默认 false。
+    // volatile 是因为 setPermanentOwner 在物品注册进地图后由 bot 线程锁外写入,
+    // 拾取判定(锁内 canBePickedBy / 锁外 hasClientsideOwnership)要保证可见性。
+    protected volatile boolean permanentOwner;
     protected long dropTime;
     private final Lock itemLock = new ReentrantLock();
 
@@ -154,10 +160,14 @@ public class MapItem extends AbstractMapObject {
     }
 
     public final boolean hasClientsideOwnership(Character player) {
-        return this.character_ownerid == player.getId() || this.party_ownerid == player.getPartyId() || hasExpiredOwnershipTime();
+        return this.character_ownerid == player.getId() || this.party_ownerid == player.getPartyId() || (!permanentOwner && hasExpiredOwnershipTime());
     }
 
     public final boolean isFFADrop() {
+        // permanentOwner 掉落永不转 FFA(源 SoloMapling 语义一致)
+        if (permanentOwner) {
+            return false;
+        }
         return type == 2 || type == 3 || hasExpiredOwnershipTime();
     }
 
@@ -195,7 +205,24 @@ public class MapItem extends AbstractMapObject {
             }
         }
 
-        return hasExpiredOwnershipTime();
+        // permanentOwner 置位时,即使 15s 到期也不向非 owner/party 开放(源 SoloMapling 语义)
+        return !permanentOwner && hasExpiredOwnershipTime();
+    }
+
+    /**
+     * 永久所有权标志(移植自 SoloMapling):置位后本掉落永不因 15s 到期转为 FFA,
+     * 非 owner/party 永远无法拾取。仅供 bot 掉落路径(黑杰克发牌、drop game 赌注等
+     * owner-only 掉落)在物品生成后立即调用;真实玩家掉落不设置,行为与 vanilla 一致。
+     */
+    public void setPermanentOwner(boolean permanentOwner) {
+        this.permanentOwner = permanentOwner;
+    }
+
+    /**
+     * 读取永久所有权标志(volatile 读,可在 itemLock 之外安全使用)。
+     */
+    public boolean isPermanentOwner() {
+        return permanentOwner;
     }
 
     public final Client getOwnerClient() {

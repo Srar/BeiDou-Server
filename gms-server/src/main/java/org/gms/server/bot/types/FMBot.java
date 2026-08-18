@@ -12,6 +12,7 @@ import org.gms.server.bot.freemarket.ShopKeeper;
 import org.gms.server.bot.gcmove.GCMovement;
 import org.gms.server.bot.messaging.ChatMessage;
 import org.gms.server.bot.messaging.MessageQueue;
+import org.gms.server.bot.replay.navigation.FMMovementCommands;
 import org.gms.server.maps.HiredMerchant;
 import org.gms.server.maps.MapObject;
 import org.gms.server.maps.MapObjectType;
@@ -44,7 +45,8 @@ import static org.gms.server.bot.freemarket.BotRand.generateRandomNumber;
  * 自由市场逛店 Bot（逐行移植自 SoloMapling FMBot，500 行）。
  * BASE_WALK_CHANCE=0.40 / WALK_CHANCE_INCREMENT=0.10 / 购买阈值 {0.7..1.2}→概率 {1.0..0.05} /
  * ratio&gt;1.2 不买 / MAX_DOOR_WALK_ATTEMPTS=3。
- * gms 底座差异：FM 门导航（FMMovementCommands，录制引擎）未移植，getDoorPoint 退化占位。
+ * gms 底座差异：FM 门导航已接线（FMMovementCommands.getDoorPoint 恢复房间门坐标查询，
+ * 走门仍由 gcmove 驱动，与源一致）；portal 缺失时退化直接进房。
  */
 @Slf4j
 public class FMBot extends BotSM {
@@ -134,10 +136,14 @@ public class FMBot extends BotSM {
     }
 
     private Point getDoorPoint(int room) {
-        // gms 移植：源 FMMovementCommands.getDoorPoint(room) 返回 FM 入口图上房间门的坐标，
-        // 依赖录制引擎（BotMovementSystem.NavigationSystem），未移植。
-        // TODO(FM门导航)：用 gcmove 图导航替换；退化返回 null，直接 botEnterFMRoom。
-        return null;
+        // 录制引擎接线（P5-H2）：恢复 SoloMapling 的 FMMovementCommands.getDoorPoint(room)——
+        // 即 FM 入口图（910000000）上房间门 portal（in%02d）的坐标。gms 底座 portal 可能缺失
+        //（地图未加载等），返回 null 时 navToFMRoom 按移植前语义直接 botEnterFMRoom。
+        Point doorPt = FMMovementCommands.getDoorPoint(room);
+        if (doorPt == null) {
+            log.warn("FMBot.getDoorPoint: no door point for room {}", room);
+        }
+        return doorPt;
     }
 
     private void processRoom() {

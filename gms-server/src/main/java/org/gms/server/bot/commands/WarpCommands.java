@@ -6,11 +6,17 @@ import org.gms.net.server.Server;
 import org.gms.net.server.channel.Channel;
 import org.gms.server.bot.BotHelpers;
 import org.gms.server.bot.DefaultBotServerAccess;
+import org.gms.server.bot.replay.MovementCommands;
+import org.gms.server.bot.replay.MovementRecording;
 import org.gms.server.maps.MapleMap;
 import org.gms.server.maps.Portal;
+import org.gms.util.I18nUtil;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.gms.server.bot.replay.InPacketReader.getMovementRecording;
+import static org.gms.server.bot.replay.MovementCommands.BotMoveStreamOffset;
 
 /**
  * 传送命令（SoloMapling BotCommandsPack.WarpCommands 逐行移植）。
@@ -18,7 +24,8 @@ import java.util.Map;
  * 底座差异：无 BotClientHandler 的 getBotClient() 无参静态导入，改走
  * {@code fakechar.getMap().getChannelServer()}（有角色时）或
  * {@link DefaultBotServerAccess} 解析的 bot 频道（无角色入参的 FM portal 查询）；
- * 无录制引擎，{@link #botEnterPortalDropDown(Character, int)} 仅保留假 portal 延迟。
+ * {@link #botEnterPortalDropDown(Character, int)} 已恢复录制回放（"portalenterdrop"），
+ * 回放前按导航原语模式拿移动锁（gms 底座出生即 enable gcmove，锁被占时跳过落下动画）。
  */
 @Slf4j
 public class WarpCommands {
@@ -184,11 +191,28 @@ public class WarpCommands {
     // Deliberate synchronous choreography: fake portal lag, then a blocking
     // recording replay. Part of the spawn/warp arrival scripts that hold their thread.
     public static void botEnterPortalDropDown(Character fakechar, int variablePortalLag) {
-        // TODO(录制引擎缺口): SoloMapling 原行为为「假 portal 延迟 variablePortalLag 后回放
-        // "portalenterdrop" 录制（getMovementRecording(0, "portalenterdrop") + BotMoveStreamOffset），
-        // 以模拟角色从 portal 落下动画。gms 未移植录制引擎，此处仅保留假 portal 延迟；
-        // 落地定位已由调用方 changeMap 完成（简化落地等价）。
         BotHelpers.blockingSleep(variablePortalLag);
+        String recName = "portalenterdrop";
+        try {
+            MovementRecording mvr = getMovementRecording(0, recName);
+            // 录制引擎接线（P5-H2）：回放与 gcmove 会话互斥。SoloMapling 原语义不拿锁
+            //（其出生链不 enable gcmove）；gms 底座出生即 enable（BotStartupManager.spawnOne），
+            // 故此处按导航原语模式拿锁：锁被动态会话占住时跳过落下动画（假 portal 延迟已睡过），
+            // 避免两个引擎并发驱动同一 Character。
+            if (!MovementCommands.tryAcquireMovementLock(fakechar)) {
+                log.warn(I18nUtil.getLogMessage("WarpCommands.portalDropDown.lockBusy", fakechar.getId()));
+                return;
+            }
+            try {
+                BotMoveStreamOffset(mvr, fakechar);
+            } finally {
+                MovementCommands.releaseMovementLock(fakechar);
+            }
+        } catch (Exception e) {
+            // Missing/corrupt recording shouldn't break the warp — arrival position is already set.
+            log.warn(I18nUtil.getLogMessage("WarpCommands.portalDropDown.playbackFailed",
+                    fakechar.getId(), recName));
+        }
     }
 
     public static void botEnterPortalDropDown(Character fakechar) {

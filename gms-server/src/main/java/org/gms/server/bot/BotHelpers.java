@@ -422,12 +422,16 @@ public final class BotHelpers {
     /**
      * 等价 SoloMapling BotHelpers.blockingSleep：刻意阻塞当前线程（数据驱动的编排）。
      * 仅供 BotCommandsPack 等已在独立虚拟线程上运行的编排路径使用。
+     * 返回 false 表示线程被中断（中断标志已恢复）——同步编排（如出生到场动画）
+     * 应据此中止后续步骤；既有调用方忽略返回值的行为不变。
      */
-    public static void blockingSleep(long milliseconds) {
+    public static boolean blockingSleep(long milliseconds) {
         try {
             Thread.sleep(milliseconds);
+            return true;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            return false;
         }
     }
 }

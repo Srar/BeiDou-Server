@@ -23,6 +23,7 @@ import lombok.Getter;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -39,6 +40,15 @@ public class ThreadManager {
 
     public void newTask(Runnable r) {
         executorService.execute(r);
+    }
+
+    /**
+     * 提交任务并返回可取消的 Future（等价 SoloMapling
+     * ExecutorServiceManager.getVirtualThreadExecutorService().submit(...)）。
+     * 供需要中断长任务（如录制回放流）的调用方使用；执行前需先 {@link #start()}。
+     */
+    public Future<?> submit(Runnable r) {
+        return executorService.submit(r);
     }
 
     public void start() {

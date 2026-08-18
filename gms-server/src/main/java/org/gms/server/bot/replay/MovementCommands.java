@@ -15,6 +15,7 @@ import org.gms.util.PacketCreator;
 import org.gms.exception.EmptyMovementException;
 
 import org.gms.server.maps.MapleMap;
+import org.gms.util.I18nUtil;
 
 import java.awt.*;
 import java.util.Map;
@@ -607,7 +608,7 @@ public class MovementCommands {
     private static boolean waitBetweenTwoLong(long timestamp1, long timestamp2) {
         long diff = Math.max(0, timestamp2 - timestamp1);
         if (diff > 2000) {
-            System.out.println("More than 2 seconds waiting");
+            log.debug(I18nUtil.getLogMessage("MovementCommands.waitGapLong", diff));
         }
         try {
             Thread.sleep(diff);

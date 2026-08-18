@@ -87,11 +87,11 @@ class BotTypeManagerTest {
         assertTrue(bot.getRunning());
         assertTrue(BotTickService.isRegistered(botId), "started bot must be registered on the tick wheel");
 
-        // 首 tick 延迟在 [SPAWN_CHOREOGRAPHY_MAX_MS(2000), 2000+3000) 区间；
+        // 首 tick 延迟在 [SPAWN_CHOREOGRAPHY_MAX_MS(7000), 7000+3000) 区间；
         // 以 start 前时刻为基准计算期望区间，避免 start→断言之间的耗时侵蚀下界余量
         Long due = BotTickService.nextDueMs(botId);
         assertNotNull(due);
-        assertTrue(due >= t0 + 1_900 && due <= t0 + 5_100,
+        assertTrue(due >= t0 + 6_900 && due <= t0 + 10_100,
                 "first tick delay out of bounds: " + (due - t0) + "ms");
     }
 

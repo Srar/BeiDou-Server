@@ -130,9 +130,9 @@ public class BotDialogueHandler {
     }
 
     public void listOptions(Character player, BotSM botSM) {
-        // gms 未移植 DiceBot（soloMapling.ArtificialPlayer.BotTypes.DiceBot），
-        // 源里的 DiceBot 分支移除，统一走基类 displayCommands。
-        // TODO(移植): DiceBot 落地后恢复 instanceof DiceBot -> displayCommands 分支。
+        // DiceBot 已移植（org.gms.server.bot.types.DiceBot，覆盖 displayCommands）。
+        // 源里的 instanceof DiceBot 分支与基类同为调用 displayCommands(player)，多态下
+        // 二者等价，统一走此调用即可，无需恢复 instanceof 分支。
         botSM.displayCommands(player);
     }
 

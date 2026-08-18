@@ -417,8 +417,10 @@ public final class BotAttackDriver {
      * so a mob behind the bot got a one-frame swing then an immediate revert. Bots not under dynamic
      * control (e.g. the GM TestAttackBot) fall back to that legacy flip.
      *
-     * gms 移植：SoloMapling 的 MovementCommands.botFaceTowardsPoint / facingLeft 未移植；旧引擎分支
-     * 直接翻转 Character 的 stance（STAND_LEFT_STANCE / STAND_RIGHT_STANCE）并广播 idle 朝向。
+     * gms 移植：SoloMapling 的 MovementCommands.botFaceTowardsPoint / facingLeft 已随
+     * MovementCommands 移植（org.gms.server.bot.replay 包）；本方法保留 gms 侧实现——
+     * GC 控制走 GCMovement.face（设置权威 facingDir 并广播转身），旧引擎分支直接翻转
+     * Character 的 stance（STAND_LEFT_STANCE / STAND_RIGHT_STANCE）并广播 idle 朝向。
      */
     private static boolean faceTarget(Character bot, Point target) {
         boolean left = target.x < bot.getPosition().x;

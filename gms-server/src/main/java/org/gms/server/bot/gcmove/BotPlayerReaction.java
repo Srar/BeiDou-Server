@@ -57,7 +57,8 @@ final class BotPlayerReaction {
     // playerId -> earliest time any bot may react to that player again. Shared across all bots.
     private static final Map<Integer, Long> PLAYER_REACT_UNTIL = new ConcurrentHashMap<>();
 
-    // Three-way roll outcome. Mirrors SoloMapling PlayerReaction.ReactionType (not yet ported).
+    // Three-way roll outcome. 与已移植的 PlayerReaction.ReactionType（replay 包）一一对应；
+    // 本类保留本地枚举以保持 GC 层自包含，不引入对 replay 包的静态耦合。
     private enum Reaction {
         IGNORE,
         STOP_REACT,
@@ -122,10 +123,10 @@ final class BotPlayerReaction {
                 .executeBotContextDialogue(REACT_NODE, botSM, player, BotDialogueHandler.CONTEXT_LINE_CHANCE));
     }
 
-    // Inline equivalent of SoloMapling PlayerReaction.executeWalkReaction (PlayerReaction not ported):
-    // on a virtual thread, roll a random emote-or-chat walk reaction. The emote is a random ambient
-    // emote from the shared HenesysBot "PlayerReaction" node; chat falls back to emote when no
-    // token-free line resolves (there is no specific player here, so {PLAYER_*} lines drop).
+    // PlayerReaction.executeWalkReaction 已移植（replay 包），本 fallback 为其内联等价：
+    // 在虚拟线程上随机 emote 或聊天。emote 取自共享 HenesysBot "PlayerReaction" 节点的
+    // 随机环境 emote；无 token-free 行可解析时聊天回退为 emote（此处无特定玩家，{PLAYER_*} 行丢弃）。
+    // 内联是因为 GC 层不直接依赖 replay 包的回放线程模型。
     private static void executeWalkReactionFallback(Character bot) {
         BotExecutors.runAsync(() -> {
             try {

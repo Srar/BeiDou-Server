@@ -268,7 +268,8 @@ public final class BotBuffRequestHandler {
         return lines[ThreadLocalRandom.current().nextInt(lines.length)];
     }
 
-    // gms 移植：SoloMapling 的 MovementCommands.botFaceTowardsPoint 未移植；GC 控制的 bot 用
+    // gms 移植：SoloMapling 的 MovementCommands.botFaceTowardsPoint 已随 MovementCommands 移植
+    // （org.gms.server.bot.replay 包）；本方法保留 gms 侧实现——GC 控制的 bot 用
     // GCMovement.face，旧引擎分支直接翻转 stance 并广播 idle 朝向。
     private static void faceTowards(Character chr, Point target) {
         boolean left = target.x < chr.getPosition().x;
@@ -291,8 +292,9 @@ public final class BotBuffRequestHandler {
         chr.getMap().broadcastMessage(chr, packet, chr.getPosition());
     }
 
-    // gms 移植：SoloMapling 的 SocialCommands.BotChatbubble 未移植；用 PacketCreator.getChatText
-    // 广播气泡（show=1 只显示气泡、不进聊天框，等价实现）。
+    // gms 移植：SoloMapling 的 SocialCommands.BotChatbubble 已随 SocialCommands 移植
+    // （org.gms.server.bot.commands 包）；此处保留等价内联——用 PacketCreator.getChatText
+    // 广播气泡（show=1 只显示气泡、不进聊天框）。
     private static void botChatbubble(Character chr, String message) {
         chr.getMap().broadcastMessage(PacketCreator.getChatText(chr.getId(), message, false, 1));
     }

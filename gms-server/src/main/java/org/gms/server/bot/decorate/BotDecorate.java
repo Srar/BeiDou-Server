@@ -387,11 +387,12 @@ public class BotDecorate {
     }
 
     /**
-     * SoloMapling's EquipMetadataCache.isInitialized() gate is not ported — gms'
-     * {@link org.gms.server.ItemInformationProvider} is the canonical equip source and
-     * is always available once the server is up, so this always returns true.
+     * SoloMapling 以 EquipMetadataCache.isInitialized() 作装饰门。gms 的
+     * {@link org.gms.server.bot.itempool.EquipMetadataCache} 已移植，但
+     * {@link org.gms.server.ItemInformationProvider} 始终是权威装备来源且服务器起来后恒可用，
+     * 故此门恒返回 true。
      * <p>
-     * 因此 gms 无 EquipMetadataCache，装饰恒为同步 inline（走 if 分支直接装饰）；调用方的
+     * 因此装饰恒为同步 inline（走 if 分支直接装饰）；调用方的
      * else 分支（延迟装饰队列 BotDecorationQueue.addBot）仅在该缓存未就绪的路径使用，
      * 在 gms 恒不可达——不是死代码，而是为保持源控制流 1:1 迁移所保留的结构。
      */

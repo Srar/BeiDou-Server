@@ -125,8 +125,8 @@ final class LodMetrics {
         return released;
     }
 
-    // TODO: SoloMapling's BotHelpers.getCharFromChannelStorage(id) has no gms BotHelpers equivalent,
-    // so resolve the character by walking every world's player storage instead.
+    // BotHelpers.getCharFromChannelStorage 在 gms 无对应实现，此处遍历所有 world 的
+    // playerStorage 按 id 解析角色（等价逻辑）。
     private static Character getCharFromChannelStorage(int id) {
         for (World world : Server.getInstance().getWorlds()) {
             Character chr = world.getPlayerStorage().getCharacterById(id);

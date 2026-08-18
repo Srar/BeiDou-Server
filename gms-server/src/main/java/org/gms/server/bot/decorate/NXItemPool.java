@@ -88,10 +88,10 @@ public class NXItemPool {
             })
     );
 
-    // Rebuilt cash-item id ranges. SoloMapling's EquipMetadataCache (not ported) derived
-    // these from its EQUIP_RANGES table; we replicate that full table verbatim (including
-    // FACE and RING, which gms' ItemInformationProvider.EQUIP_TYPE_RANGES does not carry)
-    // so the getCashByType rebuild below sees the same item space.
+    // Rebuilt cash-item id ranges. EquipMetadataCache（org.gms.server.bot.itempool 包）已移植，
+    // 其 EQUIP_RANGES 表源自 SoloMapling；此处完整复制该表（含 FACE 与 RING——gms 的
+    // ItemInformationProvider.EQUIP_TYPE_RANGES 不携带这两个区间），使下方 getCashByType
+    // 重建看到相同的物品空间。可择机改调 EquipMetadataCache 的区间表消除重复。
     private static final Map<EquipType, int[]> EQUIP_RANGES = Map.ofEntries(
             Map.entry(EquipType.CAP,       new int[]{1000000, 1003073}),
             Map.entry(EquipType.FACE,      new int[]{1012000, 1012200}),

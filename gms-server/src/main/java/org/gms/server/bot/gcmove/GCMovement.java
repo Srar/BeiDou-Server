@@ -90,7 +90,8 @@ public final class GCMovement {
         BotMovementState st = STATES.remove(bot.getId());
         if (st != null) {
             GCMovementDriver.stop(st);
-            // gms 移植：SoloMapling 的 MovementCommands.releaseMovementLock 未移植（无 recorded-path 引擎）。
+            // gms 移植：SoloMapling 的 MovementCommands.releaseMovementLock 已随 MovementCommands
+            // 移植（org.gms.server.bot.replay 包）；GC 路径不持有录制引擎的移动锁，故无需调用。
         }
         ARRIVAL_CALLBACKS.remove(bot.getId());
     }

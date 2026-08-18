@@ -389,13 +389,14 @@ public class BotTradeSM {
         });
     }
 
-    // ── 移植自 SocialCommands.BotSpeak/BotEmote（gms 未落地 SocialCommands，按原语照搬） ──
+    // ── 移植自 SocialCommands.BotSpeak/BotEmote（SocialCommands 已移植，见 org.gms.server.bot
+    //    .commands.SocialCommands；此处按原语照搬保留本地实现） ──
 
     /**
      * 等价 SocialCommands.BotSpeak→BotFullChat：普通聊天广播。
-     * 源 BotSpeak 会按 botChatTypingStyle 分支走打字气泡（该开关源默认 false、属调试用途，
-     * gms 未移植），此处直接对齐默认分支 BotFullChat；源 BotFullChat 以 isGM() 作白色聊天位，
-     * gms 以 getWhiteChat()（= isGM() && whiteChat）代替，对非 GM bot 二者等价。
+     * 源 BotSpeak 会按 botChatTypingStyle 分支走打字气泡（该开关已随 SocialCommands 移植、
+     * 默认 false、属调试用途），此处直接对齐默认分支 BotFullChat；源 BotFullChat 以 isGM() 作
+     * 白色聊天位，gms 以 getWhiteChat()（= isGM() && whiteChat）代替，对非 GM bot 二者等价。
      */
     private static void botSpeak(Character chr, String message) {
         if (chr.getMap() != null) {

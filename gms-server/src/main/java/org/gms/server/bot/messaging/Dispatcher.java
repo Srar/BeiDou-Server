@@ -196,7 +196,8 @@ public class Dispatcher implements Runnable {
         Character respondant = message.getSender();
         if (checkIfRespondant(respondant)) { // Check if message contains a respondant
             // TODO(P5-D 对话体系)：SoloMapling 原实现先 expirePlayerChatCommands(respondant) 清除气泡，
-            // 再入默认 secondary 队列；expirePlayerChatCommands 属对话命令，尚未移植。
+            // 再入默认 secondary 队列；expirePlayerChatCommands 已随 SocialCommands 移植
+            // （org.gms.server.bot.commands 包），此处尚未接入。
             messageQueue.addMessage(message); // Put into 2nd queue
         } else if (checkIfInquirer(respondant)) {
             messageQueue.addMessage("tertiary", message);

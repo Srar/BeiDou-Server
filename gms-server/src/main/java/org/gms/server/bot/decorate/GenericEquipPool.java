@@ -169,8 +169,8 @@ public class GenericEquipPool {
         for (PoolItem item : list) {
             if (item.minLevel > botLevel) continue; // hard rule: never over-level
             if (item.gender != GENDER_UNISEX && item.gender != botGender) continue; // gender gate
-            // NOTE: SoloMapling's EquipOmitList.isOmitted(item.id) skip is not ported —
-            // EquipOmitList is a SoloMapling-specific blocklist with no gms equivalent.
+            // EquipOmitList 已移植（org.gms.server.bot.itempool.EquipOmitList，YAML 数据驱动，
+            // isOmitted(int) 可用）。此处未接源里的 isOmitted(item.id) 过滤，可择机恢复。
             double gap = botLevel - item.minLevel;
             double w = 1.0 / (1.0 + gap * LEVEL_DECAY);
             if (w < FASHION_FLOOR) w = FASHION_FLOOR;

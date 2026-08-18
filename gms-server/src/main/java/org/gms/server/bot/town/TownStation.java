@@ -97,10 +97,11 @@ public final class TownStation {
         Point dest = spots.get(0);
 
         releaseSpot(bot); // free the old ledge before the walk so it isn't held stale mid-stroll
-        // SoloMapling 此处调用旧引擎阻塞走位 pathFinderAware(bot, dest)，到点后才 claimSpot。gms 未移植
-        // 录制引擎，改用 GCMovement.move 的 onArrival 回调：bot 走到新点才 claim，而不是 fire-and-forget
-        // 后立即 claim（那会在 bot 尚未就位时就抢占目标 ledge）。
-        GCMovement.move(bot, dest.x, dest.y, () -> claimSpot(bot));
+        // SoloMapling 此处调用旧引擎阻塞走位 pathFinderAware(bot, dest)，到点后无论成败都 claimSpot
+        //（claim the ledge we actually ended on）。gms 用 GCMovement.move 的异步驱动：onArrival 到点
+        // claim；onAbandon（无进展/不可达时 abandonMove 丢弃到达回调）兜底 claim 实际所在 ledge，
+        // 否则失败走位会留下空置 ledge / 后续 bot 堆叠。
+        GCMovement.move(bot, dest.x, dest.y, () -> claimSpot(bot), () -> claimSpot(bot));
         return true;
     }
 

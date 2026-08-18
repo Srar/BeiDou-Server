@@ -38,6 +38,7 @@ public final class GCMovement {
 
     private static final Map<Integer, BotMovementState> STATES = new ConcurrentHashMap<>();
     private static final Map<Integer, Runnable> ARRIVAL_CALLBACKS = new ConcurrentHashMap<>();
+    private static final Map<Integer, Runnable> ABANDON_CALLBACKS = new ConcurrentHashMap<>();
 
     // ── Lifecycle ───────────────────────────────────────────────────────────
 
@@ -93,6 +94,7 @@ public final class GCMovement {
             // gms 移植：SoloMapling 的 MovementCommands.releaseMovementLock 未移植（无 recorded-path 引擎）。
         }
         ARRIVAL_CALLBACKS.remove(bot.getId());
+        ABANDON_CALLBACKS.remove(bot.getId());
     }
 
     public static boolean isEnabled(Character bot) {
@@ -112,6 +114,7 @@ public final class GCMovement {
         }
         STATES.clear();
         ARRIVAL_CALLBACKS.clear();
+        ABANDON_CALLBACKS.clear();
         GCMovementDriver.shutdownPool();
         ObserverTracker.stop();
         BotNavigationGraphProvider.shutdown();
@@ -136,6 +139,13 @@ public final class GCMovement {
 
     /* As .move(Character, int, int) with an arrival callback. */
     public static void move(Character bot, int x, int y, Runnable onArrival) {
+        move(bot, x, y, onArrival, null);
+    }
+
+    /* As .move(Character, int, int, Runnable) with an additional abandon callback: fired when the move
+     * is given up (no progress / unreachable) instead of the callback being silently dropped. Lets
+     * callers reclaim resources (e.g. TownStation ledge claims) even when the walk fails. */
+    public static void move(Character bot, int x, int y, Runnable onArrival, Runnable onAbandon) {
         if (bot == null) {
             return;
         }
@@ -156,6 +166,11 @@ public final class GCMovement {
             ARRIVAL_CALLBACKS.put(bot.getId(), onArrival);
         } else {
             ARRIVAL_CALLBACKS.remove(bot.getId());
+        }
+        if (onAbandon != null) {
+            ABANDON_CALLBACKS.put(bot.getId(), onAbandon);
+        } else {
+            ABANDON_CALLBACKS.remove(bot.getId());
         }
     }
 
@@ -296,6 +311,7 @@ public final class GCMovement {
         st.farmAnchorMapId = -1;
         BotMovementManager.clearNavigationState(st);
         ARRIVAL_CALLBACKS.remove(bot.getId());
+        ABANDON_CALLBACKS.remove(bot.getId());
     }
 
     /* GCFollow: target is on the bot's map — arm same-map follow (the driver does the walking). */
@@ -860,10 +876,21 @@ public final class GCMovement {
 
     // ── Internal driver callback ────────────────────────────────────────────
 
-    /* Driver hook: a move was abandoned (no progress / unreachable) — drop its callback unfired. */
+    /* Driver hook: a move was abandoned (no progress / unreachable) — drop its arrival callback and fire
+     * the abandon callback (if any) so callers can reclaim resources held for the failed walk. */
     static void abandonMove(BotMovementState entry) {
-        if (entry != null && entry.bot != null) {
-            ARRIVAL_CALLBACKS.remove(entry.bot.getId());
+        if (entry == null || entry.bot == null) {
+            return;
+        }
+        ARRIVAL_CALLBACKS.remove(entry.bot.getId());
+        Runnable cb = ABANDON_CALLBACKS.remove(entry.bot.getId());
+        if (cb != null) {
+            try {
+                cb.run();
+            } catch (Throwable ignored) {
+                // callback errors must not kill the tick
+                log.debug("GCMovement abandon callback failed for bot {}", entry.bot.getId(), ignored);
+            }
         }
     }
 

@@ -13,6 +13,8 @@ import org.gms.model.dto.GachaponPoolSearchReqDTO;
 import org.gms.model.dto.GachaponPoolSearchRtnDTO;
 import org.gms.net.server.Server;
 import org.gms.server.ItemInformationProvider;
+import org.gms.server.bot.event.BotEventBus;
+import org.gms.server.bot.event.GameEvent;
 import org.gms.server.gachapon.Gachapon;
 import org.gms.server.life.LifeFactory;
 import org.gms.util.I18nUtil;
@@ -270,6 +272,11 @@ public class GachaponService {
 
         if (pool.getNotification()) {
             Server.getInstance().broadcastMessage(player.getWorld(), PacketCreator.gachaponMessage(itemGained, player.getMap().getMapName(), player));
+        }
+        // 发布扭蛋开奖事件（bot 事件总线）：同图 GachaBot 订阅 GACHAPON_REWARD 做开奖反应。
+        // player.getClient() 判空：NPC 脚本路径必有 client，但防御性跳过避免事件频道字段 NPE。
+        if (player.getClient() != null) {
+            BotEventBus.getInstance().publish(GameEvent.gachaponReward(player.getWorld(), player.getClient().getChannel(), player.getMapId(), player.getId()));
         }
     }
 

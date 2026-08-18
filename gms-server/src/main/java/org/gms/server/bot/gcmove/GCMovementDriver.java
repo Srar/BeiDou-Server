@@ -1,6 +1,7 @@
 package org.gms.server.bot.gcmove;
 
 import org.gms.client.Character;
+import org.gms.server.bot.BotMapEntryResponder;
 import org.gms.server.maps.MapleMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -487,8 +488,9 @@ final class GCMovementDriver {
             ObserverTracker.markObservedNow(bot.getMapId());
             // Ours: the movement above is already instant - also wake the arriving bot's macro brain so
             // it acts promptly instead of on its slow 2-6s/10s wheel. See BotMapEntryResponder (B).
-            // gms 移植：SoloMapling 的 BotMapEntryResponder.onBotArrivedObserved(bot) 未移植（gms 的
-            // org.gms.server.bot.BotMapEntryResponder 无此静态方法）。TODO(P2)：落地后恢复等价 nudge。
+            // 在 150-700ms 抖动窗口内把该 bot 的下一次宏 tick 拉前；nudgeSoon 只重排下一次触发、
+            // 绝不内联跑 FSM（自带去抖与运行态门控），移动 tick 线程调用安全。
+            BotMapEntryResponder.onBotArrivedObserved(bot);
         }
         entry.fhIndex = BotMovementManager.buildFhIndex(map);
         Point spawn = bot.getPosition();

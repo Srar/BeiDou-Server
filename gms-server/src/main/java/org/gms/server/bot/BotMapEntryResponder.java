@@ -1,6 +1,7 @@
 package org.gms.server.bot;
 
 import lombok.extern.slf4j.Slf4j;
+import org.gms.client.Character;
 import org.gms.server.bot.event.BotEventBus;
 import org.gms.server.bot.event.EventSubscriber;
 import org.gms.server.bot.event.EventType;
@@ -11,10 +12,14 @@ import org.gms.util.Randomizer;
 import java.util.Set;
 
 /**
- * MAP_ENTERED 单例订阅者（对应 SoloMapling 的 BotMapEntryResponder）：
- * 真实玩家进图时把同图 bot 的下一次 tick 拉前（150-700ms 抖动），
- * 让 bot 在共享地图的瞬间就有反应。
- * <p>
+ * MAP_ENTERED 单例订阅者（对应 SoloMapling 的 BotMapEntryResponder）。两个方向，一次 nudge：
+ * <ul>
+ * <li>A) 真实玩家进入有 bot 的图——onEvent(MAP_ENTERED)：把同图每个运行中 bot 的
+ * 下一次宏 tick 拉前（150-700ms 抖动），而不是等完 2-6s/10s 慢轮盘。</li>
+ * <li>B) bot 进入一张已有真人的图——{@link #onBotArrivedObserved(Character)}：只 nudge
+ * 到达的这只 bot。其移动已由 GCMovementDriver.onMapChange 当拍置为观察档（FULL），
+ * 这里同时唤醒它的宏观脑。</li>
+ * </ul>
  * 注意：事件发布是同步的且无异常保护——订阅者必须自保：重活转虚拟线程，
  * 异常自行吞掉，否则会炸掉玩家的进图线程。
  */
@@ -62,9 +67,41 @@ public final class BotMapEntryResponder implements EventSubscriber {
             if (bot.getChr().getWorld() == event.getWorld()
                     && bot.getChr().getClient() != null
                     && bot.getChr().getClient().getChannel() == event.getChannel()) {
-                bot.nudgeSoon(NUDGE_MIN_MS + Randomizer.nextInt(NUDGE_MAX_MS - NUDGE_MIN_MS + 1));
+                nudge(bot);
             }
         }
+    }
+
+    /**
+     * 方向 B（SoloMapling BotMapEntryResponder.onBotArrivedObserved 完整移植）：
+     * bot 刚进入一张已有真人的图，立即唤醒它的宏观脑——移动已由
+     * {@code GCMovementDriver.onMapChange} 当拍置为观察档（FULL），宏观 FSM 也应在
+     * 150-700ms 抖动窗口内跑下一拍，而不是等完 2-6s/10s 慢轮盘。
+     * <p>
+     * 由移动 tick 线程调用；安全——nudgeSoon 只重排轮盘上的下一次触发，
+     * 绝不内联执行 FSM，且自带去抖与运行态/交易态门控。
+     */
+    public static void onBotArrivedObserved(Character bot) {
+        try {
+            if (bot == null) {
+                return;
+            }
+            BotSM sm = BotStorage.getBotById(bot.getId());
+            if (sm != null) {
+                INSTANCE.nudge(sm);
+            }
+        } catch (Throwable ignored) {
+            // 绝不把 nudge 失败传播回移动 tick 线程/进图线程
+            log.warn(I18nUtil.getLogMessage("BotMapEntryResponder.nudge.error"), ignored);
+        }
+    }
+
+    /** 单 bot nudge：仅对运行中 bot 把下一次宏 tick 拉前（150-700ms 抖动）。 */
+    private void nudge(BotSM bot) {
+        if (!bot.getRunning()) {
+            return;
+        }
+        bot.nudgeSoon(NUDGE_MIN_MS + Randomizer.nextInt(NUDGE_MAX_MS - NUDGE_MIN_MS + 1));
     }
 
     @Override

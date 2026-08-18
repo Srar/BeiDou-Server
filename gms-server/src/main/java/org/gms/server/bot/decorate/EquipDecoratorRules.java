@@ -74,6 +74,8 @@ public class EquipDecoratorRules {
                 try {
                     // gms getRandomEquipForWearing returns int (0 = not found);
                     // SoloMapling returned a nullable Integer instead.
+                    // EquipOmitList 黑名单过滤已接入 ItemInformationProvider.getRandomEquipForWearing
+                    // 的加权抽取前(本路径经该 API,已覆盖,无需在此重复过滤)。
                     int itemId = ItemInformationProvider.getInstance().getRandomEquipForWearing(type, fakechar);
                     if (itemId > 0) {
                         BotCustomization.EquipBot(fakechar, itemId);

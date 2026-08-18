@@ -1,7 +1,10 @@
 package org.gms.server.bot.decorate;
 
+import lombok.extern.slf4j.Slf4j;
 import org.gms.server.ItemInformationProvider;
 import org.gms.server.bot.itempool.EquipMetadataCache;
+import org.gms.server.bot.itempool.EquipOmitList;
+import org.gms.util.I18nUtil;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.InputStream;
@@ -30,9 +33,8 @@ import java.util.concurrent.ThreadLocalRandom;
  * {@link #getRandom(String, int, int)} to pick a random item for a given category,
  * bot level and bot gender.
  */
+@Slf4j
 public class GenericEquipPool {
-
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GenericEquipPool.class);
 
     // Classpath resource (mirrors the SoloMapling in-tree YAML location, relocated to
     // src/main/resources/org/gms/server/bot/decorate/). Loaded via getResourceAsStream
@@ -91,7 +93,7 @@ public class GenericEquipPool {
 
         try (InputStream in = GenericEquipPool.class.getResourceAsStream(YAML_PATH)) {
             if (in == null) {
-                System.err.println("[GenericEquipPool] YAML resource not found: " + YAML_PATH);
+                log.warn(I18nUtil.getLogMessage("GenericEquipPool.resource.missing", YAML_PATH));
                 return;
             }
             Yaml yaml = new Yaml();
@@ -134,17 +136,18 @@ public class GenericEquipPool {
             }
 
             loaded = true;
-            System.out.println("[GenericEquipPool] Loaded " + itemCount
-                    + " items across " + pools.size() + " categories (reqLevel cached from WZ)");
+            log.info(I18nUtil.getLogMessage("GenericEquipPool.loaded",
+                    String.valueOf(itemCount), String.valueOf(pools.size())));
             if (filteredCount > 0) {
-                log.info("[GenericEquipPool] Filtered {} ids not found in WZ", filteredCount);
+                log.info(I18nUtil.getLogMessage("GenericEquipPool.filtered.wz",
+                        String.valueOf(filteredCount)));
             }
             if (standardFilteredCount > 0) {
-                log.info("[GenericEquipPool] Filtered {} ids outside v83 standard equip ranges", standardFilteredCount);
+                log.info(I18nUtil.getLogMessage("GenericEquipPool.filtered.standard",
+                        String.valueOf(standardFilteredCount)));
             }
         } catch (Exception e) {
-            System.err.println("[GenericEquipPool] Failed to load YAML: " + e.getMessage());
-            e.printStackTrace();
+            log.error(I18nUtil.getLogMessage("GenericEquipPool.load.fail"), e);
         }
     }
 
@@ -169,8 +172,9 @@ public class GenericEquipPool {
         for (PoolItem item : list) {
             if (item.minLevel > botLevel) continue; // hard rule: never over-level
             if (item.gender != GENDER_UNISEX && item.gender != botGender) continue; // gender gate
-            // NOTE: SoloMapling's EquipOmitList.isOmitted(item.id) skip is not ported —
-            // EquipOmitList is a SoloMapling-specific blocklist with no gms equivalent.
+            // 恢复 SoloMapling 的 EquipOmitList 过滤（源 GenericEquipPool.java:123）：
+            // 旗杆/垃圾外观 id 一律不进候选,加权随机落到同槽位其他装备。
+            if (EquipOmitList.isOmitted(item.id)) continue; // central omit list (flag/junk items)
             double gap = botLevel - item.minLevel;
             double w = 1.0 / (1.0 + gap * LEVEL_DECAY);
             if (w < FASHION_FLOOR) w = FASHION_FLOOR;

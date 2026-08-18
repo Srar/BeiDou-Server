@@ -53,6 +53,7 @@ import org.gms.provider.DataTool;
 import org.gms.provider.wz.WZFiles;
 import org.gms.server.MakerItemFactory.MakerItemCreateEntry;
 import org.gms.server.bot.itempool.EquipMetadataCache;
+import org.gms.server.bot.itempool.EquipOmitList;
 import org.gms.server.life.LifeFactory;
 import org.gms.server.life.MonsterInformationProvider;
 
@@ -2438,11 +2439,16 @@ public class ItemInformationProvider {
             candidates = highestLevelBand(belowCap);
         }
 
-        // SoloMapling additionally skips EquipOmitList entries before the weighted
-        // pick (ItemInformationProviderUtilities.java:219-227); that blocklist is
-        // SoloMapling-specific and is not ported here.
+        // SoloMapling 在加权抽取前跳过 EquipOmitList 条目
+        // （ItemInformationProviderUtilities.java:219-227）：旗杆等垃圾外观
+        // 虽然是合法装备,但 bot 穿上观感崩坏,直接从候选列表剔除,让加权随机
+        // 落在同槽位其他装备上。EquipOmitList 与 EquipMetadataCache 同属
+        // org.gms.server.bot.itempool 静态工具包,本类已有引用先例,方向一致。
         List<Integer> validEquips = new ArrayList<>(candidates.size());
         for (EquipMetadataCache.EquipEntry entry : candidates) {
+            if (EquipOmitList.isOmitted(entry.id)) {
+                continue;
+            }
             validEquips.add(entry.id);
         }
         return selectWeightedRandom(validEquips);

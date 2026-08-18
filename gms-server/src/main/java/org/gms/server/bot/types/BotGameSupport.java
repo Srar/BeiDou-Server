@@ -96,8 +96,10 @@ public final class BotGameSupport {
             return null;
         }
         Item itemToDrop = BotLogic.generateCleanItem(itemId);
-        // gms MapItem 无 setPermanentOwner；用 dropType=0（拥有者保护）近似，TODO(移植) 见源。
-        return chr.getMap().spawnItemDropNoExpire(chr, chr, itemToDrop, pos, false, false);
+        MapItem drop = chr.getMap().spawnItemDropNoExpire(chr, chr, itemToDrop, pos, false, false);
+        // permanentOwner 落地:与源一致,15s 到期不转 FFA,仅 owner/party 可拾取。
+        if (drop != null) drop.setPermanentOwner(true);
+        return drop;
     }
 
     /** 等价 DropCommands.botThrowItemToOwner：投给指定拥有者，仅其可拾取。 */
@@ -106,7 +108,8 @@ public final class BotGameSupport {
             return;
         }
         Item itemToDrop = BotLogic.generateCleanItem(itemId);
-        dropper.getMap().spawnItemDropNoExpire(dropper, owner, itemToDrop, pos, false, false);
+        MapItem drop = dropper.getMap().spawnItemDropNoExpire(dropper, owner, itemToDrop, pos, false, false);
+        if (drop != null) drop.setPermanentOwner(true);
     }
 
     /** 等价 DropCommands.botDropItemQtyOwnerOnly：脚下掉落，仅拥有者可拾取。 */
@@ -115,7 +118,8 @@ public final class BotGameSupport {
             return;
         }
         Item itemToDrop = BotLogic.generateCleanItemWithQty(itemId, qty);
-        chr.getMap().spawnItemDropNoExpire(chr, chr, itemToDrop, chr.getPosition(), false, false);
+        MapItem drop = chr.getMap().spawnItemDropNoExpire(chr, chr, itemToDrop, chr.getPosition(), false, false);
+        if (drop != null) drop.setPermanentOwner(true);
     }
 
     /** 等价 DropCommands.botDropItemWithExpiry：不消失掉落 + 到期后移除。 */

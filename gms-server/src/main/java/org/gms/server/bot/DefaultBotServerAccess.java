@@ -18,7 +18,11 @@ import org.gms.util.I18nUtil;
 @Slf4j
 public final class DefaultBotServerAccess implements BotServerAccess {
 
-    public static final DefaultBotServerAccess INSTANCE = new DefaultBotServerAccess();
+    /**
+     * 生产访问单例。刻意非 final：单元测试沿用 BotTestSupport 的反射注入模式
+     * 替换为 mock（JDK 21 禁止对 static final 字段反射赋值），生产代码只读不改写。
+     */
+    public static DefaultBotServerAccess INSTANCE = new DefaultBotServerAccess();
 
     private DefaultBotServerAccess() {
     }

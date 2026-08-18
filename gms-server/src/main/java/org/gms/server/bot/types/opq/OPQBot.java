@@ -7,10 +7,12 @@ import org.gms.server.bot.BotLogic;
 import org.gms.server.bot.BotSM;
 import org.gms.server.bot.BotTiming;
 import org.gms.server.bot.commands.BotAttack;
+import org.gms.server.bot.environment.platform.PlatformPlacement;
 import org.gms.server.bot.gcmove.GCMovement;
 import org.gms.server.bot.messaging.ChatMessage;
 import org.gms.server.bot.messaging.MessageQueue;
 import org.gms.server.bot.party.BotPartyLogic;
+import org.gms.server.bot.replay.MovementCommands;
 import org.gms.server.bot.types.BotGameSupport;
 import org.gms.server.bot.types.opq.OPQSharedContext.OPQPhase;
 import org.gms.server.maps.MapObject;
@@ -291,7 +293,12 @@ public class OPQBot extends BotSM {
             lastRecruitMessageAt = now;
             debugLogf("Recruit chat sent: \"" + msg + "\"");
 
-            wanderToRandomLedge();
+            // 换位 API 接线：招募喊话后走到大厅某个主平台的空位（占位感知，避免招募 bot 堆叠）。
+            List<String> platforms = PlatformPlacement.getMainPlatformIds(getChr().getMapId());
+            if (!platforms.isEmpty()) {
+                String target = platforms.get(new Random().nextInt(platforms.size()));
+                PlatformPlacement.botMoveToPlatformAnyUnoccupiedSpot(getChr(), target);
+            }
         }
     }
 
@@ -359,7 +366,8 @@ public class OPQBot extends BotSM {
                     "arrived within range of reactor oid=" + reactorOid + " (dx=" + dx + "px)");
             return;
         }
-        GCMovement.move(getChr(), reactorPos.x, reactorPos.y);
+        // 空中寻路接线：云反应器悬空，pathFinderBetaAerial 先投影最近录制地面点再走地面寻路。
+        MovementCommands.pathFinderBetaAerial(getChr(), reactorPos);
         waitFor(OPQConstants.NAVIGATE_SETTLE_MS); // let the walk land; range check re-runs next tick
         debugLogf("Stage1Navigate walking: dx=" + dx + " target=" + reactorPos);
     }
@@ -580,7 +588,8 @@ public class OPQBot extends BotSM {
                     "arrived at " + ordinal + " box (oid=" + reactorOid + ")");
             return;
         }
-        GCMovement.move(getChr(), reactorPos.x, reactorPos.y);
+        // 空中寻路接线：音乐盒悬空，同 STAGE_1 走 pathFinderBetaAerial 地面投影寻路。
+        MovementCommands.pathFinderBetaAerial(getChr(), reactorPos);
         waitFor(OPQConstants.NAVIGATE_SETTLE_MS); // let the walk land; range check re-runs next tick
         debugLogf("Stage2Navigate walking: dx=" + dx + " target=" + reactorPos);
     }
@@ -795,7 +804,12 @@ public class OPQBot extends BotSM {
         MapleMap lobbyMap = getChr().getMap().getChannelServer().getMapFactory().getMap(OPQConstants.OPQ_LOBBY);
         getChr().changeMap(lobbyMap, new Point(-233, 174));
         BotGameSupport.blockingSleep(2000);
-        wanderToRandomLedge();
+        // 换位 API 接线：回大厅后走到某个主平台空位（占位感知）。
+        List<String> platforms = PlatformPlacement.getMainPlatformIds(getChr().getMapId());
+        if (!platforms.isEmpty()) {
+            String target = platforms.get(new Random().nextInt(platforms.size()));
+            PlatformPlacement.botMoveToPlatformAnyUnoccupiedSpot(getChr(), target);
+        }
 
         transitionTo(OPQBotState.LOOP_CHECK, "exit-lobby complete, warped to recruitment lobby");
     }
@@ -955,17 +969,6 @@ public class OPQBot extends BotSM {
     // =========================================================================
     // gcmove 适配辅助
     // =========================================================================
-
-    /** 到随机可走平台的图导航游走（PlatformPlacement 已移植（org.gms.server.bot.environment.platform）
-        但换位 API 未接线，本类用 gcmove 踱步等价替代）。 */
-    private void wanderToRandomLedge() {
-        MapleMap map = getChr().getMap();
-        if (map == null) return;
-        List<GCMovement.Ledge> ledges = GCMovement.walkableLedges(map);
-        if (ledges.isEmpty()) return;
-        GCMovement.Ledge ledge = ledges.get(new Random().nextInt(ledges.size()));
-        GCMovement.move(getChr(), ledge.centerX(), ledge.centerY());
-    }
 
     /** 走到本图指定 portal（替代 SoloMapling MovementCommands.moveToPortal）。 */
     private void moveToPortal(int portalId) {

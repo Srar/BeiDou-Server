@@ -45,6 +45,8 @@
         <mysql-connector-j.version>8.4.0</mysql-connector-j.version> <!-- MySQL JDBC driver -->
         <junit.version>5.10.2</junit.version> <!-- Unit test -->
         <mockito.version>5.11.0</mockito.version> <!-- Unit test -->
+        <!-- 1.19.x 的 docker-java 协商 API 1.32，连不上新版 Docker（要求 >=1.40）；1.21.x 起兼容 -->
+        <testcontainers.version>1.21.0</testcontainers.version>
         <flyway-mysql.version>9.15.2</flyway-mysql.version>
         <lombok.version>1.18.30</lombok.version>
         <fastjson2.version>2.0.47</fastjson2.version>
@@ -54,6 +56,15 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- 必须先于 spring-boot-dependencies 声明（import 冲突 first-wins）：
+                 覆盖其引入的旧版 testcontainers-bom 1.19.5（docker-java 协商 API 1.32，连不上新版 Docker） -->
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>${testcontainers.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
@@ -208,6 +219,38 @@
 
         <!-- Testing -->
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mockito</groupId>
+                    <artifactId>mockito-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mockito</groupId>
+                    <artifactId>mockito-junit-jupiter</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- 端到端测试：本机 Docker 拉起 MySQL 8（镜像与 production 一致） -->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${testcontainers.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>mysql</artifactId>
+            <version>${testcontainers.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <version>${junit.version}</version>
@@ -232,6 +275,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.mybatis-flex</groupId>
             <artifactId>mybatis-flex-codegen</artifactId>
             <version>${mybatis-flex.version}</version>
@@ -242,6 +291,19 @@
     <build>
         <finalName>BeiDou</finalName>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <!-- Testcontainers shaded docker-java 的 API 版本协商键（非环境变量）。
+                             缺省时 Testcontainers 1.21 回退到 1.32，新版 Docker（>=28，minimum 1.40）会拒绝连接；
+                             旧版 Docker daemon（API<1.40）需调低或移除本属性。 -->
+                        <api.version>1.40</api.version>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>

@@ -21,7 +21,8 @@ BeiDou-Server 是一个冒险岛（MapleStory v83，GMS 协议）私服服务端
 - 运行：`java -jar BeiDou.jar`，或 `gms-server/launch.bat`/`launch.sh`（脚本期望同目录下有捆绑 JRE `jdk-21.0.11+10-jre`）。
 - 开发调试：IDE 直接运行 `org.gms.ServerApplication.main`，**Working directory 必须设为 `gms-server`**（否则相对路径找 wz/scripts/logs 会错）。
 - 测试：`mvn test`。单个测试：`mvn -pl gms-server test -Dtest=CodeGen#genMapperAndEntity`。
-  - 注意：`src/test/java/` 下的 `CodeGen`、`ExportPatch`、`XmlDiff`、`XmlNode`、`XmlSort` 是**开发工具**而非 CI 单测——`CodeGen` 直连本地 `beidou` 库生成实体/Mapper，`ExportPatch`/`Xml*` 是 wz 补丁工具的 Java 版。无 MySQL 运行时 `mvn test` 会失败。
+  - 注意：`src/test/java/` 下的 `CodeGen`、`ExportPatch`、`XmlDiff`、`XmlNode`、`XmlSort` 是**开发工具**而非 CI 单测——`CodeGen` 直连本地 `beidou` 库生成实体/Mapper，`ExportPatch`/`Xml*` 是 wz 补丁工具的 Java 版。
+  - 端到端测试（E2E）：`src/test/java/org/gms/test/e2e/` 下的 `*E2ETest`（Smoke/Flyway/Auth/Account/Config/MapperDao/Character）基于 **Testcontainers + 本机 Docker 拉起 MySQL 8**（镜像 tag 固定 `mysql:8.0`，本地无此镜像时需联网 pull）。E2E 会启动真实 Spring 上下文（RANDOM_PORT）+ 真实 Flyway 全量迁移 + 真实 HTTP 调用；通过 `gms.service.game-server-enabled=false`（`application-test.yml`）跳过 Netty 游戏服启动。无 Docker 环境时 E2E 自动跳过（`@Testcontainers(disabledWithoutDocker = true)`），纯单测不受影响。E2E 红线：禁止调用 `/server/v1/*` 生命周期接口、禁止触碰 `Server.getInstance()`、禁止改动 `game_config` 中 type="world" 的行。测试基类 `org.gms.test.e2e.support.AbstractMySQLE2ETest` 提供共享容器/登录/HTTP 辅助。
 
 ### 前端 gms-ui
 - Node 20.15.0 LTS + Yarn。

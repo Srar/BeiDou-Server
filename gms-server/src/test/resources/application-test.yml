@@ -1,0 +1,15 @@
+# E2E 集成测试专用配置（@ActiveProfiles("test") 激活，覆盖主 application.yml 同键）
+# 数据库连接信息由 AbstractMySQLE2ETest 的 @DynamicPropertySource 从 Testcontainers 容器注入，不在此写死。
+gms:
+  service:
+    # 集成测试不拉起 Netty 游戏服，只验证 Spring/REST/Flyway/MyBatis 链路
+    game-server-enabled: false
+    language: zh-CN
+    rate-limit:
+      enabled: false
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false

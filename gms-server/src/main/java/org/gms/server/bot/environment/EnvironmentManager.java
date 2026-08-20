@@ -44,8 +44,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 /**
@@ -1304,7 +1306,9 @@ public final class EnvironmentManager {
     private static String fmt(String template, Object... args) {
         String s = template;
         for (Object a : args) {
-            s = s.replaceFirst("\\{\\}", a == null ? "null" : a.toString());
+            // replacement 中的 $ 和 \ 会被 replaceFirst 当正则组引用解析，异常消息等任意文本
+            // 一旦含 $ 就抛 Illegal group reference 并吞掉原始异常——必须 quoteReplacement。
+            s = s.replaceFirst("\\{\\}", Matcher.quoteReplacement(a == null ? "null" : a.toString()));
         }
         return s;
     }

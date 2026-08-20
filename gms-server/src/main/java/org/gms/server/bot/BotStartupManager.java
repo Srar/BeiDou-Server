@@ -53,7 +53,9 @@ public final class BotStartupManager {
     }
 
     /**
-     * 服务器启动完成后调用（挂 ServerManager.run 的 Server.init 之后）。
+     * 游戏服（重新）初始化完成后调用：由 {@link org.gms.net.server.Server#init()} 末尾统一触发，
+     * 覆盖 Spring 启动（ServerManager → Server.init）与后台 REST in-place 重启
+     * （restartServer / stopServer+startServer → shutdownInternal → init）两种路径。
      * 先注册进图响应订阅者（无论是否开启批量生成），再按配置生成 bot。
      * 整体兜底捕获：bot 属实验性功能，任何配置/生成异常都不允许中断游戏服启动。
      */

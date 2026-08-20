@@ -68,13 +68,35 @@ final class GCMovementDriver {
     private static final long PROFILE_REFRESH_INTERVAL_MS = 20_000;
 
     private static final AtomicInteger THREAD_SEQ = new AtomicInteger();
-    private static final ScheduledExecutorService POOL = Executors.newScheduledThreadPool(
-            Math.max(2, Runtime.getRuntime().availableProcessors() / 2),
-            r -> {
-                Thread t = new Thread(r, "gcmove-tick-" + THREAD_SEQ.getAndIncrement());
-                t.setDaemon(true);
-                return t;
-            });
+    // volatile + 惰性重建：in-place 重启（Server.shutdownInternal → init）时 shutdownPool 会 shutdownNow 旧池，
+    // 静态 final 池将永久 Terminated——重启后新 bots 的 enable/schedule 全部抛 RejectedExecutionException，
+    // 并中断环境 9 波的 spawn 任务（历史表现为重启后各波 bot 数量锐减）。
+    private static volatile ScheduledExecutorService POOL = createPool();
+
+    private static ScheduledExecutorService createPool() {
+        return Executors.newScheduledThreadPool(
+                Math.max(2, Runtime.getRuntime().availableProcessors() / 2),
+                r -> {
+                    Thread t = new Thread(r, "gcmove-tick-" + THREAD_SEQ.getAndIncrement());
+                    t.setDaemon(true);
+                    return t;
+                });
+    }
+
+    /** 取当前可用调度池；已被停机钩子关停（Terminated）时惰性重建。 */
+    private static ScheduledExecutorService currentPool() {
+        ScheduledExecutorService pool = POOL;
+        if (pool.isShutdown() || pool.isTerminated()) {
+            synchronized (GCMovementDriver.class) {
+                pool = POOL;
+                if (pool.isShutdown() || pool.isTerminated()) {
+                    pool = createPool();
+                    POOL = pool;
+                }
+            }
+        }
+        return pool;
+    }
 
     static void start(BotMovementState entry) {
         stop(entry);
@@ -90,7 +112,7 @@ final class GCMovementDriver {
         }
     }
 
-    /* 停机钩子：关停 tick 线程池（shutdownNow），清掉残留调度器。 */
+    /* 停机钩子：关停 tick 线程池（shutdownNow），清掉残留调度器。下一次 schedule 经 currentPool 惰性重建。 */
     static void shutdownPool() {
         POOL.shutdownNow();
     }
@@ -108,7 +130,7 @@ final class GCMovementDriver {
         if (entry.tickStopped) {
             return;
         }
-        entry.task = POOL.schedule(() -> {
+        entry.task = currentPool().schedule(() -> {
             safeTick(entry);
             scheduleNext(entry, nextDelayMs(entry));
         }, delayMs, TimeUnit.MILLISECONDS);

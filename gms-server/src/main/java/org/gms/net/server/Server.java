@@ -60,6 +60,7 @@ import org.gms.server.SkillbookInformationProvider;
 import org.gms.server.ThreadManager;
 import org.gms.server.TimerManager;
 import org.gms.server.bot.BotGeneration;
+import org.gms.server.bot.BotStartupManager;
 import org.gms.server.bot.BotTickService;
 import org.gms.server.bot.BotTypeManager;
 import org.gms.server.bot.decorate.BotDecorationQueue;
@@ -683,6 +684,10 @@ public class Server {
         Instant beforeInit = Instant.now();
         log.info(I18nUtil.getLogMessage("Server.init.info1"), ServerConstants.VERSION);
 
+        // 重载动态配置：GameConfig 为 JVM 内存单例，进程内原地重启（REST restartServer / stop+start）
+        // 不会自动重读 game_config 表；直接改库后原地重启需显式重载，否则后续读取仍是旧值。
+        GameConfig.reload();
+
         // 发送信件
         registerChannelDependencies();
 
@@ -775,6 +780,11 @@ public class Server {
         }
         log.info(I18nUtil.getLogMessage("Server.init.info8"));
         online = true;
+        // Bot 框架：游戏服每次（重新）初始化完成后按 game_config 配置启动 bot。
+        // 挂在这里而非 Spring ApplicationRunner，保证后台 REST 的 restartServer / stopServer+startServer
+        // 等 in-place 重启路径同样触发（spawn_on_startup=true 的环境模式对应自动执行 !env loadenv 的 9 波生成）。
+        // 环境模式由 EnvironmentManager 的防重复 guard 拦截重复执行，简单模式由 stopAllBots 清场后重新生成。
+        BotStartupManager.startup();
         Duration initDuration = Duration.between(beforeInit, Instant.now());
         log.info(I18nUtil.getLogMessage("Server.init.info9"), initDuration.toMillis() / 1000.0);
     }

@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.gms.ServerApplication;
 import org.gms.constants.net.ServerConstants;
 import org.gms.net.server.Server;
-import org.gms.server.bot.BotStartupManager;
 import org.gms.util.I18nUtil;
 import org.springdoc.core.properties.SpringDocConfigProperties;
 import org.springdoc.core.properties.SwaggerUiConfigProperties;
@@ -28,6 +27,13 @@ public class ServerManager implements ApplicationContextAware, ApplicationRunner
     @Getter
     private static ApplicationContext applicationContext;
 
+    /**
+     * 是否拉起 Netty 游戏服（Server.init/shutdownInternal）。
+     * 由 {@code gms.service.game-server-enabled} 控制，缺省 true 保持生产行为；
+     * 集成测试置 false，仅保留 Spring/REST 链路与静态 applicationContext 桥接。
+     */
+    private boolean gameServerEnabled = true;
+
     @Override
     public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
         ServerManager.applicationContext = applicationContext;
@@ -35,14 +41,16 @@ public class ServerManager implements ApplicationContextAware, ApplicationRunner
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        Server.getInstance().init();
-
-        // Bot 框架：游戏服就绪后按配置批量生成人工玩家（默认关闭）
-        BotStartupManager.startup();
+        Environment environment = applicationContext.getBean(Environment.class);
+        gameServerEnabled = Boolean.TRUE.equals(environment.getProperty("gms.service.game-server-enabled", Boolean.class, true));
+        if (gameServerEnabled) {
+            // Bot 启动编排已由 Server.init 末尾统一触发（BotStartupManager.startup），
+            // 覆盖 Spring 启动与后台 REST in-place 重启两种路径，此处不再单独调用。
+            Server.getInstance().init();
+        }
 
         SpringDocConfigProperties springDocConfigProperties = applicationContext.getBean(SpringDocConfigProperties.class);
         SwaggerUiConfigProperties swaggerUiConfigProperties = applicationContext.getBean(SwaggerUiConfigProperties.class);
-        Environment environment = applicationContext.getBean(Environment.class);
         log.info(I18nUtil.getLogMessage("ServerManager.run.info3"), ServerConstants.BEI_DOU_VERSION, ServerConstants.BEI_DOU_BUILD_TIME);
         if (springDocConfigProperties.getApiDocs().isEnabled() && swaggerUiConfigProperties.isEnabled()) {
             log.info(I18nUtil.getLogMessage("ServerManager.run.info1"), InetAddress.getLocalHost().getHostAddress(), environment.getProperty("server.port"));
@@ -57,6 +65,8 @@ public class ServerManager implements ApplicationContextAware, ApplicationRunner
 
     @Override
     public void destroy() throws Exception {
-        Server.getInstance().shutdownInternal(false);
+        if (gameServerEnabled) {
+            Server.getInstance().shutdownInternal(false);
+        }
     }
 }

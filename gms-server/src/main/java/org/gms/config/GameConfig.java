@@ -28,6 +28,20 @@ public class GameConfig {
         gameConfigDOS.forEach(gameConfigDO -> add(this, gameConfigDO));
     }
 
+    /**
+     * 从 game_config 表全量重载内存树（清空后重建）。
+     * <p>
+     * 本类是 JVM 内存单例，进程内原地重启游戏服（REST restartServer / stop+start）不会自动重读
+     * 数据库；运营直接改库（不走管理后台接口的热更新链路）后原地重启将读到旧值。游戏服每次
+     * 初始化（Server.init）开头调用本方法，保证后续读取基于最新库值。
+     */
+    public static void reload() {
+        ConfigService configService = ServerManager.getApplicationContext().getBean(ConfigService.class);
+        List<GameConfigDO> gameConfigDOS = configService.loadGameConfigs();
+        config.properties.clear();
+        gameConfigDOS.forEach(gameConfigDO -> add(config, gameConfigDO));
+    }
+
     public static void add(GameConfigDO gameConfigDO) {
         add(config, gameConfigDO);
     }
